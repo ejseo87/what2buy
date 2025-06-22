@@ -4,3 +4,9 @@
 # React Router
 /.react-router/
 /build/
+
+# macOS metadata files
+._*
+.DS_Store?
+ehthumbs.db
+Thumbs.db
