@@ -1,0 +1,140 @@
+import { Link } from "react-router";
+import { Separator } from "./ui/separator";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "./ui/navigation-menu";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+const menus = [
+  {
+    name: "Histories",
+    to: "/histories",
+    items: [
+      {
+        name: "Latest",
+        to: "/histories?sort=latest",
+        description: "Latest recommendations",
+      },
+      {
+        name: "All Recommendations",
+        to: "/histories",
+        description: "list of all recommendations",
+      },
+      {
+        name: "Recommended Stocks",
+        to: "/histories/stocks",
+        description: "list of recommended stocks",
+      },
+      {
+        name: "Search",
+        to: "/histories/search",
+        description: "search for a recommendation",
+      },
+    ],
+  },
+  {
+    name: "Tickets",
+    to: "/users/tickets",
+    items: [
+      {
+        name: "Tickets",
+        to: "/users/tickets",
+        description:
+          "List of your tickets with the state whether it is used or not",
+      },
+      {
+        name: "Buy Tickets",
+        to: "/users/tickets/buy",
+        description: "buy tickets",
+      },
+    ],
+  },
+];
+
+export default function Navigation({ isLoggin }: { isLoggin: boolean }) {
+  return (
+    <nav className="flex px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
+      <div className="flex items-center">
+        <Link to="/" className="font-bold tracking-tight text-lg">
+          what2buy
+        </Link>
+        <Separator orientation="vertical" className="h-6 mx-4" />
+        <NavigationMenu>
+          <NavigationMenuList>
+            {menus.map((menu) => (
+              <NavigationMenuItem key={menu.name}>
+                <NavigationMenuTrigger>{menu.name}</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[500px] font-light gap-3 p-4 grid-cols-2">
+                    {menu.items.map((item) => (
+                      <NavigationMenuItem key={item.name}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="p-3 space-y-1 block leading-none no-underline outline-none"
+                            to={item.to}
+                          >
+                            <span className="text-sm font-medium leading-none">
+                              {item.name}
+                            </span>
+                            <p className="text-sm text-muted-foreground">
+                              {item.description}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+      <div>
+        {isLoggin ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel className="flex flex-col space-y-1">
+                <span className="font-medium">John Doe</span>
+                <span className="text-xs text-muted-foreground">@username</span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Button variant="secondary" asChild>
+              <Link to="/login">Login</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/join">Join</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
