@@ -18,6 +18,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  BellIcon,
+  LogOutIcon,
+  MessageCircleIcon,
+  MessageCircleQuestionIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
 
 const menus = [
   {
@@ -65,7 +73,15 @@ const menus = [
   },
 ];
 
-export default function Navigation({ isLoggin }: { isLoggin: boolean }) {
+export default function Navigation({
+  isLoggedIn,
+  hasNotifications,
+  hasMessages,
+}: {
+  isLoggedIn: boolean;
+  hasNotifications: boolean;
+  hasMessages: boolean;
+}) {
   return (
     <nav className="flex px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
       <div className="flex items-center">
@@ -104,33 +120,74 @@ export default function Navigation({ isLoggin }: { isLoggin: boolean }) {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      <div>
-        {isLoggin ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel className="flex flex-col space-y-1">
-                <span className="font-medium">John Doe</span>
-                <span className="text-xs text-muted-foreground">@username</span>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <div className="flex items-center gap-2">
+        {isLoggedIn ? (
+          <div className="flex items-center gap-2">
+            <Button size="icon" variant="ghost" asChild className="relative">
+              <Link to="/my/notifications">
+                <BellIcon className="size-4" />
+              </Link>
+              {hasNotifications && (
+                <span className="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full" />
+              )}
+            </Button>
+            <Button size="icon" variant="ghost" asChild className="relative">
+              <Link to="/my/messages">
+                <MessageCircleIcon className="size-4" />
+              </Link>
+              {hasMessages && (
+                <span className="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full" />
+              )}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel className="flex flex-col space-y-1">
+                  <span className="font-medium">John Doe</span>
+                  <span className="text-xs text-muted-foreground">
+                    @username
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Link to="/users/profile">
+                    <UserIcon className="size-4 mr-2" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/users/settings">
+                    <SettingsIcon className="size-4 mr-2" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/users/support">
+                    <MessageCircleQuestionIcon className="size-4 mr-2" />
+                    Support
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/auth/logout">
+                    <LogOutIcon className="size-4 mr-2" />
+                    Logout
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         ) : (
           <div className="flex items-center gap-4">
             <Button variant="secondary" asChild>
-              <Link to="/login">Login</Link>
+              <Link to="/auth/login">Login</Link>
             </Button>
             <Button asChild>
-              <Link to="/join">Join</Link>
+              <Link to="/auth/join">Join</Link>
             </Button>
           </div>
         )}
