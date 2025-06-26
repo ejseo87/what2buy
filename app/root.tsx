@@ -11,6 +11,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import Navigation from "./common/components/Navigation";
+import { Settings } from "luxon";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,6 +27,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  Settings.defaultLocale = "ko";
+  Settings.defaultZone = "Asia/Seoul";
   return (
     <html lang="en" className="">
       <head>
@@ -49,9 +52,9 @@ export default function App() {
     <div className={pathname.includes("/auth/") ? "" : "py-28 px-20"}>
       {pathname.includes("/auth") ? null : (
         <Navigation
-          isLoggedIn={false}
-          hasNotifications={false}
-          hasMessages={false}
+          isLoggedIn={true}
+          hasNotifications={true}
+          hasMessages={true}
         />
       )}
       <Outlet />

@@ -26,6 +26,7 @@ import {
   SettingsIcon,
   UserIcon,
 } from "lucide-react";
+import { cn } from "~/lib/utils";
 
 const menus = [
   {
@@ -126,18 +127,19 @@ export default function Navigation({
             <Button size="icon" variant="ghost" asChild className="relative">
               <Link to="/my/notifications">
                 <BellIcon className="size-4" />
+                {hasNotifications && (
+                  <span className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
+                )}
               </Link>
-              {hasNotifications && (
-                <span className="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full" />
-              )}
             </Button>
             <Button size="icon" variant="ghost" asChild className="relative">
               <Link to="/my/messages">
                 <MessageCircleIcon className="size-4" />
+
+                {hasMessages && (
+                  <span className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
+                )}
               </Link>
-              {hasMessages && (
-                <span className="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full" />
-              )}
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -154,25 +156,25 @@ export default function Navigation({
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/users/profile">
                     <UserIcon className="size-4 mr-2" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/users/settings">
                     <SettingsIcon className="size-4 mr-2" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/users/support">
                     <MessageCircleQuestionIcon className="size-4 mr-2" />
                     Support
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/auth/logout">
                     <LogOutIcon className="size-4 mr-2" />
                     Logout
