@@ -157,27 +157,21 @@ export default function Navigation({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to="/users/profile">
+                  <Link to="/my/profile">
                     <UserIcon className="size-4 mr-2" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to="/users/settings">
+                  <Link to="/my/settings">
                     <SettingsIcon className="size-4 mr-2" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to="/users/support">
+                  <Link to="/my/support">
                     <MessageCircleQuestionIcon className="size-4 mr-2" />
                     Support
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to="/auth/logout">
-                    <LogOutIcon className="size-4 mr-2" />
-                    Logout
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

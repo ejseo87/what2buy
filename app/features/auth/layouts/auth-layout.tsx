@@ -1,13 +1,16 @@
 import { Outlet } from "react-router";
+import { FlickeringGrid } from "~/common/components/magicui/flickering-grid";
 
 export default function AuthLayout() {
   return (
-    <div className="grid grid-cols-2 h-screen">
-      <div className="bg-gradient-to-br from-green-600 to-yellow-700 flex items-center justify-center">
-        <img
-          src="/images/tech_daily.jpg"
-          alt="What2Buy"
-          className="max-w-full max-h-full object-cover"
+    <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
+      <div>
+        <FlickeringGrid
+          squareSize={10}
+          gridGap={10}
+          color="#E92251"
+          maxOpacity={0.5}
+          flickerChance={0.2}
         />
       </div>
       <Outlet />

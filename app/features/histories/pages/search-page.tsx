@@ -1,20 +1,8 @@
 import type { Route } from "./+types/search-page";
 
-export function loader({ request }: Route.LoaderArgs) {
-  return {
-    // Add loader data here
-  };
-}
-
-export function action({ request }: Route.ActionArgs) {
-  return {
-    // Add action data here
-  };
-}
-
-export function meta() {
+export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Search - What2Buy" },
+    { title: "Search |What2Buy" },
     {
       name: "description",
       content: "Search recommendation history and stocks",
@@ -41,7 +29,7 @@ export default function SearchPage({
             />
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               Search
             </button>
