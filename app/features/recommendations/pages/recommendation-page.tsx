@@ -1,28 +1,13 @@
 import type { Route } from "./+types/recommendation-page";
 
-export function loader({ request }: Route.LoaderArgs) {
-  return {
-    // Add loader data here
-  };
-}
-
-export function action({ request }: Route.ActionArgs) {
-  return {
-    // Add action data here
-  };
-}
-
-export function meta() {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: "Request Recommendation - What2Buy" },
     { name: "description", content: "Request stock recommendations" },
   ];
-}
+};
 
-export default function RecommendationPage({
-  loaderData,
-  actionData,
-}: Route.ComponentProps) {
+export default function RecommendationPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Request Stock Recommendation</h1>

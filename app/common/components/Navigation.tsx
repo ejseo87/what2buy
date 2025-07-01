@@ -7,6 +7,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
 import { Button } from "./ui/button";
 import {
@@ -34,11 +35,6 @@ const menus = [
     to: "/histories",
     items: [
       {
-        name: "Latest",
-        to: "/histories?sort=latest",
-        description: "Latest recommendations",
-      },
-      {
         name: "All Recommendations",
         to: "/histories",
         description: "list of all recommendations",
@@ -56,18 +52,23 @@ const menus = [
     ],
   },
   {
+    name: "Recommendation",
+    to: "/recommendation",
+    description: "recommendation for some stocks",
+  },
+  {
     name: "Tickets",
-    to: "/users/tickets",
+    to: "/tickets",
     items: [
       {
         name: "Tickets",
-        to: "/users/tickets",
+        to: "/tickets",
         description:
           "List of your tickets with the state whether it is used or not",
       },
       {
         name: "Buy Tickets",
-        to: "/users/tickets/buy",
+        to: "/tickets/buy",
         description: "buy tickets",
       },
     ],
@@ -94,28 +95,36 @@ export default function Navigation({
           <NavigationMenuList>
             {menus.map((menu) => (
               <NavigationMenuItem key={menu.name}>
-                <NavigationMenuTrigger>{menu.name}</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[500px] font-light gap-3 p-4 grid-cols-2">
-                    {menu.items.map((item) => (
-                      <NavigationMenuItem key={item.name}>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            className="p-3 space-y-1 block leading-none no-underline outline-none"
-                            to={item.to}
-                          >
-                            <span className="text-sm font-medium leading-none">
-                              {item.name}
-                            </span>
-                            <p className="text-sm text-muted-foreground">
-                              {item.description}
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </NavigationMenuItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
+                {menu.items ? (
+                  <>
+                    <NavigationMenuTrigger>{menu.name}</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[500px] font-light gap-3 p-4 grid-cols-2">
+                        {menu.items?.map((item) => (
+                          <NavigationMenuItem key={item.name}>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                className="p-3 space-y-1 block leading-none no-underline outline-none"
+                                to={item.to}
+                              >
+                                <span className="text-sm font-medium leading-none">
+                                  {item.name}
+                                </span>
+                                <p className="text-sm text-muted-foreground">
+                                  {item.description}
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </NavigationMenuItem>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </>
+                ) : (
+                  <Link className={navigationMenuTriggerStyle()} to={menu.to}>
+                    {menu.name}
+                  </Link>
+                )}
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
@@ -128,15 +137,6 @@ export default function Navigation({
               <Link to="/my/notifications">
                 <BellIcon className="size-4" />
                 {hasNotifications && (
-                  <span className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
-                )}
-              </Link>
-            </Button>
-            <Button size="icon" variant="ghost" asChild className="relative">
-              <Link to="/my/messages">
-                <MessageCircleIcon className="size-4" />
-
-                {hasMessages && (
                   <span className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
                 )}
               </Link>

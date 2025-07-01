@@ -26,9 +26,15 @@ export default [
 
   // Recommendation request
   route(
-    "recommendation",
+    "/recommendation",
     "features/recommendations/pages/recommendation-page.tsx"
   ),
+
+  // Ticket details and buy tickets
+  ...prefix("/tickets", [
+    index("features/tickets/pages/tickets-page.tsx"),
+    route("/buy", "features/tickets/pages/buy-tickets-page.tsx"),
+  ]),
 
   //auth
   ...prefix("/auth", [
@@ -51,8 +57,6 @@ export default [
 
   //:username
   ...prefix("/my", [
-
-   
     route("/profile", "features/users/pages/my-profile-page.tsx"),
     route("/settings", "features/users/pages/settings-page.tsx"),
     route("/notifications", "features/users/pages/notifications-page.tsx"),
