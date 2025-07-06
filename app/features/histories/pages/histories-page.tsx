@@ -1,6 +1,4 @@
-import { Button } from "~/common/components/ui/button";
 import type { Route } from "./+types/histories-page";
-
 import { Form, Link } from "react-router";
 import {
   DropdownMenu,

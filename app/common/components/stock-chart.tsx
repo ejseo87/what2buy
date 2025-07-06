@@ -1,7 +1,14 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
   Card,
@@ -17,6 +24,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "./ui/chart";
+import { Separator } from "./ui/separator";
 
 export const description = "A stock price line chart";
 
@@ -25,10 +33,11 @@ interface StockChartProps {
   description: string;
   chartData: Array<{ date: string; [key: string]: number | string }>;
   dataKey: string;
-  currentPrice: string;
-  changeAmount: string;
+  currentPrice: number;
+  changeAmount: number;
   changePercent: string;
-  referencePrice: string;
+  referencePrice: number;
+  recommendationDate: string;
 }
 export function StockChart({
   title,
@@ -39,9 +48,12 @@ export function StockChart({
   changeAmount,
   changePercent,
   referencePrice,
+  recommendationDate,
 }: StockChartProps) {
+  // Create a safe key for CSS variable
+  const safeDataKey = "stock";
   const chartConfig = {
-    [dataKey]: {
+    [safeDataKey]: {
       label: dataKey,
       color: "hsl(var(--primary))",
     },
@@ -73,35 +85,55 @@ export function StockChart({
               tickFormatter={(value) => value}
             />
             <YAxis
+              hide={true}
               dataKey={dataKey}
               domain={["dataMin-2000", "dataMax+2000"]}
-              hide={true}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.toLocaleString()}
             />
             <ChartTooltip
               cursor={true}
-              content={<ChartTooltipContent hideLabel />}
+              content={
+                <ChartTooltipContent
+                  hideLabel={false}
+                  labelFormatter={(label) => `날짜: ${label}`}
+                  formatter={(value, name) => [
+                    `${Number(value).toLocaleString()}원 ${name}`,
+                  ]}
+                />
+              }
             />
             <Line
               dataKey={dataKey}
               type="linear"
-              stroke={`var(--color-${dataKey})`}
+              stroke={`var(--color-${safeDataKey})`}
               strokeWidth={2}
-              dot={true}
+              dot={false}
+            />
+            <ReferenceLine
+              x={recommendationDate}
+              stroke="#ff6b6b"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              label={{ value: "추천일", position: "top" }}
             />
           </LineChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          추천일 종가 대비 {changeAmount} ({changePercent}){" "}
-          <TrendingUp className="h-4 w-4" />
+        <div className="flex flex-row gap-2 leading-none  font-bold">
+          추천일 종가 대비 {changeAmount.toLocaleString()}원 ({changePercent}%)
+          {parseFloat(changePercent) > 0 ? (
+            <TrendingUp className="size-5 text-green-500" />
+          ) : (
+            <TrendingDown className="size-5 text-red-500" />
+          )}
         </div>
-        <div className="text-muted-foreground leading-none">
-          현재가: {currentPrice} | 추천일 종가: {referencePrice}
+        <div className="flex flex-row justify-between w-full text-muted-foreground">
+          <span className="block">
+            추천일 종가: {referencePrice.toLocaleString()}원
+          </span>
+          <span className="block">
+            현재가: {currentPrice.toLocaleString()}원
+          </span>
         </div>
       </CardFooter>
     </Card>

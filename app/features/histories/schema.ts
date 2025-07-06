@@ -1,6 +1,7 @@
 import {
   bigint,
   date,
+  integer,
   numeric,
   pgTable,
   primaryKey,
@@ -27,6 +28,36 @@ export const stocks = pgTable("stocks", {
   updated_at: timestamp().notNull().defaultNow(),
 });
 
+/**
+- `stock_code` (string) : 상장회사인 경우 종목코드 6자리
+- `date` (date) : 날짜
+- `Open` (integer) : 시작가격
+- `High` (integer) : 최고가
+- `Low` (integer) : 최저가
+- `Close` (integer) : 종가
+- `Volume` (long integer) : 거래량
+- `change` (float) : 변동
+
+ */
+
+export const daily_stocks = pgTable(
+  "daily_stocks",
+  {
+    stock_id: bigint({ mode: "number" })
+      .references(() => stocks.stock_id)
+      .notNull(),
+    date: date().notNull(),
+    open: integer().notNull(),
+    high: integer().notNull(),
+    low: integer().notNull(),
+    close: integer().notNull(),
+    volume: bigint({ mode: "number" }).notNull(),
+    change: real().notNull(),
+    created_at: timestamp().notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.stock_id, table.date] })]
+);
+
 export const histories = pgTable("histories", {
   recommendation_id: bigint({ mode: "number" })
     .primaryKey()
@@ -37,9 +68,15 @@ export const histories = pgTable("histories", {
     .notNull(),
   ticket_id: bigint({ mode: "number" }).references(() => tickets.ticket_id),
   summary: text().notNull(),
-  stock1_id: bigint({ mode: "number" }).references(() => stocks.stock_id),
-  stock2_id: bigint({ mode: "number" }).references(() => stocks.stock_id),
-  stock3_id: bigint({ mode: "number" }).references(() => stocks.stock_id),
+  stock1_id: bigint({ mode: "number" })
+    .references(() => stocks.stock_id)
+    .notNull(),
+  stock2_id: bigint({ mode: "number" })
+    .references(() => stocks.stock_id)
+    .notNull(),
+  stock3_id: bigint({ mode: "number" })
+    .references(() => stocks.stock_id)
+    .notNull(),
   stock1_summary: text(),
   stock2_summary: text(),
   stock3_summary: text(),
