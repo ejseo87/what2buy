@@ -348,12 +348,27 @@ export type Database = {
           profile_id: string | null
           recommendation_date: string | null
           recommendation_id: number | null
+          stock1_dividend_per_share: number | null
           stock1_id: number | null
           stock1_name: string | null
+          stock1_pbr: number | null
+          stock1_per: number | null
+          stock1_roe: number | null
+          stock1_summary: string | null
+          stock2_dividend_per_share: number | null
           stock2_id: number | null
           stock2_name: string | null
+          stock2_pbr: number | null
+          stock2_per: number | null
+          stock2_roe: number | null
+          stock2_summary: string | null
+          stock3_dividend_per_share: number | null
           stock3_id: number | null
           stock3_name: string | null
+          stock3_pbr: number | null
+          stock3_per: number | null
+          stock3_roe: number | null
+          stock3_summary: string | null
           summary: string | null
         }
         Relationships: [

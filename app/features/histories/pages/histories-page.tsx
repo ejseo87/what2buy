@@ -106,15 +106,16 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ">
-            {loaderData.histories.map((history) => (
+            {loaderData.histories.map((history: any) => (
               <RecommendationCard
+                key={history.recommendation_id}
                 id={history.recommendation_id}
                 date={formatKoreanDate(history.recommendation_date)}
                 description={history.summary.slice(0, 500) + "..."}
                 stocks={[
-                  history.stock1_name,
-                  history.stock2_name,
-                  history.stock3_name,
+                  `Stock ${history.stock1_id}`,
+                  `Stock ${history.stock2_id}`,
+                  `Stock ${history.stock3_id}`,
                 ]}
               />
             ))}
