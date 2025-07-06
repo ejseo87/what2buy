@@ -1,66 +1,6 @@
 import client from "~/supa-client";
 import { histories, stocks, daily_stocks } from "./schema";
 
-export const getReturnRateInfo = async ({
-  stockId,
-  recommendationDate,
-}: {
-  stockId: number;
-  recommendationDate: string;
-}) => {
-  // recommendationDate를 YYYY-MM-DD 형식으로 변환
-  const recDate = recommendationDate.split("T")[0];
-
-  // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
-  const { data: recommendationPrice, error: recError } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .gte("date", recDate)
-    .order("date", { ascending: true })
-    .limit(1)
-    .single();
-
-  if (recError) {
-    console.log("Recommendation date error:", recError);
-    throw new Error("Failed to get recommendation date price");
-  }
-
-  // 가장 최근 날짜 주식 가격 가져오기
-  const { data: latestPrice, error: latestError } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .order("date", { ascending: false })
-    .limit(1)
-    .single();
-
-  if (latestError) {
-    console.log("Latest price error:", latestError);
-    throw new Error("Failed to get latest price");
-  }
-
-  return {
-    recommendationPrice: (recommendationPrice as any)?.close || 0,
-    recommendationDate: (recommendationPrice as any)?.date || recDate,
-    latestPrice: (latestPrice as any)?.close || 0,
-    latestDate:
-      (latestPrice as any)?.date || new Date().toISOString().split("T")[0],
-    profitAmount:
-      ((latestPrice as any)?.close || 0) -
-      ((recommendationPrice as any)?.close || 0),
-    profitRate:
-      (recommendationPrice as any)?.close > 0
-        ? (
-            (((latestPrice as any)?.close -
-              (recommendationPrice as any)?.close) /
-              (recommendationPrice as any)?.close) *
-            100
-          ).toFixed(2)
-        : "0.00",
-  };
-};
-
 export const getHistory = async (recommendation_id: string) => {
   const { data: history, error } = await client
     .from("recommendation_stocks_view")
@@ -171,4 +111,156 @@ export const getDailyPricesByStockId = async ({
   const sortedPrices = daily_prices?.reverse() || [];
   //console.log(sortedPrices);
   return sortedPrices;
+};
+export const getReturnRateInfo = async ({
+  stockId,
+  recommendationDate,
+}: {
+  stockId: number;
+  recommendationDate: string;
+}) => {
+  // recommendationDate를 YYYY-MM-DD 형식으로 변환
+  const recDate = recommendationDate.split("T")[0];
+
+  // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
+  const { data: recommendationPrice, error: recError } = await client
+    .from("daily_stocks")
+    .select("date, close")
+    .eq("stock_id", stockId)
+    .gte("date", recDate)
+    .order("date", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (recError) {
+    console.log("Recommendation date error:", recError);
+    throw new Error("Failed to get recommendation date price");
+  }
+
+  // 가장 최근 날짜 주식 가격 가져오기
+  const { data: latestPrice, error: latestError } = await client
+    .from("daily_stocks")
+    .select("date, close")
+    .eq("stock_id", stockId)
+    .order("date", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (latestError) {
+    console.log("Latest price error:", latestError);
+    throw new Error("Failed to get latest price");
+  }
+
+  return {
+    recommendationPrice: (recommendationPrice as any)?.close || 0,
+    recommendationDate: (recommendationPrice as any)?.date || recDate,
+    latestPrice: (latestPrice as any)?.close || 0,
+    latestDate:
+      (latestPrice as any)?.date || new Date().toISOString().split("T")[0],
+    profitAmount:
+      ((latestPrice as any)?.close || 0) -
+      ((recommendationPrice as any)?.close || 0),
+    profitRate:
+      (recommendationPrice as any)?.close > 0
+        ? (
+            (((latestPrice as any)?.close -
+              (recommendationPrice as any)?.close) /
+              (recommendationPrice as any)?.close) *
+            100
+          ).toFixed(2)
+        : "0.00",
+  };
+};
+
+export const getStocksList = async ({
+  limit,
+  sorting,
+  keyword,
+}: {
+  limit: number;
+  sorting: "asc" | "desc";
+  keyword: string;
+}) => {
+  // 먼저 모든 데이터를 가져온 후 JavaScript에서 그룹화
+  let query = client.from("stocks_list_view").select(`
+      stock_id,
+      stock_name,
+      stock_code,
+      recommendation_date,
+      per,
+      pbr,
+      roe
+    `);
+
+  if (keyword) {
+    query = query.ilike("stock_name", `%${keyword}%`);
+  }
+
+  const { data: raw_data, error } = await query;
+
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get stocks list");
+  }
+
+  if (!raw_data) {
+    return [];
+  }
+
+  // JavaScript에서 주식별로 그룹화
+  const groupedStocks = raw_data.reduce((acc: any, item: any) => {
+    const stockId = item.stock_id;
+
+    if (!acc[stockId]) {
+      acc[stockId] = {
+        stock_id: item.stock_id,
+        stock_name: item.stock_name,
+        stock_code: item.stock_code,
+        per: item.per,
+        pbr: item.pbr,
+        roe: item.roe,
+        recommendation_count: 0,
+        recommendation_dates: [],
+        latest_recommendation_date: null,
+      };
+    }
+
+    acc[stockId].recommendation_count += 1;
+    if (item.recommendation_date) {
+      acc[stockId].recommendation_dates.push(item.recommendation_date);
+
+      // 가장 최근 추천일 업데이트
+      if (
+        !acc[stockId].latest_recommendation_date ||
+        new Date(item.recommendation_date) >
+          new Date(acc[stockId].latest_recommendation_date)
+      ) {
+        acc[stockId].latest_recommendation_date = item.recommendation_date;
+      }
+    }
+
+    return acc;
+  }, {});
+
+  // 객체를 배열로 변환
+  let stocks_list = Object.values(groupedStocks);
+
+  // 정렬 (stock_name 기준)
+  const isAscending = sorting === "asc"; 
+  stocks_list = stocks_list.sort((a: any, b: any) => {
+    const nameA = a.stock_name || "";
+    const nameB = b.stock_name || "";
+
+    if (isAscending) {
+      return nameA.localeCompare(nameB, "ko"); // 올림차순 (A->Z)
+    } else {
+      return nameB.localeCompare(nameA, "ko"); // 내림차순 (Z->A)
+    }
+  });
+
+  // 제한
+  stocks_list = stocks_list.slice(0, limit);
+
+  console.log(stocks_list);
+  return stocks_list;
 };

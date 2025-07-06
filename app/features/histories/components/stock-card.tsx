@@ -7,38 +7,48 @@ import {
 } from "~/common/components/ui/card";
 import { Badge } from "~/common/components/ui/badge";
 import { Link } from "react-router";
+import { formatKoreanDate } from "~/common/utils";
 
 interface StockCardProps {
-  id: number;
+  stockId: number;
   stockName: string;
+  stockCode: string;
   recommendationCount: number;
   recommendationDates: string[];
-  description?: string;
+  per: number;
+  pbr: number;
+  roe: number;
 }
 
 export function StockCard({
-  id,
+  stockId,
   stockName,
+  stockCode,
   recommendationCount,
   recommendationDates,
-  description = "자세한 내역을 보려면 카드를 클릭해주세요.",
+  per,
+  pbr,
+  roe,
 }: StockCardProps) {
   return (
-    <Link to={`/histories/stocks/${id}`}>
+    <Link to={`/histories/stocks/${stockId}`}>
       <Card className="space-y-2 w-full max-w-screen-full">
         <CardHeader className="flex flex-row gap-5  justify-start items-center">
-          <CardTitle className="text-xl font-bold">{stockName}</CardTitle>
-          <Badge variant="outline" className="text-bold text-sm">
+          <CardTitle className="text-xl font-bold">
+            {stockName} ({stockCode})
+          </CardTitle>
+          <Badge className="text-bold text-lg">
             {recommendationCount}회 추천됨
           </Badge>
-          <CardDescription className="text-right text-sm text-muted-foreground">
-            {description}
+          <CardDescription className="text-sm">
+            <span className="text-lg py-2 px-5">PER : {per}</span>
+            <span className="text-lg py-2 px-5">PBR : {pbr}</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-row gap-5 items-center">
           {recommendationDates.map((date) => (
-            <Badge key={date} variant="outline" className="text-lg py-2 px-5">
-              {date}
+            <Badge key={date} variant="secondary" className="text-lg py-2 px-5">
+              {formatKoreanDate(date)}
             </Badge>
           ))}
         </CardContent>

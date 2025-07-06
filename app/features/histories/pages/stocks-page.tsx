@@ -12,8 +12,9 @@ import { Input } from "~/common/components/ui/input";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import type { Route } from "./+types/stocks-page";
 import { StockCard } from "../components/stock-card";
-
-export const SORT_OPTIONS = ["최신순", "오래된순"] as const;
+import { STOCK_SORT_OPTIONS } from "../constants";
+import { z } from "zod";
+import { getStocksList } from "../queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -22,9 +23,33 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export default function StocksPage() {
+const searchParamsSchema = z.object({
+  sorting: z.enum(["asc", "desc"]).optional().default("asc"),
+  keyword: z.string().optional().default(""),
+});
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const url = new URL(request.url);
+  const { success, data: parsedData } = searchParamsSchema.safeParse(
+    Object.fromEntries(url.searchParams)
+  );
+  if (!success) {
+    throw new Error("Invalid search params");
+  }
+  const { sorting } = parsedData;
+
+  const stocks_list = await getStocksList({
+    limit: 20,
+    sorting,
+    keyword: parsedData.keyword,
+  });
+  return { stocks_list };
+};
+
+export default function StocksPage({ loaderData }: Route.ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const sorting = searchParams.get("sorting") || "newest";
+  const sorting = searchParams.get("sorting") || "asc";
+  const keyword = searchParams.get("keyword") || "";
 
   return (
     <div className="space-y-10">
@@ -43,7 +68,7 @@ export default function StocksPage() {
                     <ChevronDownIcon className="size-5" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {SORT_OPTIONS.map((option) => (
+                    {STOCK_SORT_OPTIONS.map((option) => (
                       <DropdownMenuCheckboxItem
                         className="capitalize cursor-pointer"
                         key={option}
@@ -63,8 +88,9 @@ export default function StocksPage() {
               <Form>
                 <Input
                   type="text"
-                  name="search"
+                  name="keyword"
                   placeholder="추천 이력을 키워드로 검색해보세요."
+                  defaultValue={keyword}
                 />
               </Form>
             </div>
@@ -78,17 +104,17 @@ export default function StocksPage() {
             </div>
           </div>
           <div className="flex flex-col gap-10">
-            {Array.from({ length: 10 }).map((_, index) => (
+            {(loaderData.stocks_list as any[]).map((stock) => (
               <StockCard
-                key={index}
-                id={index}
-                stockName="삼성전자"
-                recommendationCount={3}
-                recommendationDates={[
-                  "2025년 06월 01일",
-                  "2025년 06월 02일",
-                  "2025년 06월 03일",
-                ]}
+                key={stock.stock_id}
+                stockId={stock.stock_id}
+                stockName={stock.stock_name}
+                stockCode={stock.stock_code}
+                recommendationCount={stock.recommendation_count}
+                recommendationDates={stock.recommendation_dates}
+                per={stock.per}
+                pbr={stock.pbr}
+                roe={stock.roe}
               />
             ))}
           </div>
