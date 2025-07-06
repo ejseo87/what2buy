@@ -23,14 +23,14 @@ export function RecommendationCard({
 }: RecommendationCardProps) {
   return (
     <Link to={`/histories/${id}`} className="block">
-      <Card>
+      <Card className="flex flex-col justify-between h-full">
         <CardHeader>
           <CardTitle>{date}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-row gap-5">
+        <CardContent className="flex flex-row justify-between gap-3">
           {stocks.map((stock) => (
-            <Badge key={stock} variant="outline" className="text-xl">
+            <Badge key={stock} variant="secondary" className="text-sm">
               {stock}
             </Badge>
           ))}

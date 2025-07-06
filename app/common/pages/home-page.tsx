@@ -8,7 +8,7 @@ import {
   getStockOverview,
   latestRecommendation,
 } from "~/features/histories/queries";
-//export const description = "A line chart";
+
 const a_profile_id = "47cb62d9-c4b5-4d90-b661-165df9138afd";
 
 export const meta: Route.MetaFunction = () => {

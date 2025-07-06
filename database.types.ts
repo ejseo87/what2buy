@@ -165,6 +165,13 @@ export type Database = {
             referencedColumns: ["recommendation_id"]
           },
           {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_stocks_view"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
@@ -336,7 +343,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      recommendation_stocks_view: {
+        Row: {
+          profile_id: string | null
+          recommendation_date: string | null
+          recommendation_id: number | null
+          stock1_id: number | null
+          stock1_name: string | null
+          stock2_id: number | null
+          stock2_name: string | null
+          stock3_id: number | null
+          stock3_name: string | null
+          summary: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "histories_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

@@ -12,8 +12,12 @@ import { useSearchParams } from "react-router";
 import { Input } from "~/common/components/ui/input";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import { RecommendationCard } from "../components/recommedation-card";
+import { getHistories } from "../queries";
+import { formatKoreanDate } from "~/common/utils";
+import { z } from "zod";
+import { SORT_OPTIONS } from "../constants";
 
-export const SORT_OPTIONS = ["최신순", "오래된순"] as const;
+const a_profile_id = "47cb62d9-c4b5-4d90-b661-165df9138afd";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -22,7 +26,31 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export default function HistoriesPage() {
+const searchParamsSchema = z.object({
+  sorting: z.enum(["newest", "oldest"]).optional().default("newest"),
+  keyword: z.string().optional().default(""),
+});
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const url = new URL(request.url);
+  const { success, data: parsedData } = searchParamsSchema.safeParse(
+    Object.fromEntries(url.searchParams)
+  );
+  if (!success) {
+    throw new Error("Invalid search params");
+  }
+  const { sorting } = parsedData;
+
+  const histories = await getHistories({
+    profile_id: a_profile_id,
+    limit: 20,
+    sorting,
+    keyword: parsedData.keyword,
+  });
+  return { histories };
+};
+
+export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sorting = searchParams.get("sorting") || "newest";
 
@@ -63,7 +91,7 @@ export default function HistoriesPage() {
               <Form>
                 <Input
                   type="text"
-                  name="search"
+                  name="keyword"
                   placeholder="추천 이력을 키워드로 검색해보세요."
                 />
               </Form>
@@ -78,12 +106,16 @@ export default function HistoriesPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ">
-            {Array.from({ length: 10 }).map((_, index) => (
+            {loaderData.histories.map((history) => (
               <RecommendationCard
-                id={index}
-                date={`2025년 06월 ${index * 2 + 5} 일 추천 내역`}
-                description="대형주가 주도하는 추세이므로 대형주 위주로 추천"
-                stocks={["삼성전자", "현대차", "LG에너지솔루션"]}
+                id={history.recommendation_id}
+                date={formatKoreanDate(history.recommendation_date)}
+                description={history.summary.slice(0, 500) + "..."}
+                stocks={[
+                  history.stock1_name,
+                  history.stock2_name,
+                  history.stock3_name,
+                ]}
               />
             ))}
           </div>
