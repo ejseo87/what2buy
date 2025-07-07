@@ -179,96 +179,63 @@ export const getReturnRateInfo = async ({
 };
 
 export const getStocksList = async ({
-  limit,
+  profile_id,
+  page,
   sorting,
   keyword,
 }: {
-  limit: number;
+  profile_id: string;
+  page: number;
   sorting: "asc" | "desc";
   keyword: string;
 }) => {
-  // 먼저 모든 데이터를 가져온 후 JavaScript에서 그룹화
-  let query = client.from("stocks_list_view").select(`
-      stock_id,
-      stock_name,
-      stock_code,
-      recommendation_date,
-      per,
-      pbr,
-      roe
-    `);
+  const isAscending = sorting === "asc";
+  const baseQuery = client
+    .from("stock_card_list_view")
+    .select("*")
+    .eq("profile_id", profile_id)
+    .order("recommendation_count", { ascending: isAscending })
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
   if (keyword) {
-    query = query.ilike("stock_name", `%${keyword}%`);
+    baseQuery.or(`
+      stock_name.ilike.%${keyword}%, 
+      stock_code.ilike.%${keyword}%`);
   }
 
-  const { data: raw_data, error } = await query;
+  const { data: stocks_list, error } = await baseQuery;
 
   if (error) {
     console.log(error);
     throw new Error("Failed to get stocks list");
   }
 
-  if (!raw_data) {
-    return [];
+  return stocks_list;
+};
+
+export const getTotalPagesStocks = async ({
+  profile_id,
+  keyword,
+}: {
+  profile_id: string;
+  keyword: string;
+}) => {
+  const baseQuery = client
+    .from("stock_card_list_view")
+    .select("stock_id", { count: "exact", head: true })
+    .eq("profile_id", profile_id);
+
+  if (keyword) {
+    baseQuery.or(`
+      stock_name.ilike.%${keyword}%, 
+      stock_code.ilike.%${keyword}%`);
   }
 
-  // JavaScript에서 주식별로 그룹화
-  const groupedStocks = raw_data.reduce((acc: any, item: any) => {
-    const stockId = item.stock_id;
-
-    if (!acc[stockId]) {
-      acc[stockId] = {
-        stock_id: item.stock_id,
-        stock_name: item.stock_name,
-        stock_code: item.stock_code,
-        per: item.per,
-        pbr: item.pbr,
-        roe: item.roe,
-        recommendation_count: 0,
-        recommendation_dates: [],
-        latest_recommendation_date: null,
-      };
-    }
-
-    acc[stockId].recommendation_count += 1;
-    if (item.recommendation_date) {
-      acc[stockId].recommendation_dates.push(item.recommendation_date);
-
-      // 가장 최근 추천일 업데이트
-      if (
-        !acc[stockId].latest_recommendation_date ||
-        new Date(item.recommendation_date) >
-          new Date(acc[stockId].latest_recommendation_date)
-      ) {
-        acc[stockId].latest_recommendation_date = item.recommendation_date;
-      }
-    }
-
-    return acc;
-  }, {});
-
-  // 객체를 배열로 변환
-  let stocks_list = Object.values(groupedStocks);
-
-  // 정렬 (stock_name 기준)
-  const isAscending = sorting === "asc";
-  stocks_list = stocks_list.sort((a: any, b: any) => {
-    const nameA = a.stock_name || "";
-    const nameB = b.stock_name || "";
-
-    if (isAscending) {
-      return nameA.localeCompare(nameB, "ko"); // 올림차순 (A->Z)
-    } else {
-      return nameB.localeCompare(nameA, "ko"); // 내림차순 (Z->A)
-    }
-  });
-
-  // 제한
-  stocks_list = stocks_list.slice(0, limit);
-
-  console.log(stocks_list);
-  return stocks_list;
+  const { count, error } = await baseQuery;
+  if (error) throw error;
+  if (count === null) return 1;
+  //console.log(count);
+  return Math.ceil(count / PAGE_SIZE);
 };
 
 export const getTotalPages = async ({

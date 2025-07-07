@@ -53,6 +53,13 @@ export type Database = {
             foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
             referencedRelation: "stocks"
             referencedColumns: ["stock_id"]
           },
@@ -113,6 +120,13 @@ export type Database = {
             foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
             columns: ["stock1_id"]
             isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
             referencedRelation: "stocks"
             referencedColumns: ["stock_id"]
           },
@@ -120,7 +134,21 @@ export type Database = {
             foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
             columns: ["stock2_id"]
             isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
             referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
+            referencedRelation: "stock_card_list_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -175,6 +203,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "recommendation_stocks_view"
             referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
           },
           {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
@@ -388,7 +423,21 @@ export type Database = {
             foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
             columns: ["stock1_id"]
             isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
             referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
+            referencedRelation: "stock_card_list_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -402,8 +451,36 @@ export type Database = {
             foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
             columns: ["stock3_id"]
             isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
             referencedRelation: "stocks"
             referencedColumns: ["stock_id"]
+          },
+        ]
+      }
+      stock_card_list_view: {
+        Row: {
+          pbr: number | null
+          per: number | null
+          profile_id: string | null
+          recommendation_count: number | null
+          recommendation_dates: string[] | null
+          stock_code: string | null
+          stock_id: number | null
+          stock_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "histories_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -436,6 +513,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "recommendation_stocks_view"
             referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
           },
           {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"

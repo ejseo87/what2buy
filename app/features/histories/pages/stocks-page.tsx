@@ -14,7 +14,9 @@ import type { Route } from "./+types/stocks-page";
 import { StockCard } from "../components/stock-card";
 import { STOCK_SORT_OPTIONS } from "../constants";
 import { z } from "zod";
-import { getStocksList } from "../queries";
+import { getStocksList, getTotalPagesStocks } from "../queries";
+import { a_profile_id } from "~/common/constants";
+import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -26,24 +28,38 @@ export const meta: Route.MetaFunction = () => {
 const searchParamsSchema = z.object({
   sorting: z.enum(["asc", "desc"]).optional().default("asc"),
   keyword: z.string().optional().default(""),
+  page: z.coerce.number().optional().default(1),
 });
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const url = new URL(request.url);
-  const { success, data: parsedData } = searchParamsSchema.safeParse(
-    Object.fromEntries(url.searchParams)
-  );
-  if (!success) {
-    throw new Error("Invalid search params");
-  }
-  const { sorting } = parsedData;
+  try {
+    const url = new URL(request.url);
+    const { success, data: parsedData } = searchParamsSchema.safeParse(
+      Object.fromEntries(url.searchParams)
+    );
+    if (!success) {
+      throw new Error("Invalid search params");
+    }
 
-  const stocks_list = await getStocksList({
-    limit: 20,
-    sorting,
-    keyword: parsedData.keyword,
-  });
-  return { stocks_list };
+    const totalPages = await getTotalPagesStocks({
+      profile_id: a_profile_id,
+      keyword: parsedData.keyword,
+    });
+    if (parsedData.page > totalPages) {
+      throw new Error("Invalid page");
+    }
+
+    const stocks_list = await getStocksList({
+      profile_id: a_profile_id,
+      page: parsedData.page,
+      sorting: parsedData.sorting,
+      keyword: parsedData.keyword,
+    });
+    return { stocks_list, totalPages };
+  } catch (e) {
+    console.error("Loader error:", e);
+    throw e;
+  }
 };
 
 export default function StocksPage({ loaderData }: Route.ComponentProps) {
@@ -118,6 +134,7 @@ export default function StocksPage({ loaderData }: Route.ComponentProps) {
               />
             ))}
           </div>
+          <AllPurposesPagination totalPages={loaderData.totalPages} />
         </div>
       </div>
     </div>
