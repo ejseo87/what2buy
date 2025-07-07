@@ -12,12 +12,12 @@ import { useSearchParams } from "react-router";
 import { Input } from "~/common/components/ui/input";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import { RecommendationCard } from "../components/recommedation-card";
-import { getHistories } from "../queries";
+import { getHistories, getTotalPages } from "../queries";
 import { formatKoreanDate } from "~/common/utils";
 import { z } from "zod";
 import { SORT_OPTIONS } from "../constants";
-
-const a_profile_id = "47cb62d9-c4b5-4d90-b661-165df9138afd";
+import { a_profile_id } from "~/common/constants";
+import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -29,6 +29,7 @@ export const meta: Route.MetaFunction = () => {
 const searchParamsSchema = z.object({
   sorting: z.enum(["newest", "oldest"]).optional().default("newest"),
   keyword: z.string().optional().default(""),
+  page: z.coerce.number().optional().default(1),
 });
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -39,15 +40,26 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!success) {
     throw new Error("Invalid search params");
   }
-  const { sorting } = parsedData;
-
-  const histories = await getHistories({
+  const totalPages = await getTotalPages({
     profile_id: a_profile_id,
-    limit: 20,
-    sorting,
     keyword: parsedData.keyword,
   });
-  return { histories };
+  //console.log(totalPages);
+  if (parsedData.page > totalPages) {
+    throw new Error("Invalid page");
+  }
+  const histories = await getHistories({
+    profile_id: a_profile_id,
+    page: parsedData.page,
+    sorting: parsedData.sorting,
+    keyword: parsedData.keyword,
+  });
+  // 날짜 포맷팅 추가
+  const formattedHistories = histories.map((h) => ({
+    ...h,
+    formattedDate: formatKoreanDate(h.recommendation_date),
+  }));
+  return { histories: formattedHistories, totalPages };
 };
 
 export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
@@ -110,16 +122,17 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
               <RecommendationCard
                 key={history.recommendation_id}
                 id={history.recommendation_id}
-                date={formatKoreanDate(history.recommendation_date)}
+                date={history.formattedDate}
                 description={history.summary.slice(0, 500) + "..."}
                 stocks={[
-                  `Stock ${history.stock1_id}`,
-                  `Stock ${history.stock2_id}`,
-                  `Stock ${history.stock3_id}`,
+                  history.stock1_name,
+                  history.stock2_name,
+                  history.stock3_name,
                 ]}
               />
             ))}
           </div>
+          <AllPurposesPagination totalPages={loaderData.totalPages} />
         </div>
       </div>
     </div>

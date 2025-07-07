@@ -1,5 +1,22 @@
 import client from "~/supa-client";
 import { histories, stocks, daily_stocks } from "./schema";
+import { PAGE_SIZE } from "~/common/constants";
+
+export const latestRecommendation = async (profile_id: string) => {
+  const { data: lastest_history, error } = await client
+    .from("histories")
+    .select("*")
+    .eq("profile_id", profile_id)
+    .order("recommendation_date", { ascending: false })
+    .limit(1)
+    .single();
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get latest recommendation");
+  }
+  //console.log(lastest_history);
+  return lastest_history;
+};
 
 export const getHistory = async (recommendation_id: string) => {
   const { data: history, error } = await client
@@ -17,12 +34,12 @@ export const getHistory = async (recommendation_id: string) => {
 
 export const getHistories = async ({
   profile_id,
-  limit,
+  page,
   sorting,
   keyword,
 }: {
   profile_id: string;
-  limit: number;
+  page: number;
   sorting: "newest" | "oldest";
   keyword: string;
 }) => {
@@ -45,9 +62,13 @@ export const getHistories = async ({
     )
     .eq("profile_id", profile_id)
     .order("recommendation_date", { ascending: isAscending })
-    .limit(limit);
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   if (keyword) {
-    baseQuery.ilike("summary", `%${keyword}%`);
+    baseQuery.or(`
+      stock1_name.ilike.%${keyword}%, 
+      stock2_name.ilike.%${keyword}%,
+      stock3_name.ilike.%${keyword}%,
+      summary.ilike.%${keyword}%`);
   }
   const { data: histories, error } = await baseQuery;
   if (error) {
@@ -56,22 +77,6 @@ export const getHistories = async ({
   }
   //console.log(histories);
   return histories;
-};
-
-export const latestRecommendation = async (profile_id: string) => {
-  const { data: lastest_history, error } = await client
-    .from("histories")
-    .select("*")
-    .eq("profile_id", profile_id)
-    .order("recommendation_date", { ascending: false })
-    .limit(1)
-    .single();
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get latest recommendation");
-  }
-  //console.log(lastest_history);
-  return lastest_history;
 };
 
 export const getStockOverview = async (stockId: number) => {
@@ -112,6 +117,7 @@ export const getDailyPricesByStockId = async ({
   //console.log(sortedPrices);
   return sortedPrices;
 };
+
 export const getReturnRateInfo = async ({
   stockId,
   recommendationDate,
@@ -246,7 +252,7 @@ export const getStocksList = async ({
   let stocks_list = Object.values(groupedStocks);
 
   // 정렬 (stock_name 기준)
-  const isAscending = sorting === "asc"; 
+  const isAscending = sorting === "asc";
   stocks_list = stocks_list.sort((a: any, b: any) => {
     const nameA = a.stock_name || "";
     const nameB = b.stock_name || "";
@@ -263,4 +269,34 @@ export const getStocksList = async ({
 
   console.log(stocks_list);
   return stocks_list;
+};
+
+export const getTotalPages = async ({
+  profile_id,
+  keyword,
+}: {
+  profile_id: string;
+  keyword: string;
+}) => {
+  const baseQuery = client
+    .from("recommendation_stocks_view")
+    .select("recommendation_id", { count: "exact", head: true })
+    .eq("profile_id", profile_id);
+
+  if (keyword) {
+    baseQuery.or(
+      `
+      stock1_name.ilike.%${keyword}%, 
+      stock2_name.ilike.%${keyword}%,
+      stock3_name.ilike.%${keyword}%,
+      summary.ilike.%${keyword}%
+    `
+    );
+  }
+
+  const { count, error } = await baseQuery;
+  if (error) throw error;
+  if (count === null) return 1;
+  //console.log(count);
+  return Math.ceil(count / PAGE_SIZE);
 };

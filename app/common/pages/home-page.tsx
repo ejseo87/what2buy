@@ -1,6 +1,7 @@
 "use client";
 import { Hero } from "../components/hero";
 import { StockChart } from "../components/stock-chart";
+import { a_profile_id } from "../constants";
 import type { Route } from "./+types/home-page";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import {
@@ -9,7 +10,7 @@ import {
   latestRecommendation,
 } from "~/features/histories/queries";
 
-const a_profile_id = "47cb62d9-c4b5-4d90-b661-165df9138afd";
+
 
 export const meta: Route.MetaFunction = () => {
   return [
