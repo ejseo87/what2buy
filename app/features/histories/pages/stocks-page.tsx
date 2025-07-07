@@ -40,7 +40,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     if (!success) {
       throw new Error("Invalid search params");
     }
-
+    console.log("###", parsedData.page, parsedData.sorting, parsedData.keyword);
     const totalPages = await getTotalPagesStocks({
       profile_id: a_profile_id,
       keyword: parsedData.keyword,
@@ -48,6 +48,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     if (parsedData.page > totalPages) {
       throw new Error("Invalid page");
     }
+    console.log("***", parsedData.page, parsedData.sorting, parsedData.keyword);
+    console.log("***", totalPages);
 
     const stocks_list = await getStocksList({
       profile_id: a_profile_id,
@@ -57,7 +59,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     });
     return { stocks_list, totalPages };
   } catch (e) {
-    console.error("Loader error:", e);
+    console.error("Loader error:", JSON.stringify(e, null, 2), e?.stack);
     throw e;
   }
 };

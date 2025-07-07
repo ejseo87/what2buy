@@ -64,11 +64,9 @@ export const getHistories = async ({
     .order("recommendation_date", { ascending: isAscending })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   if (keyword) {
-    baseQuery.or(`
-      stock1_name.ilike.%${keyword}%, 
-      stock2_name.ilike.%${keyword}%,
-      stock3_name.ilike.%${keyword}%,
-      summary.ilike.%${keyword}%`);
+    baseQuery.or(
+      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,summary.ilike.%${keyword}%`
+    );
   }
   const { data: histories, error } = await baseQuery;
   if (error) {
@@ -194,13 +192,11 @@ export const getStocksList = async ({
     .from("stock_card_list_view")
     .select("*")
     .eq("profile_id", profile_id)
-    .order("recommendation_count", { ascending: isAscending })
+    .order("stock_name", { ascending: isAscending })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
   if (keyword) {
-    baseQuery.or(`
-      stock_name.ilike.%${keyword}%, 
-      stock_code.ilike.%${keyword}%`);
+    baseQuery.or(`stock_name.ilike.%${keyword}%,stock_code.ilike.%${keyword}%`);
   }
 
   const { data: stocks_list, error } = await baseQuery;
@@ -220,15 +216,13 @@ export const getTotalPagesStocks = async ({
   profile_id: string;
   keyword: string;
 }) => {
-  const baseQuery = client
+  let baseQuery = client
     .from("stock_card_list_view")
     .select("stock_id", { count: "exact", head: true })
     .eq("profile_id", profile_id);
 
   if (keyword) {
-    baseQuery.or(`
-      stock_name.ilike.%${keyword}%, 
-      stock_code.ilike.%${keyword}%`);
+    baseQuery.or(`stock_name.ilike.%${keyword}%,stock_code.ilike.%${keyword}%`);
   }
 
   const { count, error } = await baseQuery;
@@ -252,12 +246,7 @@ export const getTotalPages = async ({
 
   if (keyword) {
     baseQuery.or(
-      `
-      stock1_name.ilike.%${keyword}%, 
-      stock2_name.ilike.%${keyword}%,
-      stock3_name.ilike.%${keyword}%,
-      summary.ilike.%${keyword}%
-    `
+      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,summary.ilike.%${keyword}%`
     );
   }
 
