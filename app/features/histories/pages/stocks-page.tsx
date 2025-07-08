@@ -12,7 +12,7 @@ import { Input } from "~/common/components/ui/input";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import type { Route } from "./+types/stocks-page";
 import { StockCard } from "../components/stock-card";
-import { STOCK_SORT_OPTIONS } from "../constants";
+import { STOCK_SORT_OPTIONS } from "~/common/constants";
 import { z } from "zod";
 import { getStocksList, getTotalPagesStocks } from "../queries";
 import { a_profile_id } from "~/common/constants";
@@ -40,7 +40,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     if (!success) {
       throw new Error("Invalid search params");
     }
-    console.log("###", parsedData.page, parsedData.sorting, parsedData.keyword);
     const totalPages = await getTotalPagesStocks({
       profile_id: a_profile_id,
       keyword: parsedData.keyword,
@@ -48,9 +47,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     if (parsedData.page > totalPages) {
       throw new Error("Invalid page");
     }
-    console.log("***", parsedData.page, parsedData.sorting, parsedData.keyword);
-    console.log("***", totalPages);
-
     const stocks_list = await getStocksList({
       profile_id: a_profile_id,
       page: parsedData.page,

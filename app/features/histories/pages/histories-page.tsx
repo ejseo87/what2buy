@@ -15,7 +15,7 @@ import { RecommendationCard } from "../components/recommedation-card";
 import { getHistories, getTotalPages } from "../queries";
 import { formatKoreanDate } from "~/common/utils";
 import { z } from "zod";
-import { SORT_OPTIONS } from "../constants";
+import { SORT_OPTIONS } from "~/common/constants";
 import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 
