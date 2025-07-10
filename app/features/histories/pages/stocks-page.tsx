@@ -17,6 +17,7 @@ import { z } from "zod";
 import { getStocksList, getTotalPagesStocks } from "../queries";
 import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -32,7 +33,7 @@ const searchParamsSchema = z.object({
 });
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  try {
+  const { client, headers } = makeSSRClient(request);
     const url = new URL(request.url);
     const { success, data: parsedData } = searchParamsSchema.safeParse(
       Object.fromEntries(url.searchParams)
@@ -40,28 +41,21 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     if (!success) {
       throw new Error("Invalid search params");
     }
-    const totalPages = await getTotalPagesStocks({
+    const totalPages = await getTotalPagesStocks(client,{
       profile_id: a_profile_id,
       keyword: parsedData.keyword,
     });
     if (parsedData.page > totalPages) {
       throw new Error("Invalid page");
     }
-    const stocks_list = await getStocksList({
+    const stocks_list = await getStocksList(client,{
       profile_id: a_profile_id,
       page: parsedData.page,
       sorting: parsedData.sorting,
       keyword: parsedData.keyword,
     });
     return { stocks_list, totalPages };
-  } catch (e) {
-    console.error(
-      "Loader error:",
-      JSON.stringify(e, null, 2),
-      e instanceof Error ? e.stack : "No stack trace"
-    );
-    throw e;
-  }
+
 };
 
 export default function StocksPage({ loaderData }: Route.ComponentProps) {

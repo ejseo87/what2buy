@@ -45,6 +45,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+//
+// export const loader = async ({ request }: Route.LoaderArgs) => {
+//   const { client, headers } = createServerClient(request);
+//   const { data: user } = await client.user.getUser.useQuery();
+//   return { user };
+// };
 
 export default function App() {
   const { pathname } = useLocation();

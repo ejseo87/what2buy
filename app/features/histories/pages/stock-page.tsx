@@ -1,7 +1,6 @@
 import { Hero } from "~/common/components/hero";
 import type { Route } from "./+types/stock-page";
 import { StockChart } from "~/common/components/stock-chart";
-import { samsungData } from "~/common/constants";
 import {
   Table,
   TableBody,
@@ -10,27 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
-
-const profitTrackingData = [
-  {
-    date: "2025-06-01",
-    recommendedPrice: 100000,
-    currentPrice: 105000,
-    profitRate: 5,
-  },
-  {
-    date: "2025-06-02",
-    recommendedPrice: 101000,
-    currentPrice: 106000,
-    profitRate: 5,
-  },
-  {
-    date: "2025-06-03",
-    recommendedPrice: 101000,
-    currentPrice: 106000,
-    profitRate: 5,
-  },
-];
+import { makeSSRClient } from "~/supa-client";
+import {
+  getStockDetail,
+  getProfitTrackingByStock,
+  getStockPerformanceChart,
+} from "../queries";
+import { a_profile_id } from "~/common/constants";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -39,31 +24,77 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export default function StockDetailPage({
-  params: { stockId },
-}: Route.ComponentProps) {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
+  const { client, headers } = makeSSRClient(request);
+  const { stockId } = params;
+
+  // 주식 상세 정보 가져오기
+  const stockDetail = await getStockDetail(client as any, {
+    stockId: Number(stockId),
+  });
+
+  // 수익률 추적 정보 가져오기
+  const profitTracking = await getProfitTrackingByStock(client as any, {
+    stockId: Number(stockId),
+    profileId: a_profile_id,
+  });
+
+  // 차트 데이터 가져오기 (최근 30일)
+  const chartData = await getStockPerformanceChart(client as any, {
+    stockId: Number(stockId),
+    days: 30,
+  });
+
+  return {
+    stockDetail,
+    profitTracking,
+    chartData,
+    stockId: Number(stockId),
+    headers,
+  };
+};
+
+export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
+  const { stockDetail, profitTracking, chartData, stockId } = loaderData;
+
+  // 차트 데이터 변환
+  const transformedChartData =
+    chartData?.map((item, index) => ({
+      date: item.date,
+      [stockDetail?.stock_name || "Stock"]: item.close,
+    })) || [];
+
+  // 현재 가격 및 변동률 계산
+  const currentPrice = stockDetail?.daily_stocks?.[0]?.close || 0;
+  const previousPrice =
+    chartData?.[chartData.length - 2]?.close || currentPrice;
+  const changeAmount = currentPrice - previousPrice;
+  const changePercent =
+    previousPrice > 0 ? ((changeAmount / previousPrice) * 100).toFixed(2) : "0";
+
   return (
     <div className="space-y-10">
       <Hero
-        title={`삼성전자`}
+        title={stockDetail?.stock_name || "주식 상세"}
         subtitle="추천된 주식 종목에 대한 자세한 내역을 확인해보세요."
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <div className="md:col-span-1">
           <h3 className="text-2xl font-bold">최근 주가 추이</h3>
           <StockChart
-            title="삼성전자 주가"
-            description="5/27 ~ 6/27 (1개월)"
-            chartData={samsungData}
-            dataKey="삼성전자"
-            currentPrice="60,700원"
-            changeAmount="+2000원"
-            changePercent="+8.3%"
-            referencePrice="57,700원"
+            title={`${stockDetail?.stock_name || "주식"} 주가`}
+            description="최근 30일 주가 추이"
+            chartData={transformedChartData}
+            dataKey={stockDetail?.stock_name || "Stock"}
+            currentPrice={currentPrice}
+            changeAmount={changeAmount}
+            changePercent={Number(changePercent)}
+            referencePrice={previousPrice}
+            recommendationDate={chartData?.[0]?.date || ""}
           />
         </div>
 
-        <div className="md:col-span-1bg-white rounded-lg shadow-md p-6">
+        <div className="md:col-span-1 bg-white rounded-lg shadow-md p-6">
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Stock ID: {stockId}</p>
 
@@ -71,16 +102,31 @@ export default function StockDetailPage({
             <div className="border-b pb-4">
               <h2 className="text-xl font-semibold mb-3">Stock Information</h2>
               <p className="text-gray-600">Stock details</p>
-              <ul>
-                <li> PER : 10.5</li>
-                <li> PBR : 1.2</li>
-                <li> ROE : 15.2%</li>
-                <li> EPS : 1,000원</li>
-                <li> BPS : 10,000원</li>
-                <li> 주당 배당금 : 100원</li>
-                <li> 주당 순이익 : 1,000원</li>
-                <li> 주당 주식 수 : 100주</li>
-                <li> 주당 주식 수 : 100주</li>
+              <ul className="space-y-1 text-sm">
+                <li>PER : {stockDetail?.per || "N/A"}</li>
+                <li>PBR : {stockDetail?.pbr || "N/A"}</li>
+                <li>
+                  ROE : {stockDetail?.roe ? `${stockDetail.roe}%` : "N/A"}
+                </li>
+                <li>
+                  EPS : {stockDetail?.eps ? `${stockDetail.eps}원` : "N/A"}
+                </li>
+                <li>
+                  BPS : {stockDetail?.bps ? `${stockDetail.bps}원` : "N/A"}
+                </li>
+                <li>
+                  주당 배당금 :{" "}
+                  {stockDetail?.dividend_per_share
+                    ? `${stockDetail.dividend_per_share}원`
+                    : "N/A"}
+                </li>
+                <li>
+                  주식 수 :{" "}
+                  {stockDetail?.stock_count
+                    ? `${stockDetail.stock_count}주`
+                    : "N/A"}
+                </li>
+                <li>종목 코드 : {stockDetail?.stock_code || "N/A"}</li>
               </ul>
             </div>
 
@@ -97,14 +143,40 @@ export default function StockDetailPage({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {profitTrackingData.map((data) => (
-                    <TableRow key={data.date}>
-                      <TableCell>{data.date}</TableCell>
-                      <TableCell>{data.recommendedPrice}</TableCell>
-                      <TableCell>{data.currentPrice}</TableCell>
-                      <TableCell>{data.profitRate}</TableCell>
+                  {profitTracking?.map((data, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {data.histories?.recommendation_date
+                          ? new Date(
+                              data.histories.recommendation_date
+                            ).toLocaleDateString("ko-KR")
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>{data.profit || "N/A"}</TableCell>
+                      <TableCell>{currentPrice || "N/A"}</TableCell>
+                      <TableCell
+                        className={`${
+                          Number(data.profit_rate) > 0
+                            ? "text-green-600"
+                            : Number(data.profit_rate) < 0
+                            ? "text-red-600"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {data.profit_rate ? `${data.profit_rate}%` : "N/A"}
+                      </TableCell>
                     </TableRow>
                   ))}
+                  {(!profitTracking || profitTracking.length === 0) && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={4}
+                        className="text-center text-gray-500"
+                      >
+                        수익률 추적 데이터가 없습니다.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>

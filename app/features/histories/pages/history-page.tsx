@@ -3,6 +3,7 @@ import type { Route } from "./+types/history-page";
 import { RecommendedStockCard } from "../components/recommended-stock-card";
 import { getHistory, getReturnRateInfo } from "../queries";
 import { formatKoreanDate } from "~/common/utils";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -11,24 +12,27 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ params }: Route.LoaderArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
+  const { client, headers } = makeSSRClient(request);
   const { recommendationId } = params;
-  const recommendation = await getHistory(Number(recommendationId));
+  const recommendation = await getHistory(client, {
+    recommendation_id: Number(recommendationId),
+  });
   if (!recommendation) {
     throw new Error("Recommendation not found");
   }
   // Get return rate information for all stocks
-  const stock1_return_info = await getReturnRateInfo({
+  const stock1_return_info = await getReturnRateInfo(client, {
     stockId: (recommendation as any).stock1_id,
     recommendationDate: (recommendation as any).recommendation_date,
   });
 
-  const stock2_return_info = await getReturnRateInfo({
+  const stock2_return_info = await getReturnRateInfo(client, {
     stockId: (recommendation as any).stock2_id,
     recommendationDate: (recommendation as any).recommendation_date,
   });
 
-  const stock3_return_info = await getReturnRateInfo({
+  const stock3_return_info = await getReturnRateInfo(client, {
     stockId: (recommendation as any).stock3_id,
     recommendationDate: (recommendation as any).recommendation_date,
   });

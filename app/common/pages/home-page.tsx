@@ -11,6 +11,7 @@ import {
   getStockRecommendationChart,
   latestRecommendation,
 } from "~/features/histories/queries";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -44,24 +45,15 @@ const transformStockPriceData = async (props: {
     };
   });
 };
-/*
-  const chart_prices_1 = stock_chart_data_1.chart_prices.map((item) => {
-    // Convert date from "2024-05-27" to "5/27" format
-    const date = new Date(item.date);
-    const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
 
-    return {
-      date: formattedDate,
-      [stock_chart_data_1.stock_name]: item.close,
-    };
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client, headers } = makeSSRClient(request);
+  const latest_recommendation = await latestRecommendation(client, {
+    profile_id: a_profile_id,
   });
-*/
-
-export const loader = async () => {
-  const latest_recommendation = await latestRecommendation(a_profile_id);
   //console.log(latest_recommendation);
 
-  const stock_chart_data_1 = await getStockRecommendationChart({
+  const stock_chart_data_1 = await getStockRecommendationChart(client, {
     recommendation_id: latest_recommendation.recommendation_id,
     stock_id: latest_recommendation.stock1_id,
   });
@@ -74,7 +66,7 @@ export const loader = async () => {
       ? (changeAmount_1 / stock_chart_data_1.recommendation_close) * 100
       : 0;
 
-  const stock_chart_data_2 = await getStockRecommendationChart({
+  const stock_chart_data_2 = await getStockRecommendationChart(client, {
     recommendation_id: latest_recommendation.recommendation_id,
     stock_id: latest_recommendation.stock2_id,
   });
@@ -87,7 +79,7 @@ export const loader = async () => {
       ? (changeAmount_2 / stock_chart_data_2.recommendation_close) * 100
       : 0;
 
-  const stock_chart_data_3 = await getStockRecommendationChart({
+  const stock_chart_data_3 = await getStockRecommendationChart(client, {
     recommendation_id: latest_recommendation.recommendation_id,
     stock_id: latest_recommendation.stock3_id,
   });

@@ -18,6 +18,7 @@ import { z } from "zod";
 import { SORT_OPTIONS } from "~/common/constants";
 import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -33,6 +34,7 @@ const searchParamsSchema = z.object({
 });
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client, headers } = makeSSRClient(request);
   const url = new URL(request.url);
   const { success, data: parsedData } = searchParamsSchema.safeParse(
     Object.fromEntries(url.searchParams)
@@ -40,7 +42,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!success) {
     throw new Error("Invalid search params");
   }
-  const totalPages = await getTotalPages({
+  const totalPages = await getTotalPages(client, {
     profile_id: a_profile_id,
     keyword: parsedData.keyword,
   });
@@ -48,7 +50,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (parsedData.page > totalPages) {
     throw new Error("Invalid page");
   }
-  const histories = await getHistories({
+  const histories = await getHistories(client, {
     profile_id: a_profile_id,
     page: parsedData.page,
     sorting: parsedData.sorting,

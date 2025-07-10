@@ -1,44 +1,75 @@
-import { createClient } from "@supabase/supabase-js";
+import {
+  createBrowserClient,
+  createServerClient,
+  parseCookieHeader,
+  serializeCookieHeader,
+} from "@supabase/ssr";
 import type { Database as SupabaseDatabase } from "../database.types";
 import type { MergeDeep, SetNonNullable } from "type-fest";
 
-const client = createClient<
-  MergeDeep<
-    SupabaseDatabase,
-    {
-      public: {
-        Views: {
-          recommendation_stocks_view: {
-            ROW: SetNonNullable<
-              SupabaseDatabase["public"]["Views"]["recommendation_stocks_view"]["Row"]
-            >;
-          };
-          stocks_list_view: {
-            ROW: SetNonNullable<
-              SupabaseDatabase["public"]["Views"]["stocks_list_view"]["Row"]
-            >;
-          };
-          stock_card_list_view: {
-            ROW: SetNonNullable<
-              SupabaseDatabase["public"]["Views"]["stock_card_list_view"]["Row"]
-            >;
-          };
-          stock_recommendation_chart_view: {
-            ROW: SetNonNullable<
-              SupabaseDatabase["public"]["Views"]["stock_recommendation_chart_view"]["Row"]
-            >;
-          };
+export type Database = MergeDeep<
+  SupabaseDatabase,
+  {
+    public: {
+      Views: {
+        recommendation_stocks_view: {
+          ROW: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["recommendation_stocks_view"]["Row"]
+          >;
+        };
+        stocks_list_view: {
+          ROW: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["stocks_list_view"]["Row"]
+          >;
+        };
+        stock_card_list_view: {
+          ROW: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["stock_card_list_view"]["Row"]
+          >;
+        };
+        stock_recommendation_chart_view: {
+          ROW: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["stock_recommendation_chart_view"]["Row"]
+          >;
         };
       };
-    }
-  >
->(
-  typeof window !== "undefined"
-    ? import.meta.env.VITE_SUPABASE_URL!
-    : process.env.SUPABASE_URL!,
-  typeof window !== "undefined"
-    ? import.meta.env.VITE_SUPABASE_ANON_KEY!
-    : process.env.SUPABASE_ANON_KEY!
+    };
+  }
+>;
+
+export const browserClient = createBrowserClient<Database>(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
 );
 
-export default client;
+export const makeSSRClient = (request: Request) => {
+  const headers = new Headers();
+  const serverSideClient = createServerClient<Database>(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          const cookies = parseCookieHeader(
+            request.headers.get("Cookie") ?? ""
+          );
+          return cookies.map(({ name, value }) => ({
+            name,
+            value: value ?? "",
+          }));
+        },
+        setAll(
+          cookiesToSet: Array<{ name: string; value: string; options?: any }>
+        ) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            headers.append(
+              "Set-Cookie",
+              serializeCookieHeader(name, value, options)
+            );
+          });
+        },
+      },
+    }
+  );
+  return { client: serverSideClient, headers };
+};
