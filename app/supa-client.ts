@@ -23,6 +23,11 @@ const client = createClient<
               SupabaseDatabase["public"]["Tables"]["stock_card_list_view"]["Row"]
             >;
           };
+          stock_recommendation_chart_view: {
+            ROW: SetNonNullable<
+              SupabaseDatabase["public"]["Tables"]["stock_recommendation_chart_view"]["Row"]
+            >;
+          };
         };
       };
     }

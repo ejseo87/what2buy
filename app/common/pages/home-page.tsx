@@ -1,4 +1,5 @@
 "use client";
+import { Line, LineChart, ResponsiveContainer } from "recharts";
 import { Hero } from "../components/hero";
 import { StockChart } from "../components/stock-chart";
 import { a_profile_id } from "../constants";
@@ -7,10 +8,9 @@ import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import {
   getDailyPricesByStockId,
   getStockOverview,
+  getStockRecommendationChart,
   latestRecommendation,
 } from "~/features/histories/queries";
-
-
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -44,114 +44,78 @@ const transformStockPriceData = async (props: {
     };
   });
 };
+/*
+  const chart_prices_1 = stock_chart_data_1.chart_prices.map((item) => {
+    // Convert date from "2024-05-27" to "5/27" format
+    const date = new Date(item.date);
+    const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
+
+    return {
+      date: formattedDate,
+      [stock_chart_data_1.stock_name]: item.close,
+    };
+  });
+*/
 
 export const loader = async () => {
   const latest_recommendation = await latestRecommendation(a_profile_id);
+  //console.log(latest_recommendation);
 
-  const stock1_overview = await getStockOverview(
-    latest_recommendation.stock1_id
-  );
-
-  const stock2_overview = await getStockOverview(
-    latest_recommendation.stock2_id
-  );
-
-  const stock3_overview = await getStockOverview(
-    latest_recommendation.stock3_id
-  );
-
-  // Use the abstracted function
-  const daily_stock_price1 = await transformStockPriceData({
-    stockId: latest_recommendation.stock1_id,
-    stockName: stock1_overview.stock_name,
-    count: 30,
+  const stock_chart_data_1 = await getStockRecommendationChart({
+    recommendation_id: latest_recommendation.recommendation_id,
+    stock_id: latest_recommendation.stock1_id,
   });
+  const changeAmount_1 =
+    stock_chart_data_1.latest_close - stock_chart_data_1.recommendation_close;
+  const changePercent_1 =
+    (changeAmount_1 / stock_chart_data_1.recommendation_close) * 100;
 
-  const daily_stock_price2 = await transformStockPriceData({
-    stockId: latest_recommendation.stock2_id,
-    stockName: stock2_overview.stock_name,
-    count: 30,
+  const stock_chart_data_2 = await getStockRecommendationChart({
+    recommendation_id: latest_recommendation.recommendation_id,
+    stock_id: latest_recommendation.stock2_id,
   });
+  const changeAmount_2 =
+    stock_chart_data_2.latest_close - stock_chart_data_2.recommendation_close;
+  const changePercent_2 =
+    (changeAmount_2 / stock_chart_data_2.recommendation_close) * 100;
 
-  const daily_stock_price3 = await transformStockPriceData({
-    stockId: latest_recommendation.stock3_id,
-    stockName: stock3_overview.stock_name,
-    count: 30,
+  const stock_chart_data_3 = await getStockRecommendationChart({
+    recommendation_id: latest_recommendation.recommendation_id,
+    stock_id: latest_recommendation.stock3_id,
   });
-
-  // 최신 주가 (배열의 마지막 항목)
-  const currentPrice1 = daily_stock_price1[daily_stock_price1.length - 1][
-    stock1_overview.stock_name
-  ] as number;
-
-  const currentPrice2 = daily_stock_price2[daily_stock_price2.length - 1][
-    stock2_overview.stock_name
-  ] as number;
-
-  const currentPrice3 = daily_stock_price3[daily_stock_price3.length - 1][
-    stock3_overview.stock_name
-  ] as number;
-
-  // 추천일 주가 (recommendation_date 기준)
-  const recommendationDate = new Date(
-    latest_recommendation.recommendation_date
-  );
-  const formattedRecommendationDate = `${
-    recommendationDate.getMonth() + 1
-  }/${recommendationDate.getDate()}`;
-
-  const referencePrice1 =
-    (daily_stock_price1.find(
-      (item) => item.date === formattedRecommendationDate
-    )?.[stock1_overview.stock_name] as number) ||
-    (daily_stock_price1[0][stock1_overview.stock_name] as number);
-
-  const referencePrice2 =
-    (daily_stock_price2.find(
-      (item) => item.date === formattedRecommendationDate
-    )?.[stock2_overview.stock_name] as number) ||
-    (daily_stock_price2[0][stock2_overview.stock_name] as number);
-
-  const referencePrice3 =
-    (daily_stock_price3.find(
-      (item) => item.date === formattedRecommendationDate
-    )?.[stock3_overview.stock_name] as number) ||
-    (daily_stock_price3[0][stock3_overview.stock_name] as number);
-
-  // 가격 변화 계산
-  const changeAmount1 = currentPrice1 - referencePrice1;
-  const changePercent1 = ((changeAmount1 / referencePrice1) * 100).toFixed(1);
-
-  const changeAmount2 = currentPrice2 - referencePrice2;
-  const changePercent2 = ((changeAmount2 / referencePrice2) * 100).toFixed(1);
-
-  const changeAmount3 = currentPrice3 - referencePrice3;
-  const changePercent3 = ((changeAmount3 / referencePrice3) * 100).toFixed(1);
+  const changeAmount_3 =
+    stock_chart_data_3.latest_close - stock_chart_data_3.recommendation_close;
+  const changePercent_3 =
+    (changeAmount_3 / stock_chart_data_3.recommendation_close) * 100;
 
   return {
-    formattedRecommendationDate,
-    stock1_overview,
-    daily_stock_price1,
-    currentPrice1,
-    referencePrice1,
-    changeAmount1,
-    changePercent1,
-    stock2_overview,
-    daily_stock_price2,
-    currentPrice2,
-    referencePrice2,
-    changeAmount2,
-    changePercent2,
-    stock3_overview,
-    daily_stock_price3,
-    currentPrice3,
-    referencePrice3,
-    changeAmount3,
-    changePercent3,
+    latest_recommendation,
+    stock_chart_data_1,
+    changeAmount_1,
+    changePercent_1,
+    stock_chart_data_2,
+    changeAmount_2,
+    changePercent_2,
+    stock_chart_data_3,
+    changeAmount_3,
+    changePercent_3,
   };
 };
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
+  const {
+    latest_recommendation,
+    stock_chart_data_1,
+
+    stock_chart_data_2,
+    stock_chart_data_3,
+    changeAmount_1,
+    changePercent_1,
+    changeAmount_2,
+    changePercent_2,
+    changeAmount_3,
+    changePercent_3,
+  } = loaderData;
   return (
     <div className="container mx-auto space-y-10">
       <Hero
@@ -168,51 +132,39 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           </PulsatingButton>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ">
           <StockChart
-            title={`${loaderData.stock1_overview.stock_name} 주가`}
-            description={`${loaderData.daily_stock_price1[0].date} ~ ${
-              loaderData.daily_stock_price1[
-                loaderData.daily_stock_price1.length - 1
-              ].date
-            } (30일)`}
-            chartData={loaderData.daily_stock_price1}
-            dataKey={loaderData.stock1_overview.stock_name}
-            currentPrice={loaderData.currentPrice1}
-            changeAmount={loaderData.changeAmount1}
-            changePercent={loaderData.changePercent1}
-            referencePrice={loaderData.referencePrice1}
-            recommendationDate={loaderData.formattedRecommendationDate}
+            title={stock_chart_data_1.stock_name}
+            description={stock_chart_data_1.stock_name}
+            dataKey={stock_chart_data_1.stock_name}
+            chartData={stock_chart_data_1.chart_prices}
+            recommendationDate={latest_recommendation.recommendation_date}
+            referencePrice={stock_chart_data_1.recommendation_close}
+            currentPrice={stock_chart_data_1.latest_close}
+            changeAmount={changeAmount_1}
+            changePercent={changePercent_1}
           />
           <StockChart
-            title={`${loaderData.stock2_overview.stock_name} 주가`}
-            description={`${loaderData.daily_stock_price2[0].date} ~ ${
-              loaderData.daily_stock_price2[
-                loaderData.daily_stock_price2.length - 1
-              ].date
-            } (30일)`}
-            chartData={loaderData.daily_stock_price2}
-            dataKey={loaderData.stock2_overview.stock_name}
-            currentPrice={loaderData.currentPrice2}
-            changeAmount={loaderData.changeAmount2}
-            changePercent={loaderData.changePercent2}
-            referencePrice={loaderData.referencePrice2}
-            recommendationDate={loaderData.formattedRecommendationDate}
+            title={stock_chart_data_2.stock_name}
+            description={stock_chart_data_2.stock_name}
+            dataKey={stock_chart_data_2.stock_name}
+            chartData={stock_chart_data_2.chart_prices}
+            recommendationDate={latest_recommendation.recommendation_date}
+            referencePrice={stock_chart_data_2.recommendation_close}
+            currentPrice={stock_chart_data_2.latest_close}
+            changeAmount={changeAmount_2}
+            changePercent={changePercent_2}
           />
           <StockChart
-            title={`${loaderData.stock3_overview.stock_name} 주가`}
-            description={`${loaderData.daily_stock_price3[0].date} ~ ${
-              loaderData.daily_stock_price3[
-                loaderData.daily_stock_price3.length - 1
-              ].date
-            } (30일)`}
-            chartData={loaderData.daily_stock_price3}
-            dataKey={loaderData.stock3_overview.stock_name}
-            currentPrice={loaderData.currentPrice3}
-            changeAmount={loaderData.changeAmount3}
-            changePercent={loaderData.changePercent3}
-            referencePrice={loaderData.referencePrice3}
-            recommendationDate={loaderData.formattedRecommendationDate}
+            title={stock_chart_data_3.stock_name}
+            description={stock_chart_data_3.stock_name}
+            dataKey={stock_chart_data_3.stock_name}
+            chartData={stock_chart_data_3.chart_prices}
+            recommendationDate={latest_recommendation.recommendation_date}
+            referencePrice={stock_chart_data_3.recommendation_close}
+            currentPrice={stock_chart_data_3.latest_close}
+            changeAmount={changeAmount_3}
+            changePercent={changePercent_3}
           />
         </div>
       </div>

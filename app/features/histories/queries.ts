@@ -32,6 +32,27 @@ export const getHistory = async (recommendation_id: string) => {
   return history;
 };
 
+export const getStockRecommendationChart = async ({
+  recommendation_id,
+  stock_id,
+}: {
+  recommendation_id: string;
+  stock_id: string;
+}) => {
+  const { data: stock_recommendation_chart, error } = await client
+    .from("stock_recommendation_chart_view")
+    .select("*")
+    .eq("stock_id", stock_id)
+    .eq("recommendation_id", recommendation_id)
+    .single();
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get stock recommendation chart");
+  }
+  //console.log(stock_recommendation_chart);
+  return stock_recommendation_chart;
+};
+
 export const getHistories = async ({
   profile_id,
   page,
