@@ -18,7 +18,7 @@ export const latestRecommendation = async (profile_id: string) => {
   return lastest_history;
 };
 
-export const getHistory = async (recommendation_id: string) => {
+export const getHistory = async (recommendation_id: number) => {
   const { data: history, error } = await client
     .from("recommendation_stocks_view")
     .select("*")
@@ -36,8 +36,8 @@ export const getStockRecommendationChart = async ({
   recommendation_id,
   stock_id,
 }: {
-  recommendation_id: string;
-  stock_id: string;
+  recommendation_id: number;
+  stock_id: number;
 }) => {
   const { data: stock_recommendation_chart, error } = await client
     .from("stock_recommendation_chart_view")

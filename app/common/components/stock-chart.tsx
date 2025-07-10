@@ -34,8 +34,8 @@ interface StockChartProps {
   dataKey: string;
   chartData: Array<{ date: string; [key: string]: number | string }>;
   recommendationDate: string;
-  currentPrice: number;
-  referencePrice: number;
+  currentPrice: number | null;
+  referencePrice: number | null;
   changeAmount: number;
   changePercent: number;
 }

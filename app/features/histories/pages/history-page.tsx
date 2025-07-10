@@ -13,7 +13,7 @@ export const meta: Route.MetaFunction = () => {
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
   const { recommendationId } = params;
-  const recommendation = await getHistory(recommendationId);
+  const recommendation = await getHistory(Number(recommendationId));
   if (!recommendation) {
     throw new Error("Recommendation not found");
   }

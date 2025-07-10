@@ -51,7 +51,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   // 날짜 포맷팅 추가
   const formattedHistories = histories.map((h) => ({
     ...h,
-    formattedDate: formatKoreanDate(h.recommendation_date),
+    formattedDate: h.recommendation_date
+      ? formatKoreanDate(h.recommendation_date)
+      : "날짜 없음",
   }));
   return { histories: formattedHistories, totalPages };
 };

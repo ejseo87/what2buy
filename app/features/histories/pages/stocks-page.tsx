@@ -55,7 +55,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     });
     return { stocks_list, totalPages };
   } catch (e) {
-    console.error("Loader error:", JSON.stringify(e, null, 2), e?.stack);
+    console.error(
+      "Loader error:",
+      JSON.stringify(e, null, 2),
+      e instanceof Error ? e.stack : "No stack trace"
+    );
     throw e;
   }
 };

@@ -66,27 +66,39 @@ export const loader = async () => {
     stock_id: latest_recommendation.stock1_id,
   });
   const changeAmount_1 =
-    stock_chart_data_1.latest_close - stock_chart_data_1.recommendation_close;
+    (stock_chart_data_1.latest_close ?? 0) -
+    (stock_chart_data_1.recommendation_close ?? 0);
   const changePercent_1 =
-    (changeAmount_1 / stock_chart_data_1.recommendation_close) * 100;
+    stock_chart_data_1.recommendation_close &&
+    stock_chart_data_1.recommendation_close !== 0
+      ? (changeAmount_1 / stock_chart_data_1.recommendation_close) * 100
+      : 0;
 
   const stock_chart_data_2 = await getStockRecommendationChart({
     recommendation_id: latest_recommendation.recommendation_id,
     stock_id: latest_recommendation.stock2_id,
   });
   const changeAmount_2 =
-    stock_chart_data_2.latest_close - stock_chart_data_2.recommendation_close;
+    (stock_chart_data_2.latest_close ?? 0) -
+    (stock_chart_data_2.recommendation_close ?? 0);
   const changePercent_2 =
-    (changeAmount_2 / stock_chart_data_2.recommendation_close) * 100;
+    stock_chart_data_2.recommendation_close &&
+    stock_chart_data_2.recommendation_close !== 0
+      ? (changeAmount_2 / stock_chart_data_2.recommendation_close) * 100
+      : 0;
 
   const stock_chart_data_3 = await getStockRecommendationChart({
     recommendation_id: latest_recommendation.recommendation_id,
     stock_id: latest_recommendation.stock3_id,
   });
   const changeAmount_3 =
-    stock_chart_data_3.latest_close - stock_chart_data_3.recommendation_close;
+    (stock_chart_data_3.latest_close ?? 0) -
+    (stock_chart_data_3.recommendation_close ?? 0);
   const changePercent_3 =
-    (changeAmount_3 / stock_chart_data_3.recommendation_close) * 100;
+    stock_chart_data_3.recommendation_close &&
+    stock_chart_data_3.recommendation_close !== 0
+      ? (changeAmount_3 / stock_chart_data_3.recommendation_close) * 100
+      : 0;
 
   return {
     latest_recommendation,
@@ -134,10 +146,14 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ">
           <StockChart
-            title={stock_chart_data_1.stock_name}
-            description={stock_chart_data_1.stock_name}
-            dataKey={stock_chart_data_1.stock_name}
-            chartData={stock_chart_data_1.chart_prices}
+            title={stock_chart_data_1.stock_name ?? "주식 1"}
+            description={stock_chart_data_1.stock_name ?? "주식 1"}
+            dataKey={stock_chart_data_1.stock_name ?? "stock1"}
+            chartData={
+              Array.isArray(stock_chart_data_1.chart_prices)
+                ? (stock_chart_data_1.chart_prices as any[])
+                : []
+            }
             recommendationDate={latest_recommendation.recommendation_date}
             referencePrice={stock_chart_data_1.recommendation_close}
             currentPrice={stock_chart_data_1.latest_close}
@@ -145,10 +161,14 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             changePercent={changePercent_1}
           />
           <StockChart
-            title={stock_chart_data_2.stock_name}
-            description={stock_chart_data_2.stock_name}
-            dataKey={stock_chart_data_2.stock_name}
-            chartData={stock_chart_data_2.chart_prices}
+            title={stock_chart_data_2.stock_name ?? "주식 2"}
+            description={stock_chart_data_2.stock_name ?? "주식 2"}
+            dataKey={stock_chart_data_2.stock_name ?? "stock2"}
+            chartData={
+              Array.isArray(stock_chart_data_2.chart_prices)
+                ? (stock_chart_data_2.chart_prices as any[])
+                : []
+            }
             recommendationDate={latest_recommendation.recommendation_date}
             referencePrice={stock_chart_data_2.recommendation_close}
             currentPrice={stock_chart_data_2.latest_close}
@@ -156,10 +176,14 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             changePercent={changePercent_2}
           />
           <StockChart
-            title={stock_chart_data_3.stock_name}
-            description={stock_chart_data_3.stock_name}
-            dataKey={stock_chart_data_3.stock_name}
-            chartData={stock_chart_data_3.chart_prices}
+            title={stock_chart_data_3.stock_name ?? "주식 3"}
+            description={stock_chart_data_3.stock_name ?? "주식 3"}
+            dataKey={stock_chart_data_3.stock_name ?? "stock3"}
+            chartData={
+              Array.isArray(stock_chart_data_3.chart_prices)
+                ? (stock_chart_data_3.chart_prices as any[])
+                : []
+            }
             recommendationDate={latest_recommendation.recommendation_date}
             referencePrice={stock_chart_data_3.recommendation_close}
             currentPrice={stock_chart_data_3.latest_close}
