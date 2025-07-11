@@ -30,6 +30,7 @@ export const profiles = pgTable("profiles", {
   avatar: text(),
   name: text().notNull(),
   username: text().notNull(),
+  role: roles().notNull().default("developer"),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });

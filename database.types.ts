@@ -60,7 +60,28 @@ export type Database = {
             foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -134,7 +155,28 @@ export type Database = {
             foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
             columns: ["stock1_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -155,7 +197,28 @@ export type Database = {
             foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
             columns: ["stock2_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -176,7 +239,28 @@ export type Database = {
             foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
             columns: ["stock3_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -240,6 +324,13 @@ export type Database = {
             referencedColumns: ["recommendation_id"]
           },
           {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
@@ -250,7 +341,28 @@ export type Database = {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -425,6 +537,101 @@ export type Database = {
       }
     }
     Views: {
+      profit_tracking_view: {
+        Row: {
+          current_price: number | null
+          current_price_date: string | null
+          profile_id: string | null
+          profit_amount: number | null
+          profit_rate: number | null
+          recommendation_date: string | null
+          recommendation_id: number | null
+          recommended_price: number | null
+          recommended_price_date: string | null
+          stock_code: string | null
+          stock_id: number | null
+          stock_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "histories_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "histories"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "recommendation_stocks_view"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_card_list_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+        ]
+      }
       recommendation_stocks_view: {
         Row: {
           profile_id: string | null
@@ -472,7 +679,28 @@ export type Database = {
             foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
             columns: ["stock1_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
+            columns: ["stock1_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -493,7 +721,28 @@ export type Database = {
             foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
             columns: ["stock2_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
+            columns: ["stock2_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -514,7 +763,28 @@ export type Database = {
             foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
             columns: ["stock3_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
+            columns: ["stock3_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -547,6 +817,43 @@ export type Database = {
           },
         ]
       }
+      stock_detail_view: {
+        Row: {
+          bps: number | null
+          current_price: number | null
+          current_price_date: string | null
+          dividend_per_share: number | null
+          eps: number | null
+          high: number | null
+          low: number | null
+          open: number | null
+          pbr: number | null
+          per: number | null
+          roe: number | null
+          stock_code: string | null
+          stock_count: number | null
+          stock_id: number | null
+          stock_name: string | null
+          volume: number | null
+        }
+        Relationships: []
+      }
+      stock_performance_chart_view: {
+        Row: {
+          change: number | null
+          close: number | null
+          date: string | null
+          high: number | null
+          low: number | null
+          moving_avg_30: number | null
+          open: number | null
+          stock_code: string | null
+          stock_id: number | null
+          stock_name: string | null
+          volume: number | null
+        }
+        Relationships: []
+      }
       stock_recommendation_chart_view: {
         Row: {
           chart_prices: Json | null
@@ -558,6 +865,37 @@ export type Database = {
           stock_name: string | null
         }
         Relationships: []
+      }
+      stock_recommendation_detail_view: {
+        Row: {
+          bps: number | null
+          current_price: number | null
+          dividend_per_share: number | null
+          eps: number | null
+          pbr: number | null
+          per: number | null
+          profile_id: string | null
+          profit_amount: number | null
+          profit_rate: number | null
+          recommendation_date: string | null
+          recommendation_id: number | null
+          recommended_price: number | null
+          roe: number | null
+          stock_code: string | null
+          stock_id: number | null
+          stock_name: string | null
+          stock_position: number | null
+          summary: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "histories_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
       }
       stocks_list_view: {
         Row: {
@@ -597,6 +935,13 @@ export type Database = {
             referencedColumns: ["recommendation_id"]
           },
           {
+            foreignKeyName: "history_stock_relations_recommendation_id_histories_recommendat"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
+            referencedColumns: ["recommendation_id"]
+          },
+          {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
@@ -607,7 +952,28 @@ export type Database = {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
+            referencedRelation: "stock_detail_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_performance_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stock_recommendation_detail_view"
             referencedColumns: ["stock_id"]
           },
           {

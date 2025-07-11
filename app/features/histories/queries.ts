@@ -192,7 +192,7 @@ export const getStockDetail = async (
   return stock_detail;
 };
 
-export const getProfitTrackingByStock = async (
+export const getProfitTrackingByStockId = async (
   client: SupabaseClient<Database>,
   {
     stockId,
@@ -204,27 +204,12 @@ export const getProfitTrackingByStock = async (
 ) => {
   // 수익률 추적 정보 가져오기
   const { data: profit_tracking, error } = await client
-    .from("history_stock_relations")
-    .select(
-      `
-      *,
-      histories(
-        recommendation_id,
-        recommendation_date,
-        profile_id,
-        summary
-      ),
-      stocks(
-        stock_name,
-        stock_code
-      )
-    `
-    )
+    .from("profit_tracking_view")
+    .select("*")
     .eq("stock_id", stockId)
-    .eq("histories.profile_id", profileId)
+    .eq("profile_id", profileId)
     .order("recommendation_date", {
       ascending: false,
-      referencedTable: "histories",
     });
 
   if (error) {

@@ -50,9 +50,10 @@ export function StockChart({
   changeAmount,
   changePercent,
 }: StockChartProps) {
-  console.log("StockChart:changePercent", changePercent);
-  console.log("StockChart:changeAmount", changeAmount);
-  console.log("StockChart:chartData", chartData);
+  //console.log("StockChart:changePercent", changePercent);
+  //console.log("StockChart:changeAmount", changeAmount);
+  //console.log("StockChart:chartData", chartData);
+  console.log("StockChart:recommendationDate", recommendationDate);
   // Create a safe key for CSS variable
   const safeDataKey = "stock";
   const chartConfig = {
@@ -61,27 +62,18 @@ export function StockChart({
       color: "hsl(var(--primary))",
     },
   } satisfies ChartConfig;
-  console.log("StockChart:chartConfig", chartConfig);
-  console.log("StockChart:line stroke", `var(--color-${safeDataKey})`);
+  //console.log("StockChart:chartConfig", chartConfig);
+  //console.log("StockChart:line stroke", `var(--color-${safeDataKey})`);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-bold">{title}</CardTitle>
         <CardDescription className="text-sm">{description}</CardDescription>
       </CardHeader>
-      <CardContent className="min-h-[240px]">
+      <CardContent>
         <ChartContainer config={chartConfig}>
-          <CardContent>
-            <LineChart
-              accessibilityLayer
-              data={chartData}
-              width={400}
-              height={240}
-              margin={{
-                left: 3,
-                right: 3,
-              }}
-            >
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="date"
@@ -90,19 +82,28 @@ export function StockChart({
                 axisLine={false}
                 tickMargin={2}
                 tickFormatter={(value) =>
-                  `${value.slice(2, 4)}/${value.slice(4, 6)}`
+                  `${value.slice(5, 7)}/${value.slice(8, 10)}`
                 }
                 className="text-xs"
               />
-
+              <YAxis
+                hide={true}
+                dataKey={dataKey}
+                domain={["dataMin", "dataMax"]}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={2}
+                tickFormatter={(value) => `${Number(value).toLocaleString()}원`}
+                className="text-xs"
+              />
               <ChartTooltip
                 cursor={true}
                 content={
                   <ChartTooltipContent
                     hideLabel={false}
-                    labelFormatter={(label) => `날짜: ${label}`}
+                    labelFormatter={(label) => `${label} 종가`}
                     formatter={(value, name) => [
-                      `${Number(value).toLocaleString()}원 ${name}`,
+                      `${name}: ${Number(value).toLocaleString()}원`,
                     ]}
                   />
                 }
@@ -114,8 +115,15 @@ export function StockChart({
                 strokeWidth={2}
                 dot={false}
               />
+              <ReferenceLine
+                x={recommendationDate ? recommendationDate : ""}
+                stroke="#ff6b6b"
+                strokeDasharray="5 5"
+                strokeWidth={2}
+                label={{ value: "추천일", position: "right" }}
+              />
             </LineChart>
-          </CardContent>
+          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">

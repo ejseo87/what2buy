@@ -4,7 +4,7 @@ import {
   parseCookieHeader,
   serializeCookieHeader,
 } from "@supabase/ssr";
-import type { Database as SupabaseDatabase } from "../database.types";
+import type { Database as SupabaseDatabase } from "~/database.types";
 import type { MergeDeep, SetNonNullable } from "type-fest";
 
 export type Database = MergeDeep<
@@ -30,6 +30,11 @@ export type Database = MergeDeep<
         stock_recommendation_chart_view: {
           ROW: SetNonNullable<
             SupabaseDatabase["public"]["Views"]["stock_recommendation_chart_view"]["Row"]
+          >;
+        };
+        profit_tracking_view: {
+          ROW: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["profit_tracking_view"]["Row"]
           >;
         };
       };

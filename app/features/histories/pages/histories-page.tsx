@@ -42,7 +42,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!success) {
     throw new Error("Invalid search params");
   }
-  const totalPages = await getTotalPages(client,{
+  const totalPages = await getTotalPages(client as any,{
     profile_id: a_profile_id,
     keyword: parsedData.keyword,
   });

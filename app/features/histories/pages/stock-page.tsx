@@ -12,7 +12,7 @@ import {
 import { makeSSRClient } from "~/supa-client";
 import {
   getStockDetail,
-  getProfitTrackingByStock,
+  getProfitTrackingByStockId,
   getStockPerformanceChart,
 } from "../queries";
 import { a_profile_id } from "~/common/constants";
@@ -27,50 +27,63 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
   const { stockId } = params;
-  console.log("stock-page params=", params);
+  //console.log("stock-page params=", params);
   // 주식 상세 정보 가져오기
   const stockDetail = await getStockDetail(client as any, {
     stockId: Number(stockId),
   });
-
+  //console.log("stockDetail=", stockDetail);
   // 수익률 추적 정보 가져오기
-  const profitTracking = await getProfitTrackingByStock(client as any, {
+  const profitTracking = await getProfitTrackingByStockId(client as any, {
     stockId: Number(stockId),
     profileId: a_profile_id,
   });
+  //console.log("profitTracking=", profitTracking);
+  const recommendationDate =
+    profitTracking[profitTracking.length - 1]?.recommended_price_date || "";
+  //console.log("recommendationDate=", recommendationDate);
+  const recommendationPrice =
+    profitTracking[profitTracking.length - 1]?.recommended_price || 0;
+  //console.log("recommendationPrice=", recommendationPrice);
 
   // 차트 데이터 가져오기 (최근 30일)
   const chartData = await getStockPerformanceChart(client as any, {
     stockId: Number(stockId),
     days: 30,
   });
-
-  return {
-    stockDetail,
-    profitTracking,
-    chartData,
-    stockId: Number(stockId),
-    headers,
-  };
-};
-
-export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
-  const { stockDetail, profitTracking, chartData, stockId } = loaderData;
-
+  //console.log("chartData=", chartData);
   // 차트 데이터 변환
   const transformedChartData =
     chartData?.map((item, index) => ({
       date: item.date,
       [stockDetail?.stock_name || "Stock"]: item.close,
     })) || [];
+  return {
+    stockDetail,
+    profitTracking,
+    transformedChartData,
+    recommendationDate,
+    recommendationPrice,
+    headers,
+  };
+};
+
+export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
+  const {
+    stockDetail,
+    profitTracking,
+    transformedChartData,
+    recommendationDate,
+    recommendationPrice,
+  } = loaderData;
 
   // 현재 가격 및 변동률 계산
   const currentPrice = stockDetail?.daily_stocks?.[0]?.close || 0;
-  const previousPrice =
-    chartData?.[chartData.length - 2]?.close || currentPrice;
-  const changeAmount = currentPrice - previousPrice;
+  const changeAmount = currentPrice - recommendationPrice;
   const changePercent =
-    previousPrice > 0 ? ((changeAmount / previousPrice) * 100).toFixed(2) : "0";
+    recommendationPrice > 0
+      ? ((changeAmount / recommendationPrice) * 100).toFixed(2)
+      : "0";
 
   return (
     <div className="space-y-10">
@@ -79,8 +92,7 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
         subtitle="추천된 주식 종목에 대한 자세한 내역을 확인해보세요."
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div className="md:col-span-1">
-          <h3 className="text-2xl font-bold">최근 주가 추이</h3>
+        <div className="md:col-span-1 ">
           <StockChart
             title={`${stockDetail?.stock_name || "주식"} 주가`}
             description="최근 30일 주가 추이"
@@ -89,19 +101,20 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
             currentPrice={currentPrice}
             changeAmount={changeAmount}
             changePercent={Number(changePercent)}
-            referencePrice={previousPrice}
-            recommendationDate={chartData?.[0]?.date || ""}
+            referencePrice={recommendationPrice}
+            recommendationDate={recommendationDate || ""}
           />
         </div>
 
         <div className="md:col-span-1 bg-white rounded-lg shadow-md p-6">
           <div className="space-y-4">
-            <p className="text-sm text-gray-500">Stock ID: {stockId}</p>
+            <p className="text-sm text-gray-500">
+              종목 코드 : {stockDetail?.stock_code || "N/A"}
+            </p>
 
             {/* Stock Information */}
             <div className="border-b pb-4">
-              <h2 className="text-xl font-semibold mb-3">Stock Information</h2>
-              <p className="text-gray-600">Stock details</p>
+              <h2 className="text-xl font-semibold mb-3">종목 정보</h2>
               <ul className="space-y-1 text-sm">
                 <li>PER : {stockDetail?.per || "N/A"}</li>
                 <li>PBR : {stockDetail?.pbr || "N/A"}</li>
@@ -126,7 +139,6 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
                     ? `${stockDetail.stock_count}주`
                     : "N/A"}
                 </li>
-                <li>종목 코드 : {stockDetail?.stock_code || "N/A"}</li>
               </ul>
             </div>
 
@@ -146,13 +158,13 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
                   {profitTracking?.map((data, index) => (
                     <TableRow key={index}>
                       <TableCell>
-                        {data.histories?.recommendation_date
+                        {data.recommendation_date
                           ? new Date(
-                              data.histories.recommendation_date
+                              data.recommendation_date
                             ).toLocaleDateString("ko-KR")
                           : "N/A"}
                       </TableCell>
-                      <TableCell>{data.profit || "N/A"}</TableCell>
+                      <TableCell>{data.recommended_price || "N/A"}</TableCell>
                       <TableCell>{currentPrice || "N/A"}</TableCell>
                       <TableCell
                         className={`${

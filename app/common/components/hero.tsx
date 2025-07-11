@@ -10,7 +10,7 @@ interface HeroProps {
 export function Hero({ title, subtitle, className }: HeroProps) {
   return (
     <div>
-      <div className=" w-full h-auto ">
+      <div className=" w-full h-auto hidden lg:block">
         <FlickeringGrid
           squareSize={10}
           gridGap={10}

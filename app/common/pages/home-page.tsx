@@ -6,9 +6,8 @@ import { a_profile_id } from "../constants";
 import type { Route } from "./+types/home-page";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import {
-  getDailyPricesByStockId,
-  getStockOverview,
-  getStockRecommendationChart,
+  getStockDetail,
+  getStockPerformanceChart,
   latestRecommendation,
 } from "~/features/histories/queries";
 import { makeSSRClient } from "~/supa-client";
@@ -20,87 +19,109 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-// Abstract function to transform stock price data
-const transformStockPriceData = async (props: {
-  stockId: number;
-  stockName: string;
-  count: number;
-}) => {
-  const { stockId, stockName, count } = props;
-
-  const rawData = await getDailyPricesByStockId({
-    stockId,
-    count,
-  });
-
-  // Transform data to match constants.tsx format
-  return rawData.map((item) => {
-    // Convert date from "2024-05-27" to "5/27" format
-    const date = new Date(item.date);
-    const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
-
-    return {
-      date: formattedDate,
-      [stockName]: Number(item.close),
-    };
-  });
-};
-
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
-  const latest_recommendation = await latestRecommendation(client, {
+  const latest_recommendation = await latestRecommendation(client as any, {
     profile_id: a_profile_id,
   });
   //console.log(latest_recommendation);
-
-  const stock_chart_data_1 = await getStockRecommendationChart(client, {
-    recommendation_id: latest_recommendation.recommendation_id,
-    stock_id: latest_recommendation.stock1_id,
+  const recommendationDate = latest_recommendation.recommendation_date.slice(
+    0,
+    10
+  );
+  console.log(
+    "recommendationDate=",
+    recommendationDate,
+    "recommendationDate.length=",
+    recommendationDate.length
+  );
+  // #1 주식 상세 정보 가져오기
+  const stockDetail_1 = await getStockDetail(client as any, {
+    stockId: latest_recommendation.stock1_id,
   });
-  const changeAmount_1 =
-    (stock_chart_data_1.latest_close ?? 0) -
-    (stock_chart_data_1.recommendation_close ?? 0);
+  // #1 차트 데이터 가져오기 (최근 30일)
+  const chartData_1 = await getStockPerformanceChart(client as any, {
+    stockId: latest_recommendation.stock1_id,
+    days: 30,
+  });
+  //console.log("chartData_1=", chartData_1);
+  const recommendationPrice_1 =
+    chartData_1.find((item) => item.date === recommendationDate)?.close ?? 0;
+  //console.log("recommendationPrice_1=", recommendationPrice_1);
+
+  // 추천일 종가 대비 변동률 계산
+  const currentPrice_1 = stockDetail_1?.daily_stocks?.[0]?.close || 0;
+  const changeAmount_1 = currentPrice_1 - recommendationPrice_1;
   const changePercent_1 =
-    stock_chart_data_1.recommendation_close &&
-    stock_chart_data_1.recommendation_close !== 0
-      ? (changeAmount_1 / stock_chart_data_1.recommendation_close) * 100
-      : 0;
-
-  const stock_chart_data_2 = await getStockRecommendationChart(client, {
-    recommendation_id: latest_recommendation.recommendation_id,
-    stock_id: latest_recommendation.stock2_id,
+    recommendationPrice_1 > 0
+      ? ((changeAmount_1 / recommendationPrice_1) * 100).toFixed(2)
+      : "0";
+  //console.log("changeAmount_1=", changeAmount_1);
+  //console.log("changePercent_1=", changePercent_1);
+  // #2 주식 상세 정보 가져오기
+  const stockDetail_2 = await getStockDetail(client as any, {
+    stockId: latest_recommendation.stock2_id,
   });
-  const changeAmount_2 =
-    (stock_chart_data_2.latest_close ?? 0) -
-    (stock_chart_data_2.recommendation_close ?? 0);
+  // #2 차트 데이터 가져오기 (최근 30일)
+  const chartData_2 = await getStockPerformanceChart(client as any, {
+    stockId: latest_recommendation.stock2_id,
+    days: 30,
+  });
+  //console.log("chartData_2=", chartData_2);
+  const recommendationPrice_2 =
+    chartData_2.find((item) => item.date === recommendationDate)?.close ?? 0;
+  //console.log("recommendationPrice_2=", recommendationPrice_2);
+  // 추천일 종가 대비 변동률 계산
+  const currentPrice_2 = stockDetail_2?.daily_stocks?.[0]?.close || 0;
+  const changeAmount_2 = currentPrice_2 - recommendationPrice_2;
   const changePercent_2 =
-    stock_chart_data_2.recommendation_close &&
-    stock_chart_data_2.recommendation_close !== 0
-      ? (changeAmount_2 / stock_chart_data_2.recommendation_close) * 100
-      : 0;
-
-  const stock_chart_data_3 = await getStockRecommendationChart(client, {
-    recommendation_id: latest_recommendation.recommendation_id,
-    stock_id: latest_recommendation.stock3_id,
+    recommendationPrice_2 > 0
+      ? ((changeAmount_2 / recommendationPrice_2) * 100).toFixed(2)
+      : "0";
+  //console.log("changeAmount_2=", changeAmount_2);
+  //console.log("changePercent_2=", changePercent_2);
+  // #3 주식 상세 정보 가져오기
+  const stockDetail_3 = await getStockDetail(client as any, {
+    stockId: latest_recommendation.stock3_id,
   });
-  const changeAmount_3 =
-    (stock_chart_data_3.latest_close ?? 0) -
-    (stock_chart_data_3.recommendation_close ?? 0);
+  // #3 차트 데이터 가져오기 (최근 30일)
+  const chartData_3 = await getStockPerformanceChart(client as any, {
+    stockId: latest_recommendation.stock3_id,
+    days: 30,
+  });
+  //console.log("chartData_3=", chartData_3);
+  const recommendationPrice_3 =
+    chartData_3.find((item) => item.date === recommendationDate)?.close ?? 0;
+  //console.log("recommendationPrice_3=", recommendationPrice_3);
+
+  // 추천일 종가 대비 변동률 계산
+  const currentPrice_3 = stockDetail_3?.daily_stocks?.[0]?.close || 0;
+  const changeAmount_3 = currentPrice_3 - recommendationPrice_3;
   const changePercent_3 =
-    stock_chart_data_3.recommendation_close &&
-    stock_chart_data_3.recommendation_close !== 0
-      ? (changeAmount_3 / stock_chart_data_3.recommendation_close) * 100
-      : 0;
+    recommendationPrice_3 > 0
+      ? ((changeAmount_3 / recommendationPrice_3) * 100).toFixed(2)
+      : "0";
+  //console.log("changeAmount_3=", changeAmount_3);
+  //console.log("changePercent_3=", changePercent_3);
 
   return {
-    latest_recommendation,
-    stock_chart_data_1,
+    recommendationDate,
+    stockDetail_1,
+    chartData_1,
+    recommendationPrice_1,
+    currentPrice_1,
     changeAmount_1,
     changePercent_1,
-    stock_chart_data_2,
+    stockDetail_2,
+    chartData_2,
+    recommendationPrice_2,
+    currentPrice_2,
     changeAmount_2,
     changePercent_2,
-    stock_chart_data_3,
+    stockDetail_3,
+    chartData_3,
+    recommendationPrice_3,
+    currentPrice_3,
     changeAmount_3,
     changePercent_3,
   };
@@ -108,84 +129,106 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
   const {
-    latest_recommendation,
-    stock_chart_data_1,
-
-    stock_chart_data_2,
-    stock_chart_data_3,
+    recommendationDate,
+    stockDetail_1,
+    chartData_1,
+    recommendationPrice_1,
+    currentPrice_1,
     changeAmount_1,
     changePercent_1,
+    stockDetail_2,
+    chartData_2,
+    recommendationPrice_2,
+    currentPrice_2,
     changeAmount_2,
     changePercent_2,
+    stockDetail_3,
+    chartData_3,
+    recommendationPrice_3,
+    currentPrice_3,
     changeAmount_3,
     changePercent_3,
   } = loaderData;
+  // #1 차트 데이터 변환
+  const transformedChartData_1 =
+    chartData_1?.map((item, index) => ({
+      date: item.date,
+      [stockDetail_1?.stock_name || "Stock"]: item.close,
+    })) || [];
+
+  //console.log("transformedChartData_1=", transformedChartData_1);
+  // #2 차트 데이터 변환
+  const transformedChartData_2 =
+    chartData_2?.map((item, index) => ({
+      date: item.date,
+      [stockDetail_2?.stock_name || "Stock"]: item.close,
+    })) || [];
+  //console.log("transformedChartData_2=", transformedChartData_2);
+  // #3 차트 데이터 변환
+  const transformedChartData_3 =
+    chartData_3?.map((item, index) => ({
+      date: item.date,
+      [stockDetail_3?.stock_name || "Stock"]: item.close,
+    })) || [];
+  //console.log("transformedChartData_3=", transformedChartData_3);
   return (
-    <div className="container mx-auto space-y-10">
+    <div className="space-y-10 w-full">
       <Hero
         title="주식을 추천해주는 What2Buy"
         subtitle="가치가 있는 주식 중에 내일 상승할 확률이 높은 주식을 추천해드립니다. "
       />
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-row justify-between gap-3 items-center">
-          <div className="text-2xl  font-bold  py-2.5">
-            최근에 추천한 주식 종목 현황
-          </div>
-          <PulsatingButton pulseColor="#FF007F" className="text-2xl px-10 ">
-            주식 추천 받으러 가기
-          </PulsatingButton>
+      <div className="flex flex-row justify-between gap-3 items-center">
+        <div className="text-2xl  font-bold  py-2.5">
+          최근에 추천한 주식 종목 현황
         </div>
+        <PulsatingButton pulseColor="#FF007F" className="text-2xl px-10 ">
+          주식 추천 받으러 가기
+        </PulsatingButton>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ">
+      <div className="grid grid-cols-3 gap-5">
+        <div className="w-full">
           <StockChart
-            title={stock_chart_data_1.stock_name ?? "주식 1"}
-            description={stock_chart_data_1.stock_name ?? "주식 1"}
-            dataKey={stock_chart_data_1.stock_name ?? "stock1"}
-            chartData={
-              Array.isArray(stock_chart_data_1.chart_prices)
-                ? (stock_chart_data_1.chart_prices as any[])
-                : []
-            }
-            recommendationDate={latest_recommendation.recommendation_date}
-            referencePrice={stock_chart_data_1.recommendation_close}
-            currentPrice={stock_chart_data_1.latest_close}
+            title={stockDetail_1?.stock_name ?? "주식 1"}
+            description={"최근 30일 주가 추이"}
+            dataKey={stockDetail_1?.stock_name ?? "stock1"}
+            chartData={transformedChartData_1}
+            recommendationDate={recommendationDate}
+            referencePrice={recommendationPrice_1}
+            currentPrice={currentPrice_1}
             changeAmount={changeAmount_1}
-            changePercent={changePercent_1}
+            changePercent={Number(changePercent_1)}
           />
+        </div>
+        <div className="w-full">
           <StockChart
-            title={stock_chart_data_2.stock_name ?? "주식 2"}
-            description={stock_chart_data_2.stock_name ?? "주식 2"}
-            dataKey={stock_chart_data_2.stock_name ?? "stock2"}
-            chartData={
-              Array.isArray(stock_chart_data_2.chart_prices)
-                ? (stock_chart_data_2.chart_prices as any[])
-                : []
-            }
-            recommendationDate={latest_recommendation.recommendation_date}
-            referencePrice={stock_chart_data_2.recommendation_close}
-            currentPrice={stock_chart_data_2.latest_close}
+            title={stockDetail_2?.stock_name ?? "주식 2"}
+            description={"최근 30일 주가 추이"}
+            dataKey={stockDetail_2?.stock_name ?? "stock2"}
+            chartData={transformedChartData_2}
+            recommendationDate={recommendationDate}
+            referencePrice={recommendationPrice_2}
+            currentPrice={currentPrice_2}
             changeAmount={changeAmount_2}
-            changePercent={changePercent_2}
+            changePercent={Number(changePercent_2)}
           />
+        </div>
+        <div className="w-full">
           <StockChart
-            title={stock_chart_data_3.stock_name ?? "주식 3"}
-            description={stock_chart_data_3.stock_name ?? "주식 3"}
-            dataKey={stock_chart_data_3.stock_name ?? "stock3"}
-            chartData={
-              Array.isArray(stock_chart_data_3.chart_prices)
-                ? (stock_chart_data_3.chart_prices as any[])
-                : []
-            }
-            recommendationDate={latest_recommendation.recommendation_date}
-            referencePrice={stock_chart_data_3.recommendation_close}
-            currentPrice={stock_chart_data_3.latest_close}
+            title={stockDetail_3?.stock_name ?? "주식 3"}
+            description={"최근 30일 주가 추이"}
+            dataKey={stockDetail_3?.stock_name ?? "stock3"}
+            chartData={transformedChartData_3}
+            recommendationDate={recommendationDate}
+            referencePrice={recommendationPrice_3}
+            currentPrice={currentPrice_3}
             changeAmount={changeAmount_3}
-            changePercent={changePercent_3}
+            changePercent={Number(changePercent_3)}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">최근 주식 추천 내역</h2>
           <p className="text-gray-600 mb-4">

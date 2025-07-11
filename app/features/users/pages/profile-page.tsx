@@ -6,35 +6,40 @@ import {
 } from "~/common/components/ui/avatar";
 import { Badge } from "~/common/components/ui/badge";
 import { Button, buttonVariants } from "~/common/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogHeader,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-} from "~/common/components/ui/dialog";
-import { Textarea } from "~/common/components/ui/textarea";
-import { cn } from "~/lib/utils";
+import type { Route } from "./+types/profile-page";
+import { makeSSRClient } from "~/supa-client";
+import { getUserProfile } from "../queries";
 
-export default function ProfileLayout() {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
+  const username = params.username;
+  console.log("profile-page username=", username);
+  const { client } = makeSSRClient(request);
+  const user = await getUserProfile(client as any, { username: username });
+  return { user };
+};
+
+export default function ProfilePage({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData;
   return (
     <div className="space-y-10">
       <div className="flex items-center gap-4">
         <Avatar className="size-40">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>N</AvatarFallback>
+          {user.avatar ? (
+            <AvatarImage src={user.avatar} />
+          ) : (
+            <AvatarFallback className="text-2xl">{user.name[0]}</AvatarFallback>
+          )}
         </Avatar>
         <div className="space-y-5">
           <div className="flex gap-2">
-            <h1 className="text-2xl font-semibold">John Doe</h1>
+            <h1 className="text-2xl font-semibold">{user.name}</h1>
             <Button variant="outline" asChild>
               <Link to="/my/settings">Edit profile</Link>
             </Button>
           </div>
           <div className="flex flex-col gap-2 justify-start items-start">
             <span className="text-sm text-muted-foreground px-2">
-              @john_doe
+              @{user.username}
             </span>
 
             <Badge variant={"secondary"}>paid 3 tickets </Badge>

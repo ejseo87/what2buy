@@ -59,7 +59,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
         <Link to="/auth/join">Join</Link>
       </Button>
-      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
+      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10"> 
         <h1 className="text-2xl font-semibold">Log in to your account</h1>
         <Form className="w-full space-y-4" method="post">
           <InputPair
