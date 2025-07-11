@@ -27,7 +27,7 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
   const { stockId } = params;
-
+  console.log("stock-page params=", params);
   // 주식 상세 정보 가져오기
   const stockDetail = await getStockDetail(client as any, {
     stockId: Number(stockId),

@@ -41,14 +41,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     if (!success) {
       throw new Error("Invalid search params");
     }
-    const totalPages = await getTotalPagesStocks(client,{
+    const totalPages = await getTotalPagesStocks(client as any,{
       profile_id: a_profile_id,
       keyword: parsedData.keyword,
     });
     if (parsedData.page > totalPages) {
       throw new Error("Invalid page");
     }
-    const stocks_list = await getStocksList(client,{
+    const stocks_list = await getStocksList(client as any,{
       profile_id: a_profile_id,
       page: parsedData.page,
       sorting: parsedData.sorting,

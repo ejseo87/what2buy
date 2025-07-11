@@ -22,17 +22,17 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     throw new Error("Recommendation not found");
   }
   // Get return rate information for all stocks
-  const stock1_return_info = await getReturnRateInfo(client, {
+  const stock1_return_info = await getReturnRateInfo(client as any, {
     stockId: (recommendation as any).stock1_id,
     recommendationDate: (recommendation as any).recommendation_date,
   });
 
-  const stock2_return_info = await getReturnRateInfo(client, {
+  const stock2_return_info = await getReturnRateInfo(client as any, {
     stockId: (recommendation as any).stock2_id,
     recommendationDate: (recommendation as any).recommendation_date,
   });
 
-  const stock3_return_info = await getReturnRateInfo(client, {
+  const stock3_return_info = await getReturnRateInfo(client as any, {
     stockId: (recommendation as any).stock3_id,
     recommendationDate: (recommendation as any).recommendation_date,
   });

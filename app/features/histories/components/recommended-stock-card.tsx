@@ -17,12 +17,24 @@ interface RecommendedStockCardProps {
   currentPrice: number;
   changeRate: number;
   per: number;
-  pbr:number;
+  pbr: number;
 }
 
-export function RecommendedStockCard({ stockId, recommendationDate, stockName, description, referencPrice, currentPrice, changeRate, per, pbr }: RecommendedStockCardProps) {
+export function RecommendedStockCard({
+  stockId,
+  recommendationDate,
+  stockName,
+  description,
+  referencPrice,
+  currentPrice,
+  changeRate,
+  per,
+  pbr,
+}: RecommendedStockCardProps) {
   return (
-    <Link to={`/stocks/${stockId}?recommendationDate=${recommendationDate}`}>
+    <Link
+      to={`/histories/stocks/${stockId}?recommendationDate=${recommendationDate}`}
+    >
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold">{stockName}</CardTitle>
@@ -30,8 +42,12 @@ export function RecommendedStockCard({ stockId, recommendationDate, stockName, d
         <CardContent className="flex flex-col gap-5">
           <p className="text-lg">{description}</p>
           <div className="flex flex-row gap-10">
-            <Badge variant="secondary" className="text-lg">PER : {per}</Badge>
-            <Badge variant="secondary" className="text-lg">PBR : {pbr}</Badge>
+            <Badge variant="secondary" className="text-lg">
+              PER : {per}
+            </Badge>
+            <Badge variant="secondary" className="text-lg">
+              PBR : {pbr}
+            </Badge>
           </div>
         </CardContent>
         <CardFooter className="flex flex-row gap-10 ">

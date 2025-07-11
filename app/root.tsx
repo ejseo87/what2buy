@@ -12,6 +12,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import Navigation from "./common/components/Navigation";
 import { Settings } from "luxon";
+import { makeSSRClient } from "./supa-client";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -45,20 +46,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
-//
-// export const loader = async ({ request }: Route.LoaderArgs) => {
-//   const { client, headers } = createServerClient(request);
-//   const { data: user } = await client.user.getUser.useQuery();
-//   return { user };
-// };
 
-export default function App() {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client, headers } = makeSSRClient(request);
+  const { data: user } = await client.auth.getUser();
+  console.log("root loader user=", user);
+  return { user };
+};
+
+export default function App({ loaderData }: Route.ComponentProps) {
   const { pathname } = useLocation();
+  const isLoggedIn = loaderData.user.user !== null;
+  console.log("root app loaderData=", loaderData);
+  console.log("root app isLoggedIn=", isLoggedIn);
   return (
     <div className={pathname.includes("/auth/") ? "" : "py-28 px-20"}>
       {pathname.includes("/auth") ? null : (
         <Navigation
-          isLoggedIn={true}
+          isLoggedIn={isLoggedIn}
           hasNotifications={false}
           hasMessages={false}
         />
