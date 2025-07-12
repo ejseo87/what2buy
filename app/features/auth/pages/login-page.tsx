@@ -2,9 +2,10 @@ import { Button } from "~/common/components/ui/button";
 import type { Route } from "./+types/login-page";
 import { Form, Link, redirect, useNavigation } from "react-router";
 import InputPair from "~/common/components/input-pair";
-import { LoaderCircle } from "lucide-react";
+import LoadingButton from "~/common/components/loading-button";
 import z from "zod";
 import { makeSSRClient } from "~/supa-client";
+import AuthButtons from "../components/auth-buttons";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Login | wemake" }];
@@ -59,7 +60,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
         <Link to="/auth/join">Join</Link>
       </Button>
-      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10"> 
+      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
         <h1 className="text-2xl font-semibold">Log in to your account</h1>
         <Form className="w-full space-y-4" method="post">
           <InputPair
@@ -90,17 +91,18 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
               {actionData?.formError?.password?.join(", ")}
             </p>
           )}
-          <Button className="w-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <LoaderCircle className="animate-spin" />
-            ) : (
-              "Log in"
-            )}
-          </Button>
+          <LoadingButton
+            className="w-full"
+            type="submit"
+            isLoading={isSubmitting}
+          >
+            Log in
+          </LoadingButton>
           {actionData && "loginError" in actionData && (
             <p className="text-sm text-red-500">{actionData.loginError}</p>
           )}
         </Form>
+        <AuthButtons />
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import z from "zod";
 import { checkUsernameExists } from "../queries";
 import { makeSSRClient } from "~/supa-client";
 import { LoaderCircle } from "lucide-react";
+import LoadingButton from "~/common/components/loading-button";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -146,9 +147,9 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
               {actionData?.formError?.password?.join(", ")}
             </p>
           )}
-          <Button className="w-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <LoaderCircle className="animate-spin" /> : "Join"}
-          </Button>
+          <LoadingButton isLoading={isSubmitting}>
+            {isSubmitting ? "Processing..." : "Join"}
+          </LoadingButton>
           {actionData && "signUpError" in actionData && (
             <p className="text-sm text-red-500">{actionData.signUpError}</p>
           )}
