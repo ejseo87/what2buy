@@ -1,6 +1,9 @@
 import type { Route } from "./+types/tickets-page";
 import { Hero } from "~/common/components/hero";
 import { TicketCard } from "../components/ticket-card";
+import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId } from "~/features/users/queries";
+import { getTickets } from "../queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -9,22 +12,31 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client as any);
+  const tickets = await getTickets(client as any, { userId });
+  return { tickets };
+};
 
-export default function TicketsPage() {
+export default function TicketsPage({ loaderData }: Route.ComponentProps) {
+  const { tickets } = loaderData;
+  console.log("tickets page tickets=", tickets);
   return (
     <div className="space-y-10">
       <Hero title="티켓 목록" subtitle="티켓 목록을 확인해보세요." />
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-6">
-          {Array.from({ length: 10 }).map((_, index) => (
-          <TicketCard
-            title={`티켓 ${index + 1}`}
-            type={index< 3? "무료" : "유료"}
-            duration="2025.06.01 ~ 2025.08.31"
-            status={index <5 ? "사용함" : "미사용"}
-            usedDate="2025.06.14"
-          />
+          {tickets.map((ticket) => (
+            <TicketCard
+              title={ticket.ticket_id}
+              type={ticket.ticket_type}
+              duration_start={ticket.ticket_duration_start}
+              duration_end={ticket.ticket_duration_end}
+              status={ticket.status}
+              usedDate={ticket.used_date}
+            />
           ))}
         </div>
       </div>

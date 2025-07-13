@@ -22,6 +22,20 @@
       "when": 1751798734695,
       "tag": "0002_steady_gorilla_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752389627393,
+      "tag": "0003_long_reavers",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1752389701885,
+      "tag": "0004_spotty_infant_terrible",
+      "breakpoints": true
     }
   ]
 }

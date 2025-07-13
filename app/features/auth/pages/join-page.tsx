@@ -8,6 +8,7 @@ import { checkUsernameExists } from "../queries";
 import { makeSSRClient } from "~/supa-client";
 import { LoaderCircle } from "lucide-react";
 import LoadingButton from "~/common/components/loading-button";
+import AlertMessage from "~/common/components/alert-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -150,9 +151,14 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
           <LoadingButton isLoading={isSubmitting}>
             {isSubmitting ? "Processing..." : "Join"}
           </LoadingButton>
-          {actionData && "signUpError" in actionData && (
-            <p className="text-sm text-red-500">{actionData.signUpError}</p>
-          )}
+          {actionData &&
+            "signUpError" in actionData &&
+            actionData.signUpError && (
+              <AlertMessage
+                content={actionData.signUpError}
+                variant="destructive"
+              />
+            )}
         </Form>
         <AuthButtons />
       </div>

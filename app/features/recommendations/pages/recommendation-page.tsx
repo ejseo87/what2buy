@@ -1,4 +1,7 @@
+import { makeSSRClient } from "~/supa-client";
 import type { Route } from "./+types/recommendation-page";
+import { getLoggedInUserId } from "~/features/users/queries";
+import { getTickets } from "~/features/tickets/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -7,7 +10,21 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export default function RecommendationPage() {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client as any);
+
+  const tickets  = await getTickets(client as any, {
+    userId: userId,
+  });
+  return { tickets };
+};
+
+export default function RecommendationPage({
+  loaderData,
+}: Route.ComponentProps) {
+  const { tickets } = loaderData;
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Request Stock Recommendation</h1>

@@ -433,7 +433,7 @@ export const getTotalPages = async (
 
   const { count, error } = await baseQuery;
   if (error) throw error;
-  if (count === null) return 1;
+  if (count === null || count === 0) return 1;
   //console.log(count);
   return Math.ceil(count / PAGE_SIZE);
 };

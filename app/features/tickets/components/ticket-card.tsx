@@ -6,11 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "~/common/components/ui/card";
+import { Separator } from "~/common/components/ui/separator";
 
 interface TicketCardProps {
-  title: string;
+  title: number;
   type: string;
-  duration: string;
+  duration_start: string;
+  duration_end: string;
   status: string;
   usedDate: string;
 }
@@ -18,7 +20,8 @@ interface TicketCardProps {
 export function TicketCard({
   title,
   type,
-  duration,
+  duration_start,
+  duration_end,
   status,
   usedDate,
 }: TicketCardProps) {
@@ -33,26 +36,30 @@ export function TicketCard({
           <div className="flex items-center justify-between">
             <div
               className={`text-3xl font-bold ${
-                status === "사용함" ? "" : "text-primary"
+                status === "used" ? "" : "text-primary"
               } px-10`}
             >
-              {type} 사용권
+              <span>{type === "free" ? "무료" : "유료"} 사용권</span>
+              <span className="text-muted-foreground text-lg text-light mx-2">
+                {" "}
+                |{" "}
+              </span>
+              <span>{status === "used" ? "사용함" : "미사용"}</span>
             </div>
             <Badge
               className={`text-xl text-bold ${
-                status === "사용함" ? "" : "text-primary"
+                status === "used" ? "" : "text-primary"
               }`}
               variant="secondary"
             >
-              {duration}
+              {duration_start} ~ {duration_end}
             </Badge>
           </div>
         </div>
       </CardContent>
-
       <CardFooter className="flex flex-row gap-10 justify-start">
         <Badge variant="secondary">{status}</Badge>
-        {status === "사용함" && <span>{usedDate}</span>}
+        {status === "used" && <span>{usedDate}</span>}
       </CardFooter>
     </Card>
   );

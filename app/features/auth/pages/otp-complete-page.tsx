@@ -1,6 +1,7 @@
 import type { Route } from "./+types/otp-complete-page";
 import { Form, redirect, useNavigation, useSearchParams } from "react-router";
 import z from "zod";
+import AlertMessage from "~/common/components/alert-message";
 import InputPair from "~/common/components/input-pair";
 import LoadingButton from "~/common/components/loading-button";
 import { Button } from "~/common/components/ui/button";
@@ -89,7 +90,10 @@ export default function OtpPage({ actionData }: Route.ComponentProps) {
             Verify OTP
           </LoadingButton>
           {actionData && "verifyError" in actionData && (
-            <p className="text-red-500">{actionData.verifyError}</p>
+            <AlertMessage
+              content={actionData.verifyError}
+              variant="destructive"
+            />
           )}
         </Form>
       </div>

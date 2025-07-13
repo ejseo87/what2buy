@@ -19,6 +19,7 @@ import { SORT_OPTIONS } from "~/common/constants";
 import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId } from "~/features/users/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -34,7 +35,9 @@ const searchParamsSchema = z.object({
 });
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-   const { client, headers } = makeSSRClient(request);
+  const { client, headers } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client as any);
+  console.log("histories page userId=", userId);
   const url = new URL(request.url);
   const { success, data: parsedData } = searchParamsSchema.safeParse(
     Object.fromEntries(url.searchParams)
@@ -42,16 +45,16 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!success) {
     throw new Error("Invalid search params");
   }
-  const totalPages = await getTotalPages(client as any,{
-    profile_id: a_profile_id,
+  const totalPages = await getTotalPages(client as any, {
+    profile_id: userId,
     keyword: parsedData.keyword,
   });
-  //console.log(totalPages);
+  //console.log("histories page totalPages=", totalPages);
   if (parsedData.page > totalPages) {
     throw new Error("Invalid page");
   }
-  const histories = await getHistories(client as any,{
-    profile_id: a_profile_id,
+  const histories = await getHistories(client as any, {
+    profile_id: userId,
     page: parsedData.page,
     sorting: parsedData.sorting,
     keyword: parsedData.keyword,
