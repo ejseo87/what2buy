@@ -15,7 +15,10 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
   const userId = await getLoggedInUserId(client as any);
-  const tickets = await getTickets(client as any, { userId });
+  const tickets = await getTickets(client as any, {
+    userId,
+    status: "all",
+  });
   return { tickets };
 };
 

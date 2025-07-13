@@ -296,22 +296,7 @@ export const getReturnRateInfo = async (
   }
 ) => {
   // recommendationDate를 YYYY-MM-DD 형식으로 변환
-  const recDate = recommendationDate.split("T")[0];
-
-  // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
-  const { data: recommendationPrice, error: recError } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .gte("date", recDate)
-    .order("date", { ascending: true })
-    .limit(1)
-    .single();
-
-  if (recError) {
-    console.log("Recommendation date error:", recError);
-    throw new Error("Failed to get recommendation date price");
-  }
+  let recDate = recommendationDate.split("T")[0];
 
   // 가장 최근 날짜 주식 가격 가져오기
   const { data: latestPrice, error: latestError } = await client
@@ -326,7 +311,24 @@ export const getReturnRateInfo = async (
     console.log("Latest price error:", latestError);
     throw new Error("Failed to get latest price");
   }
+  // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
+  if (recDate > latestPrice?.date) {
+    recDate = latestPrice?.date;
+  } 
+    const { data: recommendationPrice, error: recError } = await client
+      .from("daily_stocks")
+      .select("date, close")
+      .eq("stock_id", stockId)
+      .gte("date", recDate)
+      .order("date", { ascending: true })
+      .limit(1)
+      .single();
 
+    if (recError) {
+      console.log("Recommendation date error:", recError);
+      throw new Error("Failed to get recommendation date price");
+    }
+  
   return {
     recommendationPrice: (recommendationPrice as any)?.close || 0,
     recommendationDate: (recommendationPrice as any)?.date || recDate,
