@@ -64,6 +64,21 @@ export const getStockRecommendationChart = async (
   return stock_recommendation_chart;
 };
 
+export const getRecommendationCount = async (
+  client: SupabaseClient<Database>,
+  { profile_id }: { profile_id: string }
+) => {
+  const { count, error } = await client
+    .from("histories")
+    .select("recommendation_id", { count: "exact", head: true })
+    .eq("profile_id", profile_id);
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get recommendation count");
+  }
+  return count;
+};
+
 export const getHistories = async (
   client: SupabaseClient<Database>,
   {
@@ -314,21 +329,21 @@ export const getReturnRateInfo = async (
   // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
   if (recDate > latestPrice?.date) {
     recDate = latestPrice?.date;
-  } 
-    const { data: recommendationPrice, error: recError } = await client
-      .from("daily_stocks")
-      .select("date, close")
-      .eq("stock_id", stockId)
-      .gte("date", recDate)
-      .order("date", { ascending: true })
-      .limit(1)
-      .single();
+  }
+  const { data: recommendationPrice, error: recError } = await client
+    .from("daily_stocks")
+    .select("date, close")
+    .eq("stock_id", stockId)
+    .gte("date", recDate)
+    .order("date", { ascending: true })
+    .limit(1)
+    .single();
 
-    if (recError) {
-      console.log("Recommendation date error:", recError);
-      throw new Error("Failed to get recommendation date price");
-    }
-  
+  if (recError) {
+    console.log("Recommendation date error:", recError);
+    throw new Error("Failed to get recommendation date price");
+  }
+
   return {
     recommendationPrice: (recommendationPrice as any)?.close || 0,
     recommendationDate: (recommendationPrice as any)?.date || recDate,

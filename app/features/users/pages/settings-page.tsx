@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useNavigation } from "react-router";
 import type { Route } from "./+types/settings-page";
 import InputPair from "~/common/components/input-pair";
 import { useState } from "react";
@@ -7,12 +7,92 @@ import { Input } from "~/common/components/ui/input";
 import { Button } from "~/common/components/ui/button";
 import SelectPair from "~/common/components/select-pair";
 import { Separator } from "~/common/components/ui/separator";
+import { makeSSRClient } from "~/supa-client";
+import { checkUsername, getLoggedInUserId, getUserById } from "../queries";
+import LoadingButton from "~/common/components/loading-button";
+import z from "zod";
+import AlertMessage from "~/common/components/alert-message";
+import { updateUser, updateUserAvatar } from "../mutations";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "Settings | wemake" }];
+  return [{ title: "Edit profile | What2Buy" }];
 };
 
-export default function SettingsPage() {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const userID = await getLoggedInUserId(client as any);
+  const user = await getUserById(client as any, { id: userID });
+  return { user };
+};
+
+const formSchema = z.object({
+  name: z.string().min(3),
+  username: z.string().min(3),
+});
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const { client } = makeSSRClient(request);
+  const userID = await getLoggedInUserId(client as any);
+  console.log("settings page userID=", userID);
+  const formData = await request.formData();
+  const avatar = formData.get("avatar");
+  console.log("settings page avatar=", avatar);
+  if (avatar && avatar instanceof File) {
+    if (
+      avatar.size <= 1048576 && // 1MB = 1024 * 1024
+      (avatar.type === "image/png" || avatar.type === "image/jpeg")
+    ) {
+      const { data, error } = await client.storage
+        .from("avatars")
+        .upload(userID, avatar, {
+          contentType: avatar.type,
+          upsert: true,
+        });
+      if (error) {
+        // error.message를 반환
+        return {
+          formErrors: { avatar: error.message || "Failed to upload avatar" },
+        };
+      }
+      const {
+        data: { publicUrl },
+      } = await client.storage.from("avatars").getPublicUrl(data.path);
+      await updateUserAvatar(client as any, {
+        profile_id: userID,
+        avatarUrl: publicUrl,
+      });
+    } else {
+      return { formErrors: { avatar: "Invalid file size or type" } };
+    }
+  } else {
+    const { success, data, error } = formSchema.safeParse(
+      Object.fromEntries(formData)
+    );
+    if (!success) {
+      return { formErrors: error.flatten().fieldErrors };
+    }
+    const usernameCount = await checkUsername(client as any, {
+      username: data.username,
+    });
+    if (usernameCount && usernameCount > 0) {
+      return { formErrors: { username: "Username already exists" } };
+    }
+    const userID = await getLoggedInUserId(client as any);
+    await updateUser(client as any, {
+      profile_id: userID,
+      name: data.name,
+      username: data.username,
+    });
+    return {
+      ok: true,
+    };
+  }
+};
+
+export default function SettingsPage({
+  loaderData,
+  actionData,
+}: Route.ComponentProps) {
   const [avatar, setAvatar] = useState<string | null>(null);
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -20,31 +100,51 @@ export default function SettingsPage() {
       setAvatar(URL.createObjectURL(file));
     }
   };
+  const navigation = useNavigation();
+  const isSubmitting =
+    navigation.state === "submitting" || navigation.state === "loading";
   return (
     <div className="space-y-20 ">
       <div className="grid grid-cols-6 gap-40">
-        <div className="col-span-4 flex flex-col gap-10">
-          <h2 className="text-2xl font-semibold">Edit profile</h2>
-          <Form className="flex flex-col w-1/2 gap-5">
+        <div className="col-span-3 flex flex-col gap-10">
+          {actionData?.ok ? (
+            <AlertMessage content="프로파일 변경사항이 저장되었습니다." />
+          ) : null}
+          <h2 className="text-2xl font-semibold">프로필 변경</h2>
+          <Form className="flex flex-col  gap-5" method="post">
             <InputPair
-              label="Name"
-              description="Your public name"
+              label="이름"
+              description="공개될 이름"
               required
+              defaultValue={loaderData.user.name}
               id="name"
               name="name"
-              placeholder="John Doe"
+              placeholder="홍길동"
               type="text"
             />
+            {actionData?.formErrors && "name" in actionData?.formErrors ? (
+              <p className="text-red-500">
+                {actionData.formErrors?.name?.join(", ")}
+              </p>
+            ) : null}
             <InputPair
-              label="Email"
-              description="Your public email address"
+              label="Username"
+              description="공개될 username으로 사용자를 식별할 수 있습니다."
               required
-              id="email"
-              name="email"
-              placeholder="example@example.com"
-              type="email"
+              defaultValue={loaderData.user.username}
+              id="username"
+              name="username"
+              placeholder="username"
+              type="text"
             />
-            <Separator />
+            {actionData?.formErrors && "username" in actionData?.formErrors ? (
+              <p className="text-red-500">
+                {Array.isArray(actionData.formErrors?.username)
+                  ? actionData.formErrors?.username?.join(", ")
+                  : actionData.formErrors?.username}
+              </p>
+            ) : null}
+            {/*             <Separator />
             <h4>Change Password</h4>
             <p className="text-sm text-muted-foreground">
               If you want to change your password, please enter your current
@@ -70,15 +170,25 @@ export default function SettingsPage() {
               id="confirmNewPassword"
               name="confirmNewPassword"
               type="password"
-            />
-            <Button className="w-full fill-primary">Update profile</Button>
+            /> */}
+            <LoadingButton
+              className="w-full fill-primary"
+              type="submit"
+              isLoading={isSubmitting}
+            >
+              프로필 변경
+            </LoadingButton>
           </Form>
         </div>
-        <aside className="col-span-2 p-6 rounded-lg border shadow-md">
+        <Form
+          className="col-span-3 p-6 rounded-lg border shadow-md"
+          method="post"
+          encType="multipart/form-data"
+        >
           <Label className="flex flex-col gap-1 pb-5">
-            Avatar
+            아바타
             <small className="text-muted-foreground">
-              This is your public avatar.
+              공개될 아바타 이미지입니다.
             </small>
           </Label>
           <div className="space-y-5">
@@ -92,20 +202,35 @@ export default function SettingsPage() {
               className="w-1/2"
               onChange={onChange}
               required
-              name="icon"
+              name="avatar"
             />
+            {actionData?.formErrors && "avatar" in actionData?.formErrors ? (
+              <p className="text-red-500">
+                {Array.isArray(actionData.formErrors?.avatar)
+                  ? actionData.formErrors?.avatar?.join(", ")
+                  : actionData.formErrors?.avatar}
+              </p>
+            ) : null}
             <div className="flex flex-col text-xs">
               <span className=" text-muted-foreground">
-                Recommended size: 128x128px
+                권장 크기: 128x128px
               </span>
               <span className=" text-muted-foreground">
-                Allowed formats: PNG, JPEG
+                허용되는 이미지 포맷: PNG, JPEG
               </span>
-              <span className=" text-muted-foreground">Max file size: 1MB</span>
+              <span className=" text-muted-foreground">
+                최대 파일 크기: 1MB
+              </span>
             </div>
-            <Button className="w-full">Update avatar</Button>
+            <LoadingButton
+              className="w-full fill-primary"
+              type="submit"
+              isLoading={isSubmitting}
+            >
+              아바타 변경
+            </LoadingButton>
           </div>
-        </aside>
+        </Form>
       </div>
     </div>
   );

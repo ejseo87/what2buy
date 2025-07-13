@@ -23,7 +23,7 @@ export const getUserProfile = async (
     console.error(error);
     throw new Error("Failed to get user profile");
   }
-  console.log("profile=", profile);
+  //console.log("profile=", profile);
   return profile;
 };
 
@@ -47,7 +47,7 @@ export const getUserById = async (
     console.error(error);
     throw new Error("Failed to get user profile");
   }
-  console.log("profile=", profile);
+  //console.log("profile=", profile);
   return profile;
 };
 
@@ -58,4 +58,19 @@ export const getLoggedInUserId = async (client: SupabaseClient<Database>) => {
     throw redirect("/auth/login");
   }
   return data.user.id;
+};
+
+export const checkUsername = async (
+  client: SupabaseClient<Database>,
+  { username }: { username: string }
+) => {
+  const { count, error } = await client
+    .from("profiles")
+    .select("username", { count: "exact", head: true })
+    .eq("username", username);
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to check username");
+  }
+  return count;
 };

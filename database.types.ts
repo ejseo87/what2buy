@@ -477,30 +477,50 @@ export type Database = {
       }
       tickets: {
         Row: {
+          created_at: string | null
+          profile_id: string | null
           status: Database["public"]["Enums"]["ticket_status"]
           ticket_description: string | null
           ticket_duration_end: string
           ticket_duration_start: string
           ticket_id: number
           ticket_type: Database["public"]["Enums"]["ticket_types"]
+          updated_at: string | null
+          used_date: string | null
         }
         Insert: {
+          created_at?: string | null
+          profile_id?: string | null
           status: Database["public"]["Enums"]["ticket_status"]
           ticket_description?: string | null
           ticket_duration_end: string
           ticket_duration_start: string
-          ticket_id?: never
+          ticket_id?: number
           ticket_type: Database["public"]["Enums"]["ticket_types"]
+          updated_at?: string | null
+          used_date?: string | null
         }
         Update: {
+          created_at?: string | null
+          profile_id?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           ticket_description?: string | null
           ticket_duration_end?: string
           ticket_duration_start?: string
-          ticket_id?: never
+          ticket_id?: number
           ticket_type?: Database["public"]["Enums"]["ticket_types"]
+          updated_at?: string | null
+          used_date?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
       }
       user_ticket_relations: {
         Row: {
@@ -1002,7 +1022,7 @@ export type Database = {
         | "marketer"
         | "founder"
         | "product-manager"
-      ticket_status: "used" | "not_used"
+      ticket_status: "used" | "not_used" | "expired"
       ticket_types: "free" | "premium"
     }
     CompositeTypes: {
@@ -1139,7 +1159,7 @@ export const Constants = {
         "promotion",
       ],
       role: ["developer", "designer", "marketer", "founder", "product-manager"],
-      ticket_status: ["used", "not_used"],
+      ticket_status: ["used", "not_used", "expired"],
       ticket_types: ["free", "premium"],
     },
   },

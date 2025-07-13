@@ -62,7 +62,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export default function App({ loaderData }: Route.ComponentProps) {
   const { pathname } = useLocation();
   const isLoggedIn = loaderData.user !== null;
-  console.log("root app loaderData=", loaderData);
+  //console.log("root app loaderData=", loaderData);
   console.log("root app isLoggedIn=", isLoggedIn);
   return (
     <div className={pathname.includes("/auth/") ? "" : "py-28 px-20"}>
@@ -76,7 +76,14 @@ export default function App({ loaderData }: Route.ComponentProps) {
           hasMessages={false}
         />
       )}
-      <Outlet />
+      <Outlet
+        context={{
+          isLoggedIn,
+          username: loaderData.profile?.username ?? "",
+          name: loaderData.profile?.name ?? "",
+          avatar: loaderData.profile?.avatar ?? null,
+        }}
+      />
     </div>
   );
 }
