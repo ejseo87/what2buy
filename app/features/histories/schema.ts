@@ -89,10 +89,10 @@ export const history_stock_relations = pgTable(
     recommendation_id: bigint({ mode: "number" }).references(
       () => histories.recommendation_id,
       { onDelete: "cascade" }
-    ),
+    ).notNull(),
     stock_id: bigint({ mode: "number" }).references(() => stocks.stock_id, {
       onDelete: "cascade",
-    }),
+    }).notNull(),
     recommendation_date: timestamp().notNull().defaultNow(),
     profit: numeric(),
     profit_rate: numeric(),
