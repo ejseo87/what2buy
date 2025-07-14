@@ -44,9 +44,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
     ) {
       const { data, error } = await client.storage
         .from("avatars")
-        .upload(userID, avatar, {
+        .upload(`${userID}/${Date.now()}`, avatar, {
           contentType: avatar.type,
-          upsert: true,
+          upsert: false,
         });
       if (error) {
         // error.message를 반환
@@ -93,7 +93,7 @@ export default function SettingsPage({
   loaderData,
   actionData,
 }: Route.ComponentProps) {
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(loaderData.user.avatar);
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const file = event.target.files[0];
