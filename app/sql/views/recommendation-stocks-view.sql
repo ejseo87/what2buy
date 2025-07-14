@@ -1,4 +1,9 @@
-CREATE OR REPLACE VIEW recommendation_stocks_view AS
+DROP VIEW IF EXISTS recommendation_stocks_view;
+
+
+CREATE OR REPLACE VIEW recommendation_stocks_view 
+WITH (security_invoker = on)
+AS
 SELECT
   histories.recommendation_id,
   histories.recommendation_date,
@@ -29,3 +34,10 @@ FROM histories
 LEFT JOIN stocks s1 ON histories.stock1_id = s1.stock_id
 LEFT JOIN stocks s2 ON histories.stock2_id = s2.stock_id
 LEFT JOIN stocks s3 ON histories.stock3_id = s3.stock_id;
+
+
+
+
+select * from recommendation_stocks_view;
+
+select * from recommendation_stocks_view where profile_id = 'fd97f837-683c-499f-8d95-bca873f5799a' order by recommendation_date desc limit 1;

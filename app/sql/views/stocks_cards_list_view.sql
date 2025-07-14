@@ -1,4 +1,9 @@
-CREATE OR REPLACE VIEW stock_card_list_view AS
+DROP VIEW IF EXISTS stock_card_list_view;
+
+
+CREATE OR REPLACE VIEW stock_card_list_view 
+WITH (security_invoker = on)
+AS
 SELECT
   s.stock_id,
   s.stock_name,
@@ -18,3 +23,7 @@ GROUP BY
   s.stock_id, s.stock_name, s.stock_code, s.per, s.pbr, h2.profile_id
 ORDER BY
   recommendation_count DESC;
+
+
+
+select * from stock_card_list_view;

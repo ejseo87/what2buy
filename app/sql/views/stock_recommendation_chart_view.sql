@@ -1,6 +1,8 @@
 DROP VIEW IF EXISTS stock_recommendation_chart_view;
 
-CREATE OR REPLACE VIEW stock_recommendation_chart_view AS
+CREATE OR REPLACE VIEW stock_recommendation_chart_view 
+WITH (security_invoker = on)
+AS
 SELECT
   h.recommendation_id,
   s.stock_id,
@@ -25,7 +27,7 @@ SELECT
   ) AS latest_close,
   -- Last 30 days of prices as JSON for charting
   (
-    SELECT json_agg(json_build_object('date', to_char(ds.date, 'YYMMDD'), 'close', ds.close) ORDER BY ds.date)
+    SELECT json_agg(json_build_object('date', ds.date,  'close', ds.close) ORDER BY ds.date)
     FROM (
       SELECT ds.date, ds.close
       FROM daily_stocks ds
