@@ -1,9 +1,109 @@
 {
-  "id": "77710b2c-7291-4d9c-a66f-e9d11a06f975",
+  "id": "f6860f5d-ee55-49b1-b823-fc1c015cfb43",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.daily_stocks": {
+      "name": "daily_stocks",
+      "schema": "",
+      "columns": {
+        "stock_id": {
+          "name": "stock_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "open": {
+          "name": "open",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "high": {
+          "name": "high",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "low": {
+          "name": "low",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "close": {
+          "name": "close",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "volume": {
+          "name": "volume",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "change": {
+          "name": "change",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "daily_stocks_stock_id_stocks_stock_id_fk": {
+          "name": "daily_stocks_stock_id_stocks_stock_id_fk",
+          "tableFrom": "daily_stocks",
+          "tableTo": "stocks",
+          "columnsFrom": [
+            "stock_id"
+          ],
+          "columnsTo": [
+            "stock_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "daily_stocks_stock_id_date_pk": {
+          "name": "daily_stocks_stock_id_date_pk",
+          "columns": [
+            "stock_id",
+            "date"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {
+        "stocks-select-policy": {
+          "name": "stocks-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.histories": {
       "name": "histories",
       "schema": "",
@@ -54,19 +154,19 @@
           "name": "stock1_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "stock2_id": {
           "name": "stock2_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "stock3_id": {
           "name": "stock3_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "stock1_summary": {
           "name": "stock1_summary",
@@ -164,7 +264,26 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "histories-select-policy": {
+          "name": "histories-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "(select auth.uid()) = \"histories\".\"profile_id\""
+        },
+        "histories-insert-policy": {
+          "name": "histories-insert-policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"histories\".\"profile_id\""
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -176,13 +295,13 @@
           "name": "recommendation_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "stock_id": {
           "name": "stock_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "recommendation_date": {
           "name": "recommendation_date",
@@ -243,7 +362,25 @@
         }
       },
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "history_stock_relations-select-policy": {
+          "name": "history_stock_relations-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "true"
+        },
+        "history_stock_relations-insert-policy": {
+          "name": "history_stock_relations-insert-policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "authenticated"
+          ]
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -341,7 +478,17 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "stocks-select-policy": {
+          "name": "stocks-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "true"
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -397,13 +544,81 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "used_date": {
+          "name": "used_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profile_id": {
+          "name": "profile_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "tickets_profile_id_profiles_profile_id_fk": {
+          "name": "tickets_profile_id_profiles_profile_id_fk",
+          "tableFrom": "tickets",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "profile_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "tickets-insert-policy": {
+          "name": "tickets-insert-policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"tickets\".\"profile_id\""
+        },
+        "tickets-select-policy": {
+          "name": "tickets-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "(select auth.uid()) = \"tickets\".\"profile_id\""
+        },
+        "tickets-update-policy": {
+          "name": "tickets-update-policy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"tickets\".\"profile_id\""
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -467,7 +682,35 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
+      "policies": {
+        "notifications-insert-policy": {
+          "name": "notifications-insert-policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"notifications\".\"profile_id\""
+        },
+        "notifications-update-policy": {
+          "name": "notifications-update-policy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"notifications\".\"profile_id\""
+        },
+        "notifications-select-policy": {
+          "name": "notifications-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "(select auth.uid()) = \"notifications\".\"profile_id\""
+        }
+      },
       "checkConstraints": {},
       "isRLSEnabled": false
     },
@@ -533,74 +776,35 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.user_ticket_relations": {
-      "name": "user_ticket_relations",
-      "schema": "",
-      "columns": {
-        "profile_id": {
-          "name": "profile_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
+      "policies": {
+        "profiles-insert-policy": {
+          "name": "profiles-insert-policy",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"profiles\".\"profile_id\""
         },
-        "ticket_id": {
-          "name": "ticket_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
+        "profiles-update-policy": {
+          "name": "profiles-update-policy",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "(select auth.uid()) = \"profiles\".\"profile_id\""
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+        "profiles-select-policy": {
+          "name": "profiles-select-policy",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "(select auth.uid()) = \"profiles\".\"profile_id\""
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "user_ticket_relations_profile_id_profiles_profile_id_fk": {
-          "name": "user_ticket_relations_profile_id_profiles_profile_id_fk",
-          "tableFrom": "user_ticket_relations",
-          "tableTo": "profiles",
-          "columnsFrom": [
-            "profile_id"
-          ],
-          "columnsTo": [
-            "profile_id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "user_ticket_relations_ticket_id_tickets_ticket_id_fk": {
-          "name": "user_ticket_relations_ticket_id_tickets_ticket_id_fk",
-          "tableFrom": "user_ticket_relations",
-          "tableTo": "tickets",
-          "columnsFrom": [
-            "ticket_id"
-          ],
-          "columnsTo": [
-            "ticket_id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "user_ticket_relations_profile_id_ticket_id_pk": {
-          "name": "user_ticket_relations_profile_id_ticket_id_pk",
-          "columns": [
-            "profile_id",
-            "ticket_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     }
@@ -611,7 +815,8 @@
       "schema": "public",
       "values": [
         "used",
-        "not_used"
+        "not_used",
+        "expired"
       ]
     },
     "public.ticket_types": {
@@ -626,22 +831,10 @@
       "name": "notification_type",
       "schema": "public",
       "values": [
-        "ticket_expired",
-        "ticket_used",
-        "ticket_created",
-        "ticket_refunded",
-        "promotion"
-      ]
-    },
-    "public.role": {
-      "name": "role",
-      "schema": "public",
-      "values": [
-        "developer",
-        "designer",
-        "marketer",
-        "founder",
-        "product-manager"
+        "alert",
+        "system",
+        "promotion",
+        "information"
       ]
     }
   },

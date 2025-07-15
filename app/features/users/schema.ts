@@ -18,7 +18,6 @@ import { authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
 //  id: uuid().primaryKey(),
 //});
 
-
 export const profiles = pgTable(
   "profiles",
   {
@@ -48,7 +47,7 @@ export const profiles = pgTable(
       for: "select",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`${authUid} = ${table.profile_id}`,
+      using: sql`${authUid} = ${table.profile_id}`,
     }),
   ]
 );
@@ -89,7 +88,7 @@ export const notifications = pgTable(
       for: "select",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`${authUid} = ${table.profile_id}`,
+      using: sql`${authUid} = ${table.profile_id}`,
     }),
   ]
 );

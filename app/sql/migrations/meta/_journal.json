@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1751390129982,
-      "tag": "0000_open_the_order",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1751785080016,
-      "tag": "0001_watery_mulholland_black",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1751798734695,
-      "tag": "0002_steady_gorilla_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752389627393,
-      "tag": "0003_long_reavers",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1752389701885,
-      "tag": "0004_spotty_infant_terrible",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1752503266138,
-      "tag": "0005_amused_zzzax",
+      "when": 1752558059421,
+      "tag": "0000_burly_kid_colt",
       "breakpoints": true
     }
   ]

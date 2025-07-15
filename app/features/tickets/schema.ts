@@ -53,7 +53,7 @@ export const tickets = pgTable(
       for: "select",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`${authUid} = ${table.profile_id}`,
+      using: sql`${authUid} = ${table.profile_id}`,
     }),
     pgPolicy("tickets-update-policy", {
       for: "update",

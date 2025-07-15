@@ -21,7 +21,6 @@ import {
   authUsers,
 } from "drizzle-orm/supabase";
 
-
 export const stocks = pgTable(
   "stocks",
   {
@@ -49,7 +48,6 @@ export const stocks = pgTable(
     }),
   ]
 );
-
 
 export const daily_stocks = pgTable(
   "daily_stocks",
@@ -108,7 +106,7 @@ export const histories = pgTable(
       for: "select",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`${authUid} = ${table.profile_id}`,
+      using: sql`${authUid} = ${table.profile_id}`,
     }),
     pgPolicy("histories-insert-policy", {
       for: "insert",
@@ -146,7 +144,6 @@ export const history_stock_relations = pgTable(
       for: "insert",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`true`,
     }),
   ]
 );
