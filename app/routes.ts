@@ -25,10 +25,13 @@ export default [
   ]),
 
   // Recommendation request
-  route(
-    "/recommendation",
-    "features/recommendations/pages/recommendation-page.tsx"
-  ),
+  ...prefix("/recommendation", [
+    index("features/recommendations/pages/recommendation-page.tsx"),
+    route(
+      "/generate",
+      "features/recommendations/pages/generate-recommendation-page.tsx"
+    ),
+  ]),
 
   // Ticket details and buy tickets
   ...prefix("/tickets", [

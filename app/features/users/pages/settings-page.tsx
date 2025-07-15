@@ -49,6 +49,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
           upsert: false,
         });
       if (error) {
+        console.log("avatar upload error=", error);
         // error.message를 반환
         return {
           formErrors: { avatar: error.message || "Failed to upload avatar" },

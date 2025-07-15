@@ -47,7 +47,7 @@ export const getTicketCount = async (
   if (status !== "all") {
     baseQuery.eq("status", status);
   }
-  const { data: count, error } = await baseQuery;
+  const { count, error } = await baseQuery;
   if (error) {
     console.error(error);
     throw new Error("Failed to get ticket count");

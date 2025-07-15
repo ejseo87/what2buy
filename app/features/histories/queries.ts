@@ -3,6 +3,7 @@ import { PAGE_SIZE } from "~/common/constants";
 import type { Database } from "~/supa-client";
 import pkg from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { redirect } from "react-router";
 
 export const latestRecommendation = async (
   client: SupabaseClient<Database>,
@@ -17,7 +18,7 @@ export const latestRecommendation = async (
     .single();
   if (error) {
     console.log(error);
-    throw new Error("Failed to get latest recommendation");
+    throw redirect("/recommendation");
   }
   //console.log(lastest_history);
   return lastest_history;

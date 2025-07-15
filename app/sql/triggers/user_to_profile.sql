@@ -1,4 +1,5 @@
 drop function if exists public.handle_new_user() cascade;
+drop trigger if exists user_to_profile_trigger on auth.users;
 
 create function public.handle_new_user()
 returns trigger

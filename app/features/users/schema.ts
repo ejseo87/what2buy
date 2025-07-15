@@ -41,6 +41,7 @@ export const profiles = pgTable(
       for: "update",
       to: authenticatedRole,
       as: "permissive",
+      using: sql`${authUid} = ${table.profile_id}`,
       withCheck: sql`${authUid} = ${table.profile_id}`,
     }),
     pgPolicy("profiles-select-policy", {

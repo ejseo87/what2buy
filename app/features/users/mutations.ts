@@ -15,16 +15,24 @@ export const updateUser = async (
     username: string;
   }
 ) => {
+  console.log("Updating user with profile_id:", profile_id);
+
+  // 먼저 현재 사용자 정보 확인
+  const { data: currentUser, error: selectError } = await client
+    .from("profiles")
+    .select("*")
+    .eq("profile_id", profile_id)
+    .single();
+
+  console.log("Current user data:", currentUser);
+  console.log("Select error:", selectError);
+
   const { data, error } = await client
     .from("profiles")
-    .update({
-      name: name,
-      username: username,
-    } as any)
+    .update({ name, username } as any)
     .eq("profile_id", profile_id)
     .select()
     .single();
-
   if (error) {
     console.error("Update user error:", error);
     throw new Error("Failed to update user");
@@ -33,7 +41,6 @@ export const updateUser = async (
   console.log("Updated user data:", data);
   return { success: true, data };
 };
-
 
 export const updateUserAvatar = async (
   client: SupabaseClient<Database>,

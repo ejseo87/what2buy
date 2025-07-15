@@ -8,6 +8,20 @@
       "when": 1752558059421,
       "tag": "0000_burly_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752568118670,
+      "tag": "0001_wet_wild_child",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752583402085,
+      "tag": "0002_yellow_spyke",
+      "breakpoints": true
     }
   ]
 }

@@ -6,12 +6,7 @@ import LoadingButton from "~/common/components/loading-button";
 import z from "zod";
 import { makeSSRClient } from "~/supa-client";
 import AuthButtons from "../components/auth-buttons";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "~/common/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
+import AlertMessage from "~/common/components/alert-message";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Login | wemake" }];
@@ -106,7 +101,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
           </LoadingButton>
           {actionData && "loginError" in actionData && (
             <AlertMessage
-              content={actionData.loginError}
+              content={actionData.loginError || undefined}
               variant="destructive"
             />
           )}

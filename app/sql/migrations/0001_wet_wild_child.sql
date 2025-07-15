@@ -1,0 +1,1 @@
+ALTER POLICY "profiles-update-policy" ON "profiles" TO authenticated USING ((select auth.uid()) = "profiles"."profile_id") WITH CHECK ((select auth.uid()) = "profiles"."profile_id");

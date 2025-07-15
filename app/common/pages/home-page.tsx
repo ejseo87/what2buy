@@ -11,6 +11,7 @@ import {
   latestRecommendation,
 } from "~/features/histories/queries";
 import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId } from "~/features/users/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -21,8 +22,9 @@ export const meta: Route.MetaFunction = () => {
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client as any);
   const latest_recommendation = await latestRecommendation(client as any, {
-    profile_id: a_profile_id,
+    profile_id: userId,
   });
   //console.log(latest_recommendation);
   const recommendationDate = latest_recommendation.recommendation_date.slice(

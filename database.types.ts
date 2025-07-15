@@ -67,13 +67,6 @@ export type Database = {
             foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "daily_stocks_stock_id_stocks_stock_id_fk"
-            columns: ["stock_id"]
-            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
             referencedColumns: ["stock_id"]
           },
@@ -162,13 +155,6 @@ export type Database = {
             foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
             columns: ["stock1_id"]
             isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
-            columns: ["stock1_id"]
-            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
             referencedColumns: ["stock_id"]
           },
@@ -204,13 +190,6 @@ export type Database = {
             foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
             columns: ["stock2_id"]
             isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
-            columns: ["stock2_id"]
-            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
             referencedColumns: ["stock_id"]
           },
@@ -240,13 +219,6 @@ export type Database = {
             columns: ["stock3_id"]
             isOneToOne: false
             referencedRelation: "stock_detail_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
-            columns: ["stock3_id"]
-            isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -342,13 +314,6 @@ export type Database = {
             columns: ["stock_id"]
             isOneToOne: false
             referencedRelation: "stock_detail_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
-            columns: ["stock_id"]
-            isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -477,81 +442,48 @@ export type Database = {
       }
       tickets: {
         Row: {
-          created_at: string | null
-          profile_id: string | null
+          created_at: string
+          profile_id: string
           status: Database["public"]["Enums"]["ticket_status"]
           ticket_description: string | null
           ticket_duration_end: string
           ticket_duration_start: string
           ticket_id: number
           ticket_type: Database["public"]["Enums"]["ticket_types"]
-          updated_at: string | null
+          updated_at: string
           used_date: string | null
         }
         Insert: {
-          created_at?: string | null
-          profile_id?: string | null
+          created_at?: string
+          profile_id: string
           status: Database["public"]["Enums"]["ticket_status"]
           ticket_description?: string | null
           ticket_duration_end: string
           ticket_duration_start: string
-          ticket_id?: number
+          ticket_id?: never
           ticket_type: Database["public"]["Enums"]["ticket_types"]
-          updated_at?: string | null
+          updated_at?: string
           used_date?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          profile_id?: string | null
-          status?: Database["public"]["Enums"]["ticket_status"]
-          ticket_description?: string | null
-          ticket_duration_end?: string
-          ticket_duration_start?: string
-          ticket_id?: number
-          ticket_type?: Database["public"]["Enums"]["ticket_types"]
-          updated_at?: string | null
-          used_date?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tickets_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["profile_id"]
-          },
-        ]
-      }
-      user_ticket_relations: {
-        Row: {
-          created_at: string
-          profile_id: string
-          ticket_id: number
-        }
-        Insert: {
-          created_at?: string
-          profile_id: string
-          ticket_id: number
         }
         Update: {
           created_at?: string
           profile_id?: string
-          ticket_id?: number
+          status?: Database["public"]["Enums"]["ticket_status"]
+          ticket_description?: string | null
+          ticket_duration_end?: string
+          ticket_duration_start?: string
+          ticket_id?: never
+          ticket_type?: Database["public"]["Enums"]["ticket_types"]
+          updated_at?: string
+          used_date?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "user_ticket_relations_profile_id_profiles_profile_id_fk"
+            foreignKeyName: "tickets_profile_id_profiles_profile_id_fk"
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "user_ticket_relations_ticket_id_tickets_ticket_id_fk"
-            columns: ["ticket_id"]
-            isOneToOne: false
-            referencedRelation: "tickets"
-            referencedColumns: ["ticket_id"]
           },
         ]
       }
@@ -620,13 +552,6 @@ export type Database = {
             columns: ["stock_id"]
             isOneToOne: false
             referencedRelation: "stock_detail_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
-            columns: ["stock_id"]
-            isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -706,13 +631,6 @@ export type Database = {
             foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
             columns: ["stock1_id"]
             isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "histories_stock1_id_stocks_stock_id_fk"
-            columns: ["stock1_id"]
-            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
             referencedColumns: ["stock_id"]
           },
@@ -748,13 +666,6 @@ export type Database = {
             foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
             columns: ["stock2_id"]
             isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "histories_stock2_id_stocks_stock_id_fk"
-            columns: ["stock2_id"]
-            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
             referencedColumns: ["stock_id"]
           },
@@ -784,13 +695,6 @@ export type Database = {
             columns: ["stock3_id"]
             isOneToOne: false
             referencedRelation: "stock_detail_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "histories_stock3_id_stocks_stock_id_fk"
-            columns: ["stock3_id"]
-            isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
             referencedColumns: ["stock_id"]
           },
           {
@@ -852,22 +756,6 @@ export type Database = {
           roe: number | null
           stock_code: string | null
           stock_count: number | null
-          stock_id: number | null
-          stock_name: string | null
-          volume: number | null
-        }
-        Relationships: []
-      }
-      stock_performance_chart_view: {
-        Row: {
-          change: number | null
-          close: number | null
-          date: string | null
-          high: number | null
-          low: number | null
-          moving_avg_30: number | null
-          open: number | null
-          stock_code: string | null
           stock_id: number | null
           stock_name: string | null
           volume: number | null
@@ -979,13 +867,6 @@ export type Database = {
             foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
             columns: ["stock_id"]
             isOneToOne: false
-            referencedRelation: "stock_performance_chart_view"
-            referencedColumns: ["stock_id"]
-          },
-          {
-            foreignKeyName: "history_stock_relations_stock_id_stocks_stock_id_fk"
-            columns: ["stock_id"]
-            isOneToOne: false
             referencedRelation: "stock_recommendation_chart_view"
             referencedColumns: ["stock_id"]
           },
@@ -1010,18 +891,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      notification_type:
-        | "ticket_expired"
-        | "ticket_used"
-        | "ticket_created"
-        | "ticket_refunded"
-        | "promotion"
-      role:
-        | "developer"
-        | "designer"
-        | "marketer"
-        | "founder"
-        | "product-manager"
+      notification_type: "alert" | "system" | "promotion" | "information"
       ticket_status: "used" | "not_used" | "expired"
       ticket_types: "free" | "premium"
     }
@@ -1151,14 +1021,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      notification_type: [
-        "ticket_expired",
-        "ticket_used",
-        "ticket_created",
-        "ticket_refunded",
-        "promotion",
-      ],
-      role: ["developer", "designer", "marketer", "founder", "product-manager"],
+      notification_type: ["alert", "system", "promotion", "information"],
       ticket_status: ["used", "not_used", "expired"],
       ticket_types: ["free", "premium"],
     },
