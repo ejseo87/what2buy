@@ -1,85 +1,9 @@
 {
-  "id": "7293a3ec-ccd5-4f2e-8b58-8a5841682396",
-  "prevId": "4cb716e9-133c-4919-affc-752b608c15b5",
+  "id": "4cb716e9-133c-4919-affc-752b608c15b5",
+  "prevId": "eba1bff6-3057-4925-af09-3d76118952bf",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.stocks_historical_data": {
-      "name": "stocks_historical_data",
-      "schema": "",
-      "columns": {
-        "isu_srt_cd": {
-          "name": "isu_srt_cd",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "date": {
-          "name": "date",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "open": {
-          "name": "open",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "high": {
-          "name": "high",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "low": {
-          "name": "low",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "close": {
-          "name": "close",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "volume": {
-          "name": "volume",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "stocks_historical_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk": {
-          "name": "stocks_historical_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk",
-          "tableFrom": "stocks_historical_data",
-          "tableTo": "stocks_overview",
-          "columnsFrom": [
-            "isu_srt_cd"
-          ],
-          "columnsTo": [
-            "isu_srt_cd"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.stocks_overview": {
       "name": "stocks_overview",
       "schema": "",

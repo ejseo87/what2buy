@@ -10,6 +10,13 @@ export default [
   // Home page
   index("common/pages/home-page.tsx"),
 
+  // API routes
+  ...prefix("/api", [
+    route("/stocks", "features/api/pages/stocks-api.tsx"),
+    route("/stocks/:symbol", "features/api/pages/stock-detail-api.tsx"),
+    route("/stocks/search/:query", "features/api/pages/stock-search-api.tsx"),
+  ]),
+
   // History routes
   ...prefix("histories", [
     index("features/histories/pages/histories-page.tsx"),

@@ -440,6 +440,125 @@ export type Database = {
         }
         Relationships: []
       }
+      stocks_overview: {
+        Row: {
+          created_at: string
+          isu_abbrv: string
+          isu_cd: string
+          isu_eng_nm: string
+          isu_id: number
+          isu_nm: string
+          isu_srt_cd: string
+          kind_stkcert_tp_nm: string
+          list_dd: string
+          list_shrs: number
+          mkt_tp_nm: string
+          parval: number
+          sect_tp_nm: string | null
+          secugrp_nm: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          isu_abbrv: string
+          isu_cd: string
+          isu_eng_nm: string
+          isu_id?: never
+          isu_nm: string
+          isu_srt_cd: string
+          kind_stkcert_tp_nm: string
+          list_dd: string
+          list_shrs: number
+          mkt_tp_nm: string
+          parval: number
+          sect_tp_nm?: string | null
+          secugrp_nm: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          isu_abbrv?: string
+          isu_cd?: string
+          isu_eng_nm?: string
+          isu_id?: never
+          isu_nm?: string
+          isu_srt_cd?: string
+          kind_stkcert_tp_nm?: string
+          list_dd?: string
+          list_shrs?: number
+          mkt_tp_nm?: string
+          parval?: number
+          sect_tp_nm?: string | null
+          secugrp_nm?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stocks_wargings: {
+        Row: {
+          administrative_issue: string
+          created_at: string
+          delisting_liquidation: string
+          insufficient_listed_shares_pref: string
+          investment_caution: string
+          investment_caution_realert: string
+          investment_risk: string
+          investment_warning: string
+          isu_abbrv: string
+          isu_id: number | null
+          isu_srt_cd: string
+          short_term_overheated: string
+          super_low_liquidity_single_price: string
+          trading_suspension: string
+          unfaithful_disclosure: string
+          updated_at: string
+        }
+        Insert: {
+          administrative_issue: string
+          created_at?: string
+          delisting_liquidation: string
+          insufficient_listed_shares_pref: string
+          investment_caution: string
+          investment_caution_realert: string
+          investment_risk: string
+          investment_warning: string
+          isu_abbrv: string
+          isu_id?: number | null
+          isu_srt_cd: string
+          short_term_overheated: string
+          super_low_liquidity_single_price: string
+          trading_suspension: string
+          unfaithful_disclosure: string
+          updated_at?: string
+        }
+        Update: {
+          administrative_issue?: string
+          created_at?: string
+          delisting_liquidation?: string
+          insufficient_listed_shares_pref?: string
+          investment_caution?: string
+          investment_caution_realert?: string
+          investment_risk?: string
+          investment_warning?: string
+          isu_abbrv?: string
+          isu_id?: number | null
+          isu_srt_cd?: string
+          short_term_overheated?: string
+          super_low_liquidity_single_price?: string
+          trading_suspension?: string
+          unfaithful_disclosure?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stocks_wargings_isu_id_stocks_overview_isu_id_fk"
+            columns: ["isu_id"]
+            isOneToOne: false
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_id"]
+          },
+        ]
+      }
       tickets: {
         Row: {
           created_at: string
@@ -489,6 +608,18 @@ export type Database = {
       }
     }
     Views: {
+      get_no_warging_stock_list_view: {
+        Row: {
+          isu_abbrv: string | null
+          isu_srt_cd: string | null
+          kind_stkcert_tp_nm: string | null
+          list_shrs: number | null
+          mkt_tp_nm: string | null
+          parval: number | null
+          secugrp_nm: string | null
+        }
+        Relationships: []
+      }
       profit_tracking_view: {
         Row: {
           current_price: number | null
