@@ -440,6 +440,54 @@ export type Database = {
         }
         Relationships: []
       }
+      stocks_historical_data: {
+        Row: {
+          close: number
+          created_at: string
+          date: string
+          high: number
+          isu_srt_cd: string
+          low: number
+          open: number
+          volume: number
+        }
+        Insert: {
+          close: number
+          created_at?: string
+          date: string
+          high: number
+          isu_srt_cd: string
+          low: number
+          open: number
+          volume: number
+        }
+        Update: {
+          close?: number
+          created_at?: string
+          date?: string
+          high?: number
+          isu_srt_cd?: string
+          low?: number
+          open?: number
+          volume?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stocks_historical_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: false
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "stocks_historical_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: false
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+        ]
+      }
       stocks_overview: {
         Row: {
           created_at: string
@@ -505,7 +553,6 @@ export type Database = {
           investment_risk: string
           investment_warning: string
           isu_abbrv: string
-          isu_id: number | null
           isu_srt_cd: string
           short_term_overheated: string
           super_low_liquidity_single_price: string
@@ -523,7 +570,6 @@ export type Database = {
           investment_risk: string
           investment_warning: string
           isu_abbrv: string
-          isu_id?: number | null
           isu_srt_cd: string
           short_term_overheated: string
           super_low_liquidity_single_price: string
@@ -541,7 +587,6 @@ export type Database = {
           investment_risk?: string
           investment_warning?: string
           isu_abbrv?: string
-          isu_id?: number | null
           isu_srt_cd?: string
           short_term_overheated?: string
           super_low_liquidity_single_price?: string
@@ -551,11 +596,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "stocks_wargings_isu_id_stocks_overview_isu_id_fk"
-            columns: ["isu_id"]
+            foreignKeyName: "stocks_wargings_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: false
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "stocks_wargings_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
             isOneToOne: false
             referencedRelation: "stocks_overview"
-            referencedColumns: ["isu_id"]
+            referencedColumns: ["isu_srt_cd"]
           },
         ]
       }
@@ -1019,7 +1071,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_avatars: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       notification_type: "alert" | "system" | "promotion" | "information"

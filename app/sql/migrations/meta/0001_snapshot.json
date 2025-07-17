@@ -1,9 +1,343 @@
 {
-  "id": "79edc9a5-f43f-45f3-ac56-f74d00e9a2d2",
-  "prevId": "f6860f5d-ee55-49b1-b823-fc1c015cfb43",
+  "id": "098ff5ec-42ba-4d63-a64b-b85aa5604bd0",
+  "prevId": "e367d118-857e-477e-a4ee-429143d64d06",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.stocks_historical_data": {
+      "name": "stocks_historical_data",
+      "schema": "",
+      "columns": {
+        "isu_srt_cd": {
+          "name": "isu_srt_cd",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "open": {
+          "name": "open",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "high": {
+          "name": "high",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "low": {
+          "name": "low",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "close": {
+          "name": "close",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "volume": {
+          "name": "volume",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stocks_historical_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk": {
+          "name": "stocks_historical_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk",
+          "tableFrom": "stocks_historical_data",
+          "tableTo": "stocks_overview",
+          "columnsFrom": [
+            "isu_srt_cd"
+          ],
+          "columnsTo": [
+            "isu_srt_cd"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "stocks_historical_data_isu_srt_cd_date_pk": {
+          "name": "stocks_historical_data_isu_srt_cd_date_pk",
+          "columns": [
+            "isu_srt_cd",
+            "date"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stocks_overview": {
+      "name": "stocks_overview",
+      "schema": "",
+      "columns": {
+        "isu_id": {
+          "name": "isu_id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "stocks_overview_isu_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "isu_cd": {
+          "name": "isu_cd",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isu_srt_cd": {
+          "name": "isu_srt_cd",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isu_nm": {
+          "name": "isu_nm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isu_abbrv": {
+          "name": "isu_abbrv",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isu_eng_nm": {
+          "name": "isu_eng_nm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "list_dd": {
+          "name": "list_dd",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mkt_tp_nm": {
+          "name": "mkt_tp_nm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "secugrp_nm": {
+          "name": "secugrp_nm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sect_tp_nm": {
+          "name": "sect_tp_nm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind_stkcert_tp_nm": {
+          "name": "kind_stkcert_tp_nm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parval": {
+          "name": "parval",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "list_shrs": {
+          "name": "list_shrs",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "stocks_overview_isu_cd_unique": {
+          "name": "stocks_overview_isu_cd_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "isu_cd"
+          ]
+        },
+        "stocks_overview_isu_srt_cd_unique": {
+          "name": "stocks_overview_isu_srt_cd_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "isu_srt_cd"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stocks_wargings": {
+      "name": "stocks_wargings",
+      "schema": "",
+      "columns": {
+        "isu_srt_cd": {
+          "name": "isu_srt_cd",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isu_abbrv": {
+          "name": "isu_abbrv",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trading_suspension": {
+          "name": "trading_suspension",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "delisting_liquidation": {
+          "name": "delisting_liquidation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "administrative_issue": {
+          "name": "administrative_issue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "investment_caution_realert": {
+          "name": "investment_caution_realert",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unfaithful_disclosure": {
+          "name": "unfaithful_disclosure",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "super_low_liquidity_single_price": {
+          "name": "super_low_liquidity_single_price",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "insufficient_listed_shares_pref": {
+          "name": "insufficient_listed_shares_pref",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "short_term_overheated": {
+          "name": "short_term_overheated",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "investment_caution": {
+          "name": "investment_caution",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "investment_warning": {
+          "name": "investment_warning",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "investment_risk": {
+          "name": "investment_risk",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stocks_wargings_isu_srt_cd_stocks_overview_isu_srt_cd_fk": {
+          "name": "stocks_wargings_isu_srt_cd_stocks_overview_isu_srt_cd_fk",
+          "tableFrom": "stocks_wargings",
+          "tableTo": "stocks_overview",
+          "columnsFrom": [
+            "isu_srt_cd"
+          ],
+          "columnsTo": [
+            "isu_srt_cd"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.daily_stocks": {
       "name": "daily_stocks",
       "schema": "",
@@ -616,6 +950,7 @@
           "to": [
             "authenticated"
           ],
+          "using": "(select auth.uid()) = \"tickets\".\"profile_id\"",
           "withCheck": "(select auth.uid()) = \"tickets\".\"profile_id\""
         }
       },

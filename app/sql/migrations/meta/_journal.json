@@ -1,10 +1,19 @@
 {
+  "version": "7",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
       "version": "7",
-      "when": 1752679253127,
-      "tag": "0010_damp_spacker_dave",
+      "when": 1752738207321,
+      "tag": "0000_naive_earthquake",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752753785972,
+      "tag": "0001_foamy_mojo",
       "breakpoints": true
     }
   ]

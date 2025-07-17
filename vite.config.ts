@@ -4,4 +4,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths()],
+  server: {
+    allowedHosts: [
+      "localhost",
+      "127.0.0.1",
+      "refer-declared-doing-laptops.trycloudflare.com",
+      ".trycloudflare.com", // 모든 Cloudflare Tunnel 도메인 허용
+    ],
+  },
 });

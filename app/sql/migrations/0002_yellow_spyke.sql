@@ -1,1 +1,0 @@
-ALTER POLICY "tickets-update-policy" ON "tickets" TO authenticated USING ((select auth.uid()) = "tickets"."profile_id") WITH CHECK ((select auth.uid()) = "tickets"."profile_id");

@@ -4,6 +4,7 @@ import {
   check,
   numeric,
   pgTable,
+  primaryKey,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -46,15 +47,19 @@ export const stocks_wargings = pgTable("stocks_wargings", {
   updated_at: timestamp().notNull().defaultNow(),
 });
 
-export const stocks_historical_data = pgTable("stocks_historical_data", {
-  isu_srt_cd: text()
-    .references(() => stocks_overview.isu_srt_cd)
-    .notNull(),
-  date: text().notNull(),
-  open: numeric().notNull(),
-  high: numeric().notNull(),
-  low: numeric().notNull(),
-  close: numeric().notNull(),
-  volume: numeric().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-});
+export const stocks_historical_data = pgTable(
+  "stocks_historical_data",
+  {
+    isu_srt_cd: text()
+      .references(() => stocks_overview.isu_srt_cd)
+      .notNull(),
+    date: text().notNull(),
+    open: numeric().notNull(),
+    high: numeric().notNull(),
+    low: numeric().notNull(),
+    close: numeric().notNull(),
+    volume: numeric().notNull(),
+    created_at: timestamp().notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.isu_srt_cd, table.date] })]
+);

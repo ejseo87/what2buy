@@ -122,7 +122,26 @@ export class StockDataService {
       }
 
       const data = await response.json();
+
+      // Check if the response has the expected structure
+      if (!data.chart || !data.chart.result || !data.chart.result[0]) {
+        console.warn(`No chart data available for ${symbol}`);
+        return [];
+      }
+
       const result = data.chart.result[0];
+
+      // Check if timestamps and indicators exist
+      if (
+        !result.timestamp ||
+        !result.indicators ||
+        !result.indicators.quote ||
+        !result.indicators.quote[0]
+      ) {
+        //console.warn(`Missing timestamp or quote data for ${symbol}`);
+        return [];
+      }
+
       const timestamps = result.timestamp;
       const quote = result.indicators.quote[0];
 
@@ -143,8 +162,11 @@ export class StockDataService {
 
       return historicalData;
     } catch (error) {
-      console.error(`Error fetching historical data for ${symbol}:`, error);
-      throw new Error(`Failed to fetch historical data for ${symbol}`);
+      console.error(
+        `Error fetching historical data for ${symbol}:`,
+        error instanceof Error ? error.message : String(error)
+      );
+      return [];
     }
   }
 

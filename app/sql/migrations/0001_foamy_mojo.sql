@@ -1,0 +1,1 @@
+ALTER TABLE "stocks_historical_data" ADD CONSTRAINT "stocks_historical_data_isu_srt_cd_date_pk" PRIMARY KEY("isu_srt_cd","date");
