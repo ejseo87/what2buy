@@ -6,6 +6,7 @@ import {
 } from "@supabase/ssr";
 import type { Database as SupabaseDatabase } from "~/database.types";
 import type { MergeDeep, SetNonNullable } from "type-fest";
+import { createClient } from "@supabase/supabase-js";
 
 export type Database = MergeDeep<
   SupabaseDatabase,
@@ -51,7 +52,7 @@ export const makeSSRClient = (request: Request) => {
   const headers = new Headers();
   const serverSideClient = createServerClient<Database>(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -78,3 +79,17 @@ export const makeSSRClient = (request: Request) => {
   );
   return { client: serverSideClient, headers };
 };
+
+export const adminClient = createClient<Database>(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    db: {
+      schema: "public",
+    },
+  }
+);

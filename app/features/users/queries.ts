@@ -1,29 +1,36 @@
-import type { Database } from "~/supa-client";
 import pkg from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "~/supa-client";
 import { redirect } from "react-router";
+
 
 export const getUserProfile = async (
   client: SupabaseClient<Database>,
   { username }: { username: string }
 ) => {
-  const { data: profile, error } = await client
+  //console.log("getUserProfile username=", username);
+
+  const { data: profile, error: directError } = await client
     .from("profiles")
     .select(
       `
-      profile_id,
-      name,
-      username,
-      avatar
-      `
+          profile_id,
+          name,
+          username,
+          avatar,
+          created_at,
+          updated_at
+          `
     )
     .eq("username", username)
     .single();
-  if (error) {
-    console.error(error);
-    throw new Error("Failed to get user profile");
+
+  if (directError) {
+    console.error("getUserProfile direct query error:", directError);
+    return null;
   }
-  //console.log("profile=", profile);
+
+  //console.log("getUserProfile profile=", profile);
   return profile;
 };
 
@@ -73,4 +80,17 @@ export const checkUsername = async (
     throw new Error("Failed to check username");
   }
   return count;
+};
+
+export const getEmailByUserId = async (
+  client: SupabaseClient<Database>,
+  { userId }: { userId: string }
+) => {
+  const { data, error } = await client.auth.admin.getUserById(userId);
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to get email");
+  }
+  //console.log("getEmailByUserId data=", data);
+  return data.user.email;
 };

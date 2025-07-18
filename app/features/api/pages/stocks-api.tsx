@@ -5,7 +5,7 @@ import {
 } from "../utils/stock-data-service";
 import { getNoWargingStockList } from "../queries";
 import { DateTime } from "luxon";
-import { makeSSRClient } from "~/supa-client";
+import { adminClient, makeSSRClient } from "~/supa-client";
 import { insertStocksHistoricalData } from "../mutation";
 import z from "zod";
 
@@ -15,7 +15,7 @@ export const searchParamsSchema = z.object({
   startDate: z
     .string()
     .optional()
-    .default(DateTime.now().toFormat("yyyy-MM-dd")),
+    .default(DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd")),
   endDate: z.string().optional().default(DateTime.now().toFormat("yyyy-MM-dd")),
 });
 
@@ -59,8 +59,7 @@ export async function action({ request }: Route.ActionArgs) {
     );
   }
 
-  const { client } = makeSSRClient(request);
-  const noWargingStocks = await getNoWargingStockList(client as any);
+  const noWargingStocks = await getNoWargingStockList(adminClient);
   console.log("api stocks length of noWargingStocks:", noWargingStocks.length);
 
   let processedCount = 0;
@@ -85,8 +84,11 @@ export async function action({ request }: Route.ActionArgs) {
       volume: data.volume,
     }));
     await insertStocksHistoricalData(
-      client as any,
+      adminClient,
       transformedHistoricalData as any
+    );
+    console.log(
+      `${koreanSymbol} : ${processedCount}/${noWargingStocks.length}`
     );
     processedCount++;
   }

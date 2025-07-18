@@ -15,6 +15,13 @@
       "when": 1752753785972,
       "tag": "0001_foamy_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752807362173,
+      "tag": "0002_real_vanisher",
+      "breakpoints": true
     }
   ]
 }

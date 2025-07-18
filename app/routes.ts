@@ -64,7 +64,10 @@ export default [
   ]),
 
   // User profile route (public)
-  route("/users/:username", "features/users/pages/profile-page.tsx"),
+  ...prefix("/users/:username", [
+    index("features/users/pages/profile-page.tsx"),
+    route("/welcome", "features/users/pages/welcome-page.tsx"),
+  ]),
 
   //:username
   ...prefix("/my", [
