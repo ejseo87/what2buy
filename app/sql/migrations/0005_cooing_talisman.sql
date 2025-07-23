@@ -1,0 +1,1 @@
+ALTER TABLE "yahoo_financial_data" ADD COLUMN "revenue_per_share" numeric(10, 3);

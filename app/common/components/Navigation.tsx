@@ -91,12 +91,15 @@ export default function Navigation({
   avatar: string | null;
 }) {
   return (
-    <nav className="flex px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
+    <nav className="flex px-10 sm:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
       <div className="flex items-center">
-        <Link to="/" className="font-bold tracking-tight text-lg">
+        <Link to="/" className="font-bold tracking-tight text-lg  ">
           what2buy
         </Link>
-        <Separator orientation="vertical" className="h-6 mx-4" />
+        <div className="hidden sm:block">
+          <Separator orientation="vertical" className="h-6 mx-4" />
+        </div>
+        <span className="block sm:hidden">&nbsp;&nbsp;&nbsp;</span>
         <NavigationMenu>
           <NavigationMenuList>
             {menus.map((menu) => (

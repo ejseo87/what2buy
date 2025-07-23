@@ -13,6 +13,7 @@ export default [
   // API routes
   ...prefix("/api", [
     route("/stocks", "features/api/pages/stocks-api.tsx"),
+    route("/stocks/earnings", "features/api/pages/stock-earnings-api.tsx"),
     route("/stocks/:symbol", "features/api/pages/stock-detail-api.tsx"),
     route("/stocks/search/:query", "features/api/pages/stock-search-api.tsx"),
   ]),

@@ -35,6 +35,37 @@ export interface StockInfo {
   beta: number;
 }
 
+// Earnings 데이터 인터페이스 추가
+export interface EarningsData {
+  symbol: string;
+  quarterly: Array<{
+    date: string;
+    actual: number;
+    estimate: number;
+    surprise: number;
+    surprisePercent: number;
+  }>;
+  yearly: Array<{
+    year: number;
+    revenue: number;
+    earnings: number;
+  }>;
+  nextAnnouncements: Array<{
+    start: string;
+    end: string;
+  }>;
+  summary: {
+    lastQuarter: {
+      date: string;
+      actual: number;
+      estimate: number;
+      surprise: number;
+    };
+    nextEarnings: string;
+    averageSurprise: number;
+  };
+}
+
 /**
  * Ensures that the stock code is always 6 digits with leading zeros
  * @param stockCode - The stock code to pad
@@ -65,7 +96,7 @@ export class StockDataService {
   private static readonly YAHOO_FINANCE_BASE_URL =
     "https://query1.finance.yahoo.com/v8/finance/chart";
 
-  // 실시간 주가 데이터 가져오기
+  // Yahoo Finance API를 사용한 실시간 주가 데이터 가져오기
   static async getStockQuote(symbol: string): Promise<StockQuote> {
     try {
       const response = await fetch(
@@ -103,7 +134,7 @@ export class StockDataService {
     }
   }
 
-  // 과거 주가 데이터 가져오기
+  // Yahoo Finance API를 사용한 과거 주가 데이터 가져오기
   static async getStockHistoricalData(
     symbol: string,
     startDate: string,
@@ -170,7 +201,7 @@ export class StockDataService {
     }
   }
 
-  // 종목 검색
+  // Yahoo Finance API를 사용한 종목 검색
   static async searchStocks(
     query: string,
     limit: number = 20
@@ -206,7 +237,7 @@ export class StockDataService {
     }
   }
 
-  // 한국 주식 심볼 변환 (예: 005930 -> 005930.KS)
+  // Yahoo Finance API를 사용한 한국 주식 심볼 변환 (예: 005930 -> 005930.KS)
   static formatKoreanSymbol(symbol: string): string {
     if (symbol.includes(".")) {
       return symbol;
@@ -214,7 +245,7 @@ export class StockDataService {
     return `${symbol}.KS`;
   }
 
-  // 여러 종목의 실시간 데이터 가져오기
+  // Yahoo Finance API를 사용한 여러 종목의 실시간 데이터 가져오기
   static async getMultipleStockQuotes(
     symbols: string[]
   ): Promise<StockQuote[]> {
@@ -232,6 +263,8 @@ export class StockDataService {
 
     return quotes;
   }
+
+ 
 }
 
 // 한국 주식 데이터를 위한 특별한 서비스

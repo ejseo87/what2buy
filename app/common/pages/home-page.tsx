@@ -179,16 +179,18 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         title="주식을 추천해주는 What2Buy"
         subtitle="가치가 있는 주식 중에 내일 상승할 확률이 높은 주식을 추천해드립니다. "
       />
-      <div className="flex flex-row justify-between gap-3 items-center">
-        <div className="text-2xl  font-bold  py-2.5">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 items-center">
+        <div className="order-2 sm:order-1 text-2xl font-bold py-2.5">
           최근에 추천한 주식 종목 현황
         </div>
-        <PulsatingButton pulseColor="#FF007F" className="text-2xl px-10 ">
-          주식 추천 받으러 가기
-        </PulsatingButton>
+        <div className="order-1 sm:order-2">
+          <PulsatingButton pulseColor="#FF007F" className="text-2xl px-10">
+            주식 추천 받으러 가기
+          </PulsatingButton>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <div className="w-full">
           <StockChart
             title={stockDetail_1?.stock_name ?? "주식 1"}

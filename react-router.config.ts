@@ -1,8 +1,9 @@
 import type { Config } from "@react-router/dev/config";
 import { config } from "dotenv";
+import { vercelPreset } from "@vercel/react-router/vite";
 
-// Load environment variables from .env file
-config();
+// Load environment variables from .env file with override
+config({ override: true });
 
 export default {
   // Config options...

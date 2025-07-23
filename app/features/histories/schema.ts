@@ -20,6 +20,7 @@ import {
   authUid,
   authUsers,
 } from "drizzle-orm/supabase";
+import { stocks_overview } from "../api/schema";
 
 export const stocks = pgTable(
   "stocks",
@@ -144,6 +145,45 @@ export const history_stock_relations = pgTable(
       for: "insert",
       to: authenticatedRole,
       as: "permissive",
+    }),
+  ]
+);
+
+export const recommendation_histories = pgTable(
+  "recommendation_histories",
+  {
+    recommendation_id: bigint({ mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    recommendation_date: timestamp().notNull().defaultNow(),
+    profile_id: uuid()
+      .references(() => profiles.profile_id, { onDelete: "cascade" })
+      .notNull(),
+    ticket_id: bigint({ mode: "number" }).references(() => tickets.ticket_id),
+    overall_summary: text().notNull(),
+    stock1_code: text()
+      .references(() => stocks_overview.isu_srt_cd)
+      .notNull(),
+    stock1_name: text().notNull(),
+    stock1_summary: text().notNull(),
+    stock2_code: text()
+      .references(() => stocks_overview.isu_srt_cd)
+      .notNull(),
+    stock2_name: text().notNull(),
+    stock2_summary: text().notNull(),
+    stock3_code: text()
+      .references(() => stocks_overview.isu_srt_cd)
+      .notNull(),
+    stock3_name: text().notNull(),
+    stock3_summary: text().notNull(),
+    updated_at: timestamp().notNull().defaultNow(),
+  },
+  (table) => [
+    pgPolicy("histories-select-policy", {
+      for: "select",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`${authUid} = ${table.profile_id}`,
     }),
   ]
 );

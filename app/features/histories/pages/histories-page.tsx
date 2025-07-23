@@ -81,8 +81,8 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
       />
       <div className=" items-start gap-40">
         <div className=" space-y-10">
-          <div className="flex justify-between">
-            <div className="space-y-5 w-1/2">
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <div className="space-y-5 w-full sm:w-1/2">
               <div className="flex items-center gap-5">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="flex items-center gap-1">
@@ -115,7 +115,7 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
                 />
               </Form>
             </div>
-            <div>
+            <div className="flex justify-start sm:justify-end">
               <PulsatingButton
                 pulseColor="#FF007F"
                 className="text-xl py-2 px-5 mx-auto"

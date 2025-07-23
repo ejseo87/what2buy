@@ -3,8 +3,8 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { config } from "dotenv";
 
-// Load environment variables from .env file
-config();
+// Load environment variables from .env file with override
+config({ override: true });
 
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths()],

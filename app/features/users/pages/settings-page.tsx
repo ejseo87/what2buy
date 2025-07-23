@@ -106,8 +106,8 @@ export default function SettingsPage({
     navigation.state === "submitting" || navigation.state === "loading";
   return (
     <div className="space-y-20 ">
-      <div className="grid grid-cols-6 gap-40">
-        <div className="col-span-3 flex flex-col gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-6 gap-10 sm:gap-40">
+        <div className="col-span-1 sm:col-span-3 flex flex-col gap-10">
           {actionData?.ok ? (
             <AlertMessage content="프로파일 변경사항이 저장되었습니다." />
           ) : null}
@@ -182,7 +182,7 @@ export default function SettingsPage({
           </Form>
         </div>
         <Form
-          className="col-span-3 p-6 rounded-lg border shadow-md"
+          className="col-span-1 sm:col-span-3 p-6 rounded-lg border shadow-md"
           method="post"
           encType="multipart/form-data"
         >

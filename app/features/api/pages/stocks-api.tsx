@@ -3,9 +3,9 @@ import {
   KoreanStockDataService,
   StockDataService,
 } from "../utils/stock-data-service";
-import { getNoWargingStockList } from "../queries";
+import { getNoWargingStockList, getStockList } from "../queries";
 import { DateTime } from "luxon";
-import { adminClient, makeSSRClient } from "~/supa-client";
+import { adminClient } from "~/supa-client";
 import { insertStocksHistoricalData } from "../mutation";
 import z from "zod";
 
@@ -15,7 +15,7 @@ export const searchParamsSchema = z.object({
   startDate: z
     .string()
     .optional()
-    .default(DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd")),
+    .default(DateTime.now().minus({ days: 5 }).toFormat("yyyy-MM-dd")),
   endDate: z.string().optional().default(DateTime.now().toFormat("yyyy-MM-dd")),
 });
 
@@ -49,8 +49,8 @@ export async function action({ request }: Route.ActionArgs) {
 
   const endDate = data.endDate;
   const startDate = data.startDate;
-  console.log("api stocksstartDate:", startDate);
-  console.log("api stocks endDate:", endDate);
+  console.log("[stocks-api] startDate:", startDate);
+  console.log("[stocks-api] endDate:", endDate);
 
   if (endDate < startDate) {
     return Response.json(
@@ -59,11 +59,14 @@ export async function action({ request }: Route.ActionArgs) {
     );
   }
 
-  const noWargingStocks = await getNoWargingStockList(adminClient);
-  console.log("api stocks length of noWargingStocks:", noWargingStocks.length);
+  const stocksList = await getStockList(adminClient);
+  console.log(
+    "[stocks-api] stocks length of noWargingStocks:",
+    stocksList.length
+  );
 
   let processedCount = 0;
-  for (const stock of noWargingStocks) {
+  for (const stock of stocksList) {
     const koreanSymbol = `${stock.isu_srt_cd}.KS`;
     const historicalData = await StockDataService.getStockHistoricalData(
       koreanSymbol,
@@ -71,7 +74,9 @@ export async function action({ request }: Route.ActionArgs) {
       endDate
     );
     if (!historicalData || historicalData.length === 0) {
-      console.log(`${koreanSymbol} : historicalData is null or empty`);
+      console.log(
+        `[stocks-api] ${koreanSymbol} : historicalData is null or empty`
+      );
       continue;
     }
     const transformedHistoricalData = (historicalData || []).map((data) => ({
@@ -88,17 +93,17 @@ export async function action({ request }: Route.ActionArgs) {
       transformedHistoricalData as any
     );
     console.log(
-      `${koreanSymbol} : ${processedCount}/${noWargingStocks.length}`
+      `[stock-api] ${koreanSymbol} : ${processedCount}/${stocksList.length}`
     );
     processedCount++;
   }
   console.log(
-    `Stock Historical Data Inserted (${processedCount}/${noWargingStocks.length})`
+    `[stocks-api] Stock Historical Data Inserted (${processedCount}/${stocksList.length})`
   );
 
   return Response.json({
     ok: true,
     processedCount,
-    totalStocks: noWargingStocks.length,
+    totalStocks: stocksList.length,
   });
 }

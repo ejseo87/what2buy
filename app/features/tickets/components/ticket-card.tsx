@@ -35,24 +35,33 @@ export function TicketCard({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div
-              className={`text-3xl font-bold ${
+              className={`text-2xl sm:text-3xl font-bold ${
                 status === "used" ? "" : "text-primary"
-              } px-10`}
+              } px-4 sm:px-10`}
             >
-              <span>{type === "free" ? "무료" : "유료"} 사용권</span>
-              <span className="text-muted-foreground text-lg text-light mx-2">
-                {" "}
-                |{" "}
-              </span>
-              <span>{status === "used" ? "사용함" : "미사용"}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <span>{type === "free" ? "무료" : "유료"} 사용권</span>
+                <div className="flex items-center">
+                  <span className="text-muted-foreground text-sm sm:text-lg text-light mx-2">
+                    {" "}
+                    |{" "}
+                  </span>
+                  <span>{status === "used" ? "사용함" : "미사용"}</span>
+                </div>
+              </div>
             </div>
             <Badge
-              className={`text-xl text-bold ${
+              className={`text-sm sm:text-xl text-bold ${
                 status === "used" ? "" : "text-primary"
               }`}
               variant="secondary"
             >
-              {duration_start} ~ {duration_end}
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <span>{duration_start}</span>
+                <span className="hidden sm:inline"> ~ </span>
+                <span className="sm:hidden">~</span>
+                <span>{duration_end}</span>
+              </div>
             </Badge>
           </div>
         </div>

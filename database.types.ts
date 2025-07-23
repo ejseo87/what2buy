@@ -542,6 +542,87 @@ export type Database = {
         }
         Relationships: []
       }
+      stocks_summary_with_ratios: {
+        Row: {
+          beta: number | null
+          created_at: string | null
+          eps_forward: number | null
+          eps_trailing_twelve_months: number | null
+          ev_to_ebitda: number | null
+          ev_to_revenue: number | null
+          forward_pe: number | null
+          isu_abbrv: string | null
+          isu_srt_cd: string
+          pbr: number | null
+          pcr: number | null
+          psr: number | null
+          recommendation_key: string | null
+          recommendation_mean: number | null
+          roa: number | null
+          roe: number | null
+          rps: number | null
+          trailing_pe: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          beta?: number | null
+          created_at?: string | null
+          eps_forward?: number | null
+          eps_trailing_twelve_months?: number | null
+          ev_to_ebitda?: number | null
+          ev_to_revenue?: number | null
+          forward_pe?: number | null
+          isu_abbrv?: string | null
+          isu_srt_cd: string
+          pbr?: number | null
+          pcr?: number | null
+          psr?: number | null
+          recommendation_key?: string | null
+          recommendation_mean?: number | null
+          roa?: number | null
+          roe?: number | null
+          rps?: number | null
+          trailing_pe?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          beta?: number | null
+          created_at?: string | null
+          eps_forward?: number | null
+          eps_trailing_twelve_months?: number | null
+          ev_to_ebitda?: number | null
+          ev_to_revenue?: number | null
+          forward_pe?: number | null
+          isu_abbrv?: string | null
+          isu_srt_cd?: string
+          pbr?: number | null
+          pcr?: number | null
+          psr?: number | null
+          recommendation_key?: string | null
+          recommendation_mean?: number | null
+          roa?: number | null
+          roe?: number | null
+          rps?: number | null
+          trailing_pe?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stocks_summary_with_ratios_isu_srt_cd_stocks_overview_isu_srt_c"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "stocks_summary_with_ratios_isu_srt_cd_stocks_overview_isu_srt_c"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+        ]
+      }
       stocks_wargings: {
         Row: {
           administrative_issue: string
@@ -655,6 +736,312 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      yahoo_default_key_statistics: {
+        Row: {
+          created_at: string | null
+          earnings_quarterly_growth: number | null
+          enterprise_to_ebitda: number | null
+          enterprise_to_revenue: number | null
+          enterprise_value: number | null
+          fifty_two_week_change: number | null
+          float_shares: number | null
+          forward_pe: number | null
+          held_percent_insiders: number | null
+          held_percent_institutions: number | null
+          implied_shares_outstanding: number | null
+          isu_srt_cd: string
+          last_dividend_date: string | null
+          last_dividend_value: number | null
+          last_fiscal_year_end: string | null
+          most_recent_quarter: string | null
+          net_income_to_common: number | null
+          next_fiscal_year_end: string | null
+          sand_p_fifty_two_week_change: number | null
+          shares_outstanding: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          earnings_quarterly_growth?: number | null
+          enterprise_to_ebitda?: number | null
+          enterprise_to_revenue?: number | null
+          enterprise_value?: number | null
+          fifty_two_week_change?: number | null
+          float_shares?: number | null
+          forward_pe?: number | null
+          held_percent_insiders?: number | null
+          held_percent_institutions?: number | null
+          implied_shares_outstanding?: number | null
+          isu_srt_cd: string
+          last_dividend_date?: string | null
+          last_dividend_value?: number | null
+          last_fiscal_year_end?: string | null
+          most_recent_quarter?: string | null
+          net_income_to_common?: number | null
+          next_fiscal_year_end?: string | null
+          sand_p_fifty_two_week_change?: number | null
+          shares_outstanding?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          earnings_quarterly_growth?: number | null
+          enterprise_to_ebitda?: number | null
+          enterprise_to_revenue?: number | null
+          enterprise_value?: number | null
+          fifty_two_week_change?: number | null
+          float_shares?: number | null
+          forward_pe?: number | null
+          held_percent_insiders?: number | null
+          held_percent_institutions?: number | null
+          implied_shares_outstanding?: number | null
+          isu_srt_cd?: string
+          last_dividend_date?: string | null
+          last_dividend_value?: number | null
+          last_fiscal_year_end?: string | null
+          most_recent_quarter?: string | null
+          net_income_to_common?: number | null
+          next_fiscal_year_end?: string | null
+          sand_p_fifty_two_week_change?: number | null
+          shares_outstanding?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yahoo_default_key_statistics_isu_srt_cd_stocks_overview_isu_srt"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "yahoo_default_key_statistics_isu_srt_cd_stocks_overview_isu_srt"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+        ]
+      }
+      yahoo_financial_data: {
+        Row: {
+          created_at: string | null
+          current_price: number | null
+          current_ratio: number | null
+          debt_to_equity: number | null
+          earnings_growth: number | null
+          ebitda: number | null
+          ebitda_margins: number | null
+          financial_currency: string | null
+          free_cashflow: number | null
+          gross_margins: number | null
+          gross_profits: number | null
+          isu_srt_cd: string
+          number_of_analyst_opinions: number | null
+          operating_cashflow: number | null
+          operating_margins: number | null
+          profit_margins: number | null
+          quick_ratio: number | null
+          recommendation_key: string | null
+          recommendation_mean: number | null
+          return_on_assets: number | null
+          return_on_equity: number | null
+          revenue_growth: number | null
+          revenue_per_share: number | null
+          target_high_price: number | null
+          target_low_price: number | null
+          target_mean_price: number | null
+          target_median_price: number | null
+          total_cash: number | null
+          total_cash_per_share: number | null
+          total_debt: number | null
+          total_revenue: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_price?: number | null
+          current_ratio?: number | null
+          debt_to_equity?: number | null
+          earnings_growth?: number | null
+          ebitda?: number | null
+          ebitda_margins?: number | null
+          financial_currency?: string | null
+          free_cashflow?: number | null
+          gross_margins?: number | null
+          gross_profits?: number | null
+          isu_srt_cd: string
+          number_of_analyst_opinions?: number | null
+          operating_cashflow?: number | null
+          operating_margins?: number | null
+          profit_margins?: number | null
+          quick_ratio?: number | null
+          recommendation_key?: string | null
+          recommendation_mean?: number | null
+          return_on_assets?: number | null
+          return_on_equity?: number | null
+          revenue_growth?: number | null
+          revenue_per_share?: number | null
+          target_high_price?: number | null
+          target_low_price?: number | null
+          target_mean_price?: number | null
+          target_median_price?: number | null
+          total_cash?: number | null
+          total_cash_per_share?: number | null
+          total_debt?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_price?: number | null
+          current_ratio?: number | null
+          debt_to_equity?: number | null
+          earnings_growth?: number | null
+          ebitda?: number | null
+          ebitda_margins?: number | null
+          financial_currency?: string | null
+          free_cashflow?: number | null
+          gross_margins?: number | null
+          gross_profits?: number | null
+          isu_srt_cd?: string
+          number_of_analyst_opinions?: number | null
+          operating_cashflow?: number | null
+          operating_margins?: number | null
+          profit_margins?: number | null
+          quick_ratio?: number | null
+          recommendation_key?: string | null
+          recommendation_mean?: number | null
+          return_on_assets?: number | null
+          return_on_equity?: number | null
+          revenue_growth?: number | null
+          revenue_per_share?: number | null
+          target_high_price?: number | null
+          target_low_price?: number | null
+          target_mean_price?: number | null
+          target_median_price?: number | null
+          total_cash?: number | null
+          total_cash_per_share?: number | null
+          total_debt?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yahoo_financial_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "yahoo_financial_data_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+        ]
+      }
+      yahoo_summary_detail: {
+        Row: {
+          ask: number | null
+          average_volume: number | null
+          average_volume_10days: number | null
+          beta: number | null
+          bid: number | null
+          created_at: string | null
+          currency: string | null
+          day_high: number | null
+          day_low: number | null
+          dividend_rate: number | null
+          dividend_yield: number | null
+          ex_dividend_date: string | null
+          fifty_day_average: number | null
+          fifty_two_week_high: number | null
+          fifty_two_week_low: number | null
+          five_year_avg_dividend_yield: number | null
+          isu_srt_cd: string
+          market_cap: number | null
+          open: number | null
+          payout_ratio: number | null
+          previous_close: number | null
+          price_to_sales_trailing_12_months: number | null
+          two_hundred_day_average: number | null
+          updated_at: string | null
+          volume: number | null
+        }
+        Insert: {
+          ask?: number | null
+          average_volume?: number | null
+          average_volume_10days?: number | null
+          beta?: number | null
+          bid?: number | null
+          created_at?: string | null
+          currency?: string | null
+          day_high?: number | null
+          day_low?: number | null
+          dividend_rate?: number | null
+          dividend_yield?: number | null
+          ex_dividend_date?: string | null
+          fifty_day_average?: number | null
+          fifty_two_week_high?: number | null
+          fifty_two_week_low?: number | null
+          five_year_avg_dividend_yield?: number | null
+          isu_srt_cd: string
+          market_cap?: number | null
+          open?: number | null
+          payout_ratio?: number | null
+          previous_close?: number | null
+          price_to_sales_trailing_12_months?: number | null
+          two_hundred_day_average?: number | null
+          updated_at?: string | null
+          volume?: number | null
+        }
+        Update: {
+          ask?: number | null
+          average_volume?: number | null
+          average_volume_10days?: number | null
+          beta?: number | null
+          bid?: number | null
+          created_at?: string | null
+          currency?: string | null
+          day_high?: number | null
+          day_low?: number | null
+          dividend_rate?: number | null
+          dividend_yield?: number | null
+          ex_dividend_date?: string | null
+          fifty_day_average?: number | null
+          fifty_two_week_high?: number | null
+          fifty_two_week_low?: number | null
+          five_year_avg_dividend_yield?: number | null
+          isu_srt_cd?: string
+          market_cap?: number | null
+          open?: number | null
+          payout_ratio?: number | null
+          previous_close?: number | null
+          price_to_sales_trailing_12_months?: number | null
+          two_hundred_day_average?: number | null
+          updated_at?: string | null
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yahoo_summary_detail_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "yahoo_summary_detail_isu_srt_cd_stocks_overview_isu_srt_cd_fk"
+            columns: ["isu_srt_cd"]
+            isOneToOne: true
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
           },
         ]
       }

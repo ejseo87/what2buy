@@ -22,6 +22,34 @@
       "when": 1752807362173,
       "tag": "0002_real_vanisher",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753108884076,
+      "tag": "0003_tough_longshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753154266991,
+      "tag": "0004_stiff_miek",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753158833680,
+      "tag": "0005_cooing_talisman",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753208477489,
+      "tag": "0006_naive_butterfly",
+      "breakpoints": true
     }
   ]
 }

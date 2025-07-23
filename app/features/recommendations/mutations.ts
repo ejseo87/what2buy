@@ -13,9 +13,22 @@ export const createRecommendation = async (
   }
 ) => {
   const { data: stocksData, error: stocksError } = await client
-    .from("stocks")
-    .select("stock_id, stock_name, pbr, per, roe")
-    .lte("pbr", 1.5);
+    .from("stocks_summary_with_ratios")
+    .select("*")
+    // s.pbr > 0 AND s.pbr < 1.5
+    .gt("pbr", 0)
+    .lt("pbr", 1.5)
+    // s.trailing_pe > 5
+    .gt("trailing_pe", 5)
+    // s.forward_pe > 5
+    .gt("forward_pe", 5)
+    // s.ev_to_ebitda > 0 AND s.ev_to_ebitda <= 10
+    .gt("ev_to_ebitda", 0)
+    .lte("ev_to_ebitda", 10)
+    // s.roe > 0.5
+    .gt("roe", 0.5)
+    // s.recommendation_mean <= 3
+    .lte("recommendation_mean", 3);
 
   if (stocksError) {
     console.error(stocksError);
