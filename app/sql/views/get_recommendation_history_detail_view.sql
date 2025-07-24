@@ -1,3 +1,5 @@
+DROP VIEW IF EXISTS get_recommendation_history_detail_view;
+
 CREATE OR REPLACE VIEW get_recommendation_history_detail_view 
 WITH (security_invoker = on)
 AS

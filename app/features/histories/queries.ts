@@ -301,71 +301,6 @@ export const getStockRecommendationDetail = async (
   return recommendation_detail;
 };
 
-export const getReturnRateInfo = async (
-  client: SupabaseClient<Database>,
-  {
-    stockId,
-    recommendationDate,
-  }: {
-    stockId: number;
-    recommendationDate: string;
-  }
-) => {
-  // recommendationDate를 YYYY-MM-DD 형식으로 변환
-  let recDate = recommendationDate.split("T")[0];
-
-  // 가장 최근 날짜 주식 가격 가져오기
-  const { data: latestPrice, error: latestError } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .order("date", { ascending: false })
-    .limit(1)
-    .single();
-
-  if (latestError) {
-    console.log("Latest price error:", latestError);
-    throw new Error("Failed to get latest price");
-  }
-  // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
-  if (recDate > latestPrice?.date) {
-    recDate = latestPrice?.date;
-  }
-  const { data: recommendationPrice, error: recError } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .gte("date", recDate)
-    .order("date", { ascending: true })
-    .limit(1)
-    .single();
-
-  if (recError) {
-    console.log("Recommendation date error:", recError);
-    throw new Error("Failed to get recommendation date price");
-  }
-
-  return {
-    recommendationPrice: (recommendationPrice as any)?.close || 0,
-    recommendationDate: (recommendationPrice as any)?.date || recDate,
-    latestPrice: (latestPrice as any)?.close || 0,
-    latestDate:
-      (latestPrice as any)?.date || new Date().toISOString().split("T")[0],
-    profitAmount:
-      ((latestPrice as any)?.close || 0) -
-      ((recommendationPrice as any)?.close || 0),
-    profitRate:
-      (recommendationPrice as any)?.close > 0
-        ? (
-            (((latestPrice as any)?.close -
-              (recommendationPrice as any)?.close) /
-              (recommendationPrice as any)?.close) *
-            100
-          ).toFixed(2)
-        : "0.00",
-  };
-};
-
 export const getStocksList = async (
   client: SupabaseClient<Database>,
   {
@@ -454,4 +389,90 @@ export const getTotalPages = async (
   if (count === null || count === 0) return 1;
   //console.log(count);
   return Math.ceil(count / PAGE_SIZE);
+};
+
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+
+export const getRecommendationHistoryDetail = async (
+  client: SupabaseClient<Database>,
+  { recommendationId }: { recommendationId: number }
+) => {
+  const { data: recommendation_history_detail, error } = await client
+    .from("get_recommendation_history_detail_view")
+    .select("*")
+    .eq("recommendation_id", recommendationId)
+    .single();
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get recommendation history detail");
+  }
+  console.log(recommendation_history_detail);
+  return recommendation_history_detail;
+};
+
+export const getRecommendedStockReturns = async (
+  client: SupabaseClient<Database>,
+  {
+    stockCode,
+    recommendationDate,
+  }: {
+    stockCode: string;
+    recommendationDate: string;
+  }
+) => {
+  // recommendationDate를 YYYY-MM-DD 형식으로 변환
+  let recDate = recommendationDate.split("T")[0];
+
+  // 가장 최근 날짜 주식 가격 가져오기
+  const { data: latestPrice, error: latestError } = await client
+    .from("stocks_historical_data")
+    .select("date, close")
+    .eq("isu_srt_cd", stockCode)
+    .order("date", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (latestError) {
+    console.log("Latest price error:", latestError);
+    throw new Error("Failed to get latest price");
+  }
+  // 추천일 주식 가격 가져오기 (추천일 또는 그 이후 첫 번째 거래일)
+  if (recDate > (latestPrice as any)?.date) {
+    recDate = (latestPrice as any)?.date;
+  }
+  const { data: recommendationPrice, error: recError } = await client
+    .from("stocks_historical_data")
+    .select("date, close")
+    .eq("isu_srt_cd", stockCode)
+    .gte("date", recDate)
+    .order("date", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (recError) {
+    console.log("Recommendation date error:", recError);
+    throw new Error("Failed to get recommendation date price");
+  }
+
+  return {
+    recommendationPrice: (recommendationPrice as any)?.close || 0,
+    recommendationDate: (recommendationPrice as any)?.date || recDate,
+    latestPrice: (latestPrice as any)?.close || 0,
+    latestDate:
+      (latestPrice as any)?.date || new Date().toISOString().split("T")[0],
+    profitAmount:
+      ((latestPrice as any)?.close || 0) -
+      ((recommendationPrice as any)?.close || 0),
+    profitRate:
+      (recommendationPrice as any)?.close > 0
+        ? (
+            (((latestPrice as any)?.close -
+              (recommendationPrice as any)?.close) /
+              (recommendationPrice as any)?.close) *
+            100
+          ).toFixed(2)
+        : "0.00",
+  };
 };

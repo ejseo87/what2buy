@@ -1,9 +1,15 @@
 import { Hero } from "~/common/components/hero";
 import type { Route } from "./+types/history-page";
 import { RecommendedStockCard } from "../components/recommended-stock-card";
-import { getHistory, getReturnRateInfo } from "../queries";
+import {
+  getHistory,
+  getRecommendationHistoryDetail,
+  getRecommendedStockReturns,
+  getReturnRateInfo,
+} from "../queries";
 import { formatKoreanDate } from "~/common/utils";
 import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId } from "~/features/users/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -14,28 +20,33 @@ export const meta: Route.MetaFunction = () => {
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client as any);
+  console.log("userId=", userId);
   const { recommendationId } = params;
-  const recommendation = await getHistory(client, {
-    recommendation_id: Number(recommendationId),
+  console.log("recommendationId=", recommendationId);
+  const recommendation = await getRecommendationHistoryDetail(client, {
+    recommendationId: Number(recommendationId),
   });
   if (!recommendation) {
     throw new Error("Recommendation not found");
   }
+
   // Get return rate information for all stocks
-  const stock1_return_info = await getReturnRateInfo(client as any, {
-    stockId: (recommendation as any).stock1_id,
+  const stock1_return_info = await getRecommendedStockReturns(client as any, {
+    stockCode: (recommendation as any).stock1_code,
+    recommendationDate: (recommendation as any).recommendation_date,
+  });
+  console.log(stock1_return_info);
+  const stock2_return_info = await getRecommendedStockReturns(client as any, {
+    stockCode: (recommendation as any).stock2_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
 
-  const stock2_return_info = await getReturnRateInfo(client as any, {
-    stockId: (recommendation as any).stock2_id,
+  const stock3_return_info = await getRecommendedStockReturns(client as any, {
+    stockCode: (recommendation as any).stock3_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
-
-  const stock3_return_info = await getReturnRateInfo(client as any, {
-    stockId: (recommendation as any).stock3_id,
-    recommendationDate: (recommendation as any).recommendation_date,
-  });
+  console.log(stock3_return_info);
 
   return {
     recommendation,
@@ -54,51 +65,60 @@ export default function HistoryDetailPage({
   const stock3_return = loaderData.stock3_return_info as any;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-20">
       <Hero
-        title={`주식추천이력 #${recommendation.recommendation_id}`}
-        subtitle="주식 추천 상세 내역"
+        title={` 추천 내역 #${recommendation.recommendation_id}`}
+        subtitle="추천된 종목들의 주요 지표와 수익률을 확인해 보세요"
       />
       <div className="flex flex-col gap-10 ">
-        <h3 className="text-2xl font-bold">
-          추천 날짜 : {formatKoreanDate(recommendation.recommendation_date)}
-        </h3>
-        <h3 className="text-2xl font-bold">추천 내용</h3>
-        <p className="text-lg">{recommendation.summary}</p>
+        <div>
+          <span className="font-medium text-lg">추천 날짜 : </span>
+          <span className="text-gray-700 text-lg font-bold">
+            {formatKoreanDate(recommendation.recommendation_date)}
+          </span>
+        </div>
+
+        <p className="text-xl font-bold">{recommendation.overall_summary}</p>
 
         <div className="flex flex-col gap-10">
           <RecommendedStockCard
-            stockId={recommendation.stock1_id}
+            stockCode={recommendation.stock1_code}
             recommendationDate={recommendation.recommendation_date}
             stockName={recommendation.stock1_name}
             description={recommendation.stock1_summary || "추천 주식 1번"}
             referencPrice={stock1_return.recommendationPrice}
             currentPrice={stock1_return.latestPrice}
             changeRate={parseFloat(stock1_return.profitRate)}
-            per={recommendation.stock1_per || 0}
+            per={recommendation.stock1_forward_per || 0}
             pbr={recommendation.stock1_pbr || 0}
+            roe={recommendation.stock1_roe || 0}
+            ev_to_ebitda={recommendation.stock1_ev_to_ebitda || 0}
           />
           <RecommendedStockCard
-            stockId={recommendation.stock2_id}
+            stockCode={recommendation.stock2_code}
             recommendationDate={recommendation.recommendation_date}
             stockName={recommendation.stock2_name}
             description={recommendation.stock2_summary || "추천 주식 2번"}
             referencPrice={stock2_return.recommendationPrice}
             currentPrice={stock2_return.latestPrice}
             changeRate={parseFloat(stock2_return.profitRate)}
-            per={recommendation.stock2_per || 0}
+            per={recommendation.stock2_forward_per || 0}
             pbr={recommendation.stock2_pbr || 0}
+            roe={recommendation.stock2_roe || 0}
+            ev_to_ebitda={recommendation.stock2_ev_to_ebitda || 0}
           />
           <RecommendedStockCard
-            stockId={recommendation.stock3_id}
+            stockCode={recommendation.stock3_code}
             recommendationDate={recommendation.recommendation_date}
             stockName={recommendation.stock3_name}
             description={recommendation.stock3_summary || "추천 주식 3번"}
             referencPrice={stock3_return.recommendationPrice}
             currentPrice={stock3_return.latestPrice}
             changeRate={parseFloat(stock3_return.profitRate)}
-            per={recommendation.stock3_per || 0}
+            per={recommendation.stock3_forward_per || 0}
             pbr={recommendation.stock3_pbr || 0}
+            roe={recommendation.stock3_roe || 0}
+            ev_to_ebitda={recommendation.stock3_ev_to_ebitda || 0}
           />
         </div>
       </div>
