@@ -89,7 +89,8 @@ export type GoodStock = {
 };
 
 export const getGoodStockList = async (
-  client: SupabaseClient<Database>
+  client: SupabaseClient<Database>,
+  {userId}: {userId: string}
 ): Promise<GoodStock[]> => {
   const { data, error } = await client
     .from("get_good_stocks_list_view")

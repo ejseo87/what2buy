@@ -1,10 +1,11 @@
 import { getLoggedInUserId } from "~/features/users/queries";
-import { makeSSRClient } from "~/supa-client";
+import { makeSSRClient, adminClient } from "~/supa-client";
 import type { Route } from "./+types/generate-recommendation-page";
 import OpenAI from "openai";
 import z from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { getGoodStockList, type GoodStock } from "~/features/api/queries";
+import { insertRecommendationHistory } from "../mutations";
 
 // Check if API key is available
 const apiKey = process.env.OPENAI_API_KEY;
@@ -27,7 +28,9 @@ const ResponseSchema = z.object({
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
   const userId = await getLoggedInUserId(client as any);
-  const goodStocks: GoodStock[] = await getGoodStockList(client as any);
+  const goodStocks: GoodStock[] = await getGoodStockList(client as any, {
+    userId,
+  });
   //console.log("goodStocks=", goodStocks);
 
   if (!goodStocks || goodStocks.length === 0) {
@@ -89,6 +92,23 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     console.log(parsed?.stock3_name);
 
     //db insert
+    const recommendationHistory = await insertRecommendationHistory(
+      adminClient as any,
+      {
+        profile_id: userId,
+        overall_summary: parsed.overall_summary,
+        stock1_name: parsed.stock1_name,
+        stock1_code: parsed.stock1_code,
+        stock1_summary: parsed.stock1_summary,
+        stock2_name: parsed.stock2_name,
+        stock2_code: parsed.stock2_code,
+        stock2_summary: parsed.stock2_summary,
+        stock3_name: parsed.stock3_name,
+        stock3_code: parsed.stock3_code,
+        stock3_summary: parsed.stock3_summary,
+        total_token,
+      }
+    );
 
     return Response.json({
       ok: true,

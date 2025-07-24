@@ -30,7 +30,7 @@ SELECT
   histories.stock1_summary as stock1_summary,
   histories.stock2_summary as stock2_summary,
   histories.stock3_summary as stock3_summary
-FROM histories
+FROM recommendation_histories
 LEFT JOIN stocks s1 ON histories.stock1_id = s1.stock_id
 LEFT JOIN stocks s2 ON histories.stock2_id = s2.stock_id
 LEFT JOIN stocks s3 ON histories.stock3_id = s3.stock_id;

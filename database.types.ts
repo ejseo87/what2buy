@@ -395,6 +395,120 @@ export type Database = {
         }
         Relationships: []
       }
+      recommendation_histories: {
+        Row: {
+          overall_summary: string
+          profile_id: string
+          recommendation_date: string
+          recommendation_id: number
+          stock1_code: string
+          stock1_name: string
+          stock1_summary: string
+          stock2_code: string
+          stock2_name: string
+          stock2_summary: string
+          stock3_code: string
+          stock3_name: string
+          stock3_summary: string
+          ticket_id: number | null
+          total_token: number
+          updated_at: string
+        }
+        Insert: {
+          overall_summary: string
+          profile_id: string
+          recommendation_date?: string
+          recommendation_id?: never
+          stock1_code: string
+          stock1_name: string
+          stock1_summary: string
+          stock2_code: string
+          stock2_name: string
+          stock2_summary: string
+          stock3_code: string
+          stock3_name: string
+          stock3_summary: string
+          ticket_id?: number | null
+          total_token: number
+          updated_at?: string
+        }
+        Update: {
+          overall_summary?: string
+          profile_id?: string
+          recommendation_date?: string
+          recommendation_id?: never
+          stock1_code?: string
+          stock1_name?: string
+          stock1_summary?: string
+          stock2_code?: string
+          stock2_name?: string
+          stock2_summary?: string
+          stock3_code?: string
+          stock3_name?: string
+          stock3_summary?: string
+          ticket_id?: number | null
+          total_token?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendation_histories_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_stock1_code_stocks_overview_isu_srt_cd"
+            columns: ["stock1_code"]
+            isOneToOne: false
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_stock1_code_stocks_overview_isu_srt_cd"
+            columns: ["stock1_code"]
+            isOneToOne: false
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_stock2_code_stocks_overview_isu_srt_cd"
+            columns: ["stock2_code"]
+            isOneToOne: false
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_stock2_code_stocks_overview_isu_srt_cd"
+            columns: ["stock2_code"]
+            isOneToOne: false
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_stock3_code_stocks_overview_isu_srt_cd"
+            columns: ["stock3_code"]
+            isOneToOne: false
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_stock3_code_stocks_overview_isu_srt_cd"
+            columns: ["stock3_code"]
+            isOneToOne: false
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "recommendation_histories_ticket_id_tickets_ticket_id_fk"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["ticket_id"]
+          },
+        ]
+      }
       stocks: {
         Row: {
           bps: number | null
@@ -1047,6 +1161,41 @@ export type Database = {
       }
     }
     Views: {
+      get_good_stocks_list_view: {
+        Row: {
+          analyst_recommendation: string | null
+          english_name: string | null
+          ev_to_ebitda: number | null
+          ev_to_revenue: number | null
+          forward_price_to_earnings_ratio: number | null
+          korean_name: string | null
+          list_shares: number | null
+          market_type: string | null
+          par_value: number | null
+          price_to_book_ratio: number | null
+          return_on_assets: number | null
+          return_on_equity: number | null
+          revenue_per_share: number | null
+          stock_code: string | null
+          trailing_price_to_earnings_ratio: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stocks_summary_with_ratios_isu_srt_cd_stocks_overview_isu_srt_c"
+            columns: ["stock_code"]
+            isOneToOne: true
+            referencedRelation: "get_no_warging_stock_list_view"
+            referencedColumns: ["isu_srt_cd"]
+          },
+          {
+            foreignKeyName: "stocks_summary_with_ratios_isu_srt_cd_stocks_overview_isu_srt_c"
+            columns: ["stock_code"]
+            isOneToOne: true
+            referencedRelation: "stocks_overview"
+            referencedColumns: ["isu_srt_cd"]
+          },
+        ]
+      }
       get_no_warging_stock_list_view: {
         Row: {
           isu_abbrv: string | null

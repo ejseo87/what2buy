@@ -13,22 +13,10 @@ export const createRecommendation = async (
   }
 ) => {
   const { data: stocksData, error: stocksError } = await client
-    .from("stocks_summary_with_ratios")
+    .from("stocks")
     .select("*")
     // s.pbr > 0 AND s.pbr < 1.5
-    .gt("pbr", 0)
-    .lt("pbr", 1.5)
-    // s.trailing_pe > 5
-    .gt("trailing_pe", 5)
-    // s.forward_pe > 5
-    .gt("forward_pe", 5)
-    // s.ev_to_ebitda > 0 AND s.ev_to_ebitda <= 10
-    .gt("ev_to_ebitda", 0)
-    .lte("ev_to_ebitda", 10)
-    // s.roe > 0.5
-    .gt("roe", 0.5)
-    // s.recommendation_mean <= 3
-    .lte("recommendation_mean", 3);
+    .lt("pbr", 1.5);
 
   if (stocksError) {
     console.error(stocksError);
@@ -84,4 +72,65 @@ export const createRecommendation = async (
   console.log("ticketData=", ticketData);
 
   return recommendationsData;
+};
+
+interface InsertRecommendationHistoryArgs {
+  profile_id: string;
+  ticket_id: number;
+  overall_summary: string;
+  stock1_name: string;
+  stock1_code: string;
+  stock1_summary: string;
+  stock2_name: string;
+  stock2_code: string;
+  stock2_summary: string;
+  stock3_name: string;
+  stock3_code: string;
+  stock3_summary: string;
+  total_token: number | undefined;
+}
+
+export const insertRecommendationHistory = async (
+  client: SupabaseClient,
+  {
+    profile_id,
+    ticket_id,
+    overall_summary,
+    stock1_name,
+    stock1_code,
+    stock1_summary,
+    stock2_name,
+    stock2_code,
+    stock2_summary,
+    stock3_name,
+    stock3_code,
+    stock3_summary,
+    total_token,
+  }: InsertRecommendationHistoryArgs
+) => {
+  const { data, error: recommendationsError } = await client
+    .from("recommendation_histories")
+    .insert({
+      profile_id,
+      ticket_id,
+      overall_summary,
+      stock1_name,
+      stock1_code,
+      stock1_summary,
+      stock2_name,
+      stock2_code,
+      stock2_summary,
+      stock3_name,
+      stock3_code,
+      stock3_summary,
+      total_token,
+    })
+    .select("recommendation_id")
+    .single();
+
+  if (recommendationsError) {
+    console.error(recommendationsError);
+    return null;
+  }
+  return data?.recommendation_id;
 };

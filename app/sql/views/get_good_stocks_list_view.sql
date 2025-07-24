@@ -27,9 +27,14 @@ AND ss.forward_pe > 5
 AND ss.trailing_pe > 5
 AND ss.ev_to_ebitda > 0
 AND ss.roe > 0.05
-AND ss.recommendation_key = 'strong_buy';
-
+AND ss.recommendation_key = 'strong_buy'
+AND NOT EXISTS ( -- 현재 사용자가 추천받은 종목 제외
+  SELECT 1
+  FROM public.recommendation_histories h
+  WHERE h.profile_id = auth.uid()
+);
 
 select COUNT(*) from get_good_stocks_list_view;
 
 select * from get_good_stocks_list_view;
+

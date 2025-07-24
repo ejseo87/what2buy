@@ -177,6 +177,7 @@ export const recommendation_histories = pgTable(
     stock3_name: text().notNull(),
     stock3_summary: text().notNull(),
     updated_at: timestamp().notNull().defaultNow(),
+    total_token: integer().notNull(),
   },
   (table) => [
     pgPolicy("histories-select-policy", {

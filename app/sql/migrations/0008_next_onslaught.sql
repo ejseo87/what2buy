@@ -1,0 +1,1 @@
+ALTER TABLE "recommendation_histories" ADD COLUMN "total_token" integer NOT NULL;
