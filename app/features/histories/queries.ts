@@ -176,7 +176,7 @@ export const getDailyPricesByStockId = async (
 // 새로운 뷰를 사용하는 함수들 추가 (기존 테이블 조인 방식 사용)
 export const getStockDetail = async (
   client: SupabaseClient<Database>,
-  { stockId }: { stockId: number }
+  { stockId }: { stockId: string }
 ) => {
   // 주식 정보와 최근 가격 정보를 함께 가져오기
   const { data: stock_detail, error } = await client
@@ -234,26 +234,6 @@ export const getProfitTrackingByStockId = async (
   }
 
   return profit_tracking;
-};
-
-export const getStockPerformanceChart = async (
-  client: SupabaseClient<Database>,
-  { stockId, days = 30 }: { stockId: number; days?: number }
-) => {
-  // 최근 N일간의 주식 가격 차트 데이터
-  const { data: chart_data, error } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .order("date", { ascending: true })
-    .limit(days);
-
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get stock performance chart");
-  }
-
-  return chart_data;
 };
 
 export const getStockRecommendationDetail = async (
@@ -394,6 +374,27 @@ export const getTotalPages = async (
 /*
 2025.07.24 refactoring codes for recommendation history
 */
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
 
 export const getRecommendationHistoryDetail = async (
   client: SupabaseClient<Database>,
@@ -408,7 +409,10 @@ export const getRecommendationHistoryDetail = async (
     console.log(error);
     throw new Error("Failed to get recommendation history detail");
   }
-  console.log(recommendation_history_detail);
+  console.log(
+    "[getRecommendationHistoryDetail] recommendation_history_detail=",
+    recommendation_history_detail
+  );
   return recommendation_history_detail;
 };
 
@@ -475,4 +479,79 @@ export const getRecommendedStockReturns = async (
           ).toFixed(2)
         : "0.00",
   };
+};
+
+export const getStocksOverviewByStockCode = async (
+  client: SupabaseClient<Database>,
+  { stockCode }: { stockCode: string }
+) => {
+  const { data: stocks_overview, error } = await client
+    .from("stocks_overview")
+    .select("*")
+    .eq("isu_srt_cd", stockCode)
+    .single();
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get stocks overview");
+  }
+  console.log(
+    "[getStocksOverviewByStockCode] stocks_overview=",
+    stocks_overview
+  );
+  return stocks_overview;
+};
+
+export const getStocksSummaryWithRaitosByStockCode = async (
+  client: SupabaseClient<Database>,
+  { stockCode }: { stockCode: string }
+) => {
+  const { data, error } = await client
+    .from("stocks_summary_with_ratios")
+    .select("*")
+    .eq("isu_srt_cd", stockCode)
+    .single();
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get stocks summary with raitos");
+  }
+  console.log("[getStocksSummaryWithRaitosByStockCode] data=", data);
+  return data;
+};
+
+export const getRecommendationHistoriesByStockCode = async (
+  client: SupabaseClient<Database>,
+  { stockCode }: { stockCode: string }
+) => {
+  const { data, error } = await client
+    .from("recommendation_histories")
+    .select("recommendation_id, recommendation_date")
+    .or(
+      `stock1_code.eq.${stockCode},stock2_code.eq.${stockCode},stock3_code.eq.${stockCode}`
+    );
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get recommendation histories");
+  }
+  console.log("[getRecommendationHistoriesByStockCode] data=", data);
+  return data;
+};
+
+export const getStockPerformanceChart = async (
+  client: SupabaseClient<Database>,
+  { stockCode, days = 30 }: { stockCode: string; days?: number }
+) => {
+  // 최근 N일간의 주식 가격 차트 데이터
+  const { data: chart_data, error } = await client
+    .from("stocks_historical_data")
+    .select("date, close")
+    .eq("isu_srt_cd", stockCode)
+    .order("date", { ascending: true })
+    .limit(days);
+
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get stock performance chart");
+  }
+
+  return chart_data;
 };

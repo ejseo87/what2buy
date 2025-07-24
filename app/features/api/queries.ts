@@ -1,6 +1,7 @@
 import pkg from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
+import type { GoodStock } from "./types";
 
 export const getNoWargingStockList = async (
   client: SupabaseClient<Database>
@@ -70,36 +71,56 @@ export const getStockList = async (client: SupabaseClient<Database>) => {
   return allData;
 };
 
-export type GoodStock = {
-  stock_code: string;
-  market_type: string;
-  korean_name: string;
-  english_name: string;
-  /*  price_to_book_ratio: number;
-  trailing_price_to_earnings_ratio: number;
-  forward_price_to_earnings_ratio: number;
-  ev_to_ebitda: number;
-  ev_to_revenue: number;
-  return_on_equity: number;
-  return_on_assets: number;
-  revenue_per_share: number;
-  analyst_recommendation: string;
-  par_value: number;
-  list_shares: number;*/
-};
-
-export const getGoodStockList = async (
+async function getRecommendedStocksNByUserId(
   client: SupabaseClient<Database>,
-  {userId}: {userId: string}
-): Promise<GoodStock[]> => {
+  userId: string
+): Promise<string[]> {
   const { data, error } = await client
+    .from("get_recommendation_history_detail_view")
+    .select("stock1_code, stock2_code, stock3_code")
+    .eq("profile_id", userId);
+
+  if (error) {
+    console.error("Error fetching recommended stock codes:", error);
+    return [];
+  }
+
+  const stockCodes = (data as any[]) // Assuming RecommendedHistory is no longer needed, so cast to any[]
+    .flatMap((row) => [row.stock1_code, row.stock2_code, row.stock3_code])
+    .filter((code): code is string => !!code); // Filter out null/undefined and assert type
+
+  // remove duplicates
+  return [...new Set(stockCodes)];
+}
+
+export const getGoodStockListByUserId = async (
+  client: SupabaseClient<Database>,
+  { userId }: { userId: string }
+): Promise<GoodStock[]> => {
+  const recommendedStockCodes = await getRecommendedStocksNByUserId(
+    client,
+    userId
+  );
+  console.log(
+    "[getGoodStockListByUserId] recommendedStockCodes=",
+    recommendedStockCodes
+  );
+  const query = client
     .from("get_good_stocks_list_view")
     .select("stock_code, korean_name, english_name, market_type");
-    /*.order("return_on_equity", { ascending: false })
-    .limit(20);*/
+
+  if (recommendedStockCodes.length > 0) {
+    const codes = recommendedStockCodes.map((code) => `'${code}'`).join(",");
+    console.log("[getGoodStockListByUserId] codes=", codes);
+    query.not("stock_code", "in", `(${codes})`);
+  }
+
+  const { data, error } = await query;
+
   if (error) {
     console.error(error);
     throw new Error("Failed to get good stocks");
   }
+  console.log("[getGoodStockListByUserId] data=", data);
   return data as GoodStock[];
 };

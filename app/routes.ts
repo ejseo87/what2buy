@@ -26,7 +26,7 @@ export default [
     // Stock routes
     ...prefix("/stocks", [
       index("features/histories/pages/stocks-page.tsx"),
-      route("/:stockId", "features/histories/pages/stock-page.tsx"),
+      route("/:stockCode", "features/histories/pages/stock-page.tsx"),
     ]),
     // Search
     route("search", "features/histories/pages/search-page.tsx"),

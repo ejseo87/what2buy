@@ -2,10 +2,8 @@ import { Hero } from "~/common/components/hero";
 import type { Route } from "./+types/history-page";
 import { RecommendedStockCard } from "../components/recommended-stock-card";
 import {
-  getHistory,
   getRecommendationHistoryDetail,
   getRecommendedStockReturns,
-  getReturnRateInfo,
 } from "../queries";
 import { formatKoreanDate } from "~/common/utils";
 import { makeSSRClient } from "~/supa-client";
@@ -36,17 +34,18 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     stockCode: (recommendation as any).stock1_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
-  console.log(stock1_return_info);
+  console.log("[history-page] stock1_return_info=", stock1_return_info);
   const stock2_return_info = await getRecommendedStockReturns(client as any, {
     stockCode: (recommendation as any).stock2_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
+  console.log("[history-page] stock2_return_info=", stock2_return_info);
 
   const stock3_return_info = await getRecommendedStockReturns(client as any, {
     stockCode: (recommendation as any).stock3_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
-  console.log(stock3_return_info);
+  console.log("[history-page] stock3_return_info=", stock3_return_info);
 
   return {
     recommendation,

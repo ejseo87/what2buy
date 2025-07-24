@@ -6,16 +6,12 @@ import { Hero } from "~/common/components/hero";
 import { Form, Link, redirect, useNavigation } from "react-router";
 import SelectPair from "~/common/components/select-pair";
 import LoadingButton from "~/common/components/loading-button";
-import {
-  createRecommendation,
-  insertRecommendationHistory,
-} from "~/features/recommendations/mutations";
-import { Alert } from "~/common/components/ui/alert";
+import { insertRecommendationHistory } from "~/features/recommendations/mutations";
 import AlertMessage from "~/common/components/alert-message";
 import OpenAI from "openai";
 import z from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
-import { getGoodStockList, type GoodStock } from "~/features/api/queries";
+import { getGoodStockListByUserId } from "~/features/api/queries";
 import { useTicket } from "~/features/tickets/mutation";
 import { Button } from "~/common/components/ui/button";
 
@@ -53,21 +49,18 @@ const ResponseSchema = z.object({
   stock3_code: z.string(),
   stock3_summary: z.string().min(100).max(500),
 });
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
   const userId = await getLoggedInUserId(client as any);
   const formData = await request.formData();
   const ticketId = formData.get("ticket_id");
-  console.log("ticketId=", ticketId);
-  const { recommendation_id } = await createRecommendation(client as any, {
-    ticketId: Number(ticketId),
-    userId: userId,
-  });
-  console.log(`redirect to /histories/${recommendation_id}`);
-  const goodStocks: GoodStock[] = await getGoodStockList(client as any, {
+  console.log("[recommendation-page] ticketId=", ticketId);
+  console.log("[recommendation-page] userId=", userId);
+
+  const goodStocks = await getGoodStockListByUserId(client as any, {
     userId,
   });
-  //console.log("goodStocks=", goodStocks);
 
   if (!goodStocks || goodStocks.length === 0) {
     return Response.json({
@@ -138,7 +131,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         total_token,
       }
     );
-  console.log("recommendation_id=", recommendation_id);
+    console.log("[recommendation-page] recommendation_id=", recommendation_id);
     if (recommendation_id) {
       const ticketUsedResult = await useTicket(adminClient as any, {
         ticketId: Number(ticketId),
@@ -157,7 +150,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       });
     }
   } catch (error) {
-    console.error("OpenAI API error:", error);
+    console.error("[recommendation-page] OpenAI API error:", error);
     return Response.json(
       {
         error: "OpenAI API error, Failed to generate recommendation",
