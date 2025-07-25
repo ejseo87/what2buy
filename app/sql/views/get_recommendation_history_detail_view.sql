@@ -18,7 +18,6 @@ SELECT DISTINCT
   rh.stock1_summary,
   rh.stock2_summary,
   rh.stock3_summary,
-  rh.total_token,
   s1.forward_pe as stock1_forward_per,
   s1.pbr as stock1_pbr,
   s1.roe as stock1_roe,
@@ -33,7 +32,7 @@ SELECT DISTINCT
   s3.pbr as stock3_pbr,
   s3.roe as stock3_roe,
   s3.ev_to_ebitda as stock3_ev_to_ebitda,
-  s3.recommendation_key as stock3_analysis_opinion,
+  s3.recommendation_key as stock3_analysis_opinion
 FROM recommendation_histories rh
 LEFT JOIN stocks_summary_with_ratios s1 ON rh.stock1_code = s1.isu_srt_cd
 LEFT JOIN stocks_summary_with_ratios s2 ON rh.stock2_code = s2.isu_srt_cd

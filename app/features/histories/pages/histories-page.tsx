@@ -48,7 +48,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     throw new Error("Invalid search params");
   }
   const totalPages = await getRecommendationHistoryTotalPages(client as any, {
-    profile_id: userId,
+    userId: userId,
     keyword: parsedData.keyword,
   });
   console.log("[histories page] totalPages=", totalPages);
@@ -56,7 +56,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     throw new Error("Invalid page");
   }
   const histories = await getRecommendationHistories(client as any, {
-    profile_id: userId,
+    userId: userId,
     page: parsedData.page,
     sorting: parsedData.sorting,
     keyword: parsedData.keyword,

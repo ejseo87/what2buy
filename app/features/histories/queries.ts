@@ -261,40 +261,43 @@ export const getStockRecommendationDetail = async (
 export const getRecommendationHistoryTotalPages = async (
   client: SupabaseClient<Database>,
   {
-    profile_id,
+    userId,
     keyword,
   }: {
-    profile_id: string;
+    userId: string;
     keyword: string;
   }
 ) => {
   const baseQuery = client
     .from("get_recommendation_history_detail_view")
     .select("recommendation_id", { count: "exact", head: true })
-    .eq("profile_id", profile_id);
+    .eq("profile_id", userId);
 
   if (keyword) {
     baseQuery.or(
-      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,summary.ilike.%${keyword}%`
+      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,overall_summary.ilike.%${keyword}%`
     );
   }
 
   const { count, error } = await baseQuery;
-  if (error) throw error;
+  if (error) {
+    console.log("[getRecommendationHistoryTotalPages] error=", error);
+    throw error;
+  }
   if (count === null || count === 0) return 1;
-  console.log("[getRecommendationHistoryTotalPages] count=", count);
+  //console.log("[getRecommendationHistoryTotalPages] count=", count);
   return Math.ceil(count / PAGE_SIZE);
 };
 
 export const getRecommendationHistories = async (
   client: SupabaseClient<Database>,
   {
-    profile_id,
+    userId,
     page,
     sorting,
     keyword,
   }: {
-    profile_id: string;
+    userId: string;
     page: number;
     sorting: "newest" | "oldest";
     keyword: string;
@@ -317,12 +320,12 @@ export const getRecommendationHistories = async (
       stock3_name
       `
     )
-    .eq("profile_id", profile_id)
+    .eq("profile_id", userId)
     .order("recommendation_date", { ascending: isAscending })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   if (keyword) {
     baseQuery.or(
-      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,summary.ilike.%${keyword}%`
+      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,overall_summary.ilike.%${keyword}%`
     );
   }
   const { data: histories, error } = await baseQuery;
@@ -347,10 +350,10 @@ export const getRecommendationHistoryDetail = async (
     console.log(error);
     throw new Error("Failed to get recommendation history detail");
   }
-  console.log(
-    "[getRecommendationHistoryDetail] recommendation_history_detail=",
-    recommendation_history_detail
-  );
+  //console.log(
+  //  "[getRecommendationHistoryDetail] recommendation_history_detail=",
+  //  recommendation_history_detail
+  //);
   return recommendation_history_detail;
 };
 
@@ -452,7 +455,7 @@ export const getStocksSummaryWithRaitosByStockCode = async (
     console.log(error);
     throw new Error("Failed to get stocks summary with raitos");
   }
-  console.log("[getStocksSummaryWithRaitosByStockCode] data=", data);
+  //console.log("[getStocksSummaryWithRaitosByStockCode] data=", data);
   return data;
 };
 
@@ -460,11 +463,11 @@ export const getRecommendationHistoriesByStockCode = async (
   client: SupabaseClient<Database>,
   {
     stockCode,
-    userId
+    userId,
   }: {
-      stockCode: string;
-      userId: string;
-    }
+    stockCode: string;
+    userId: string;
+  }
 ) => {
   const { data, error } = await client
     .from("recommendation_histories")
@@ -477,7 +480,7 @@ export const getRecommendationHistoriesByStockCode = async (
     console.log(error);
     throw new Error("Failed to get recommendation histories");
   }
-  console.log("[getRecommendationHistoriesByStockCode] data=", data);
+  //console.log("[getRecommendationHistoriesByStockCode] data=", data);
   return data;
 };
 
@@ -548,7 +551,7 @@ export const getStocksTotalPages = async (
   const { count, error } = await baseQuery;
   if (error) throw error;
   if (count === null) return 1;
-  console.log("[getTotalPagesStocks] count=", count);
+  //console.log("[getTotalPagesStocks] count=", count);
   return Math.ceil(count / PAGE_SIZE);
 };
 
@@ -587,6 +590,6 @@ export const getStocksList = async (
     throw new Error("Failed to get stocks list");
   }
 
-  console.log("[getStocksList] stocks_list=", stocks_list);
+  //console.log("[getStocksList] stocks_list=", stocks_list);
   return stocks_list;
 };
