@@ -14,10 +14,11 @@ import type { Route } from "./+types/stocks-page";
 import { StockCard } from "../components/stock-card";
 import { STOCK_SORT_OPTIONS } from "~/common/constants";
 import { z } from "zod";
-import { getStocksList, getTotalPagesStocks } from "../queries";
+import { getStocksList, getStocksTotalPages } from "../queries";
 import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId } from "~/features/users/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -34,28 +35,30 @@ const searchParamsSchema = z.object({
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
-    const url = new URL(request.url);
-    const { success, data: parsedData } = searchParamsSchema.safeParse(
-      Object.fromEntries(url.searchParams)
-    );
-    if (!success) {
-      throw new Error("Invalid search params");
-    }
-    const totalPages = await getTotalPagesStocks(client as any,{
-      profile_id: a_profile_id,
-      keyword: parsedData.keyword,
-    });
-    if (parsedData.page > totalPages) {
-      throw new Error("Invalid page");
-    }
-    const stocks_list = await getStocksList(client as any,{
-      profile_id: a_profile_id,
-      page: parsedData.page,
-      sorting: parsedData.sorting,
-      keyword: parsedData.keyword,
-    });
-    return { stocks_list, totalPages };
-
+  const url = new URL(request.url);
+  const { success, data: parsedData } = searchParamsSchema.safeParse(
+    Object.fromEntries(url.searchParams)
+  );
+  if (!success) {
+    throw new Error("Invalid search params");
+  }
+  console.log("[stocks page] parsedData=", parsedData);
+  const userId = await getLoggedInUserId(client as any);
+  console.log("[stocks page] userId=", userId);
+  const totalPages = await getStocksTotalPages(client as any, {
+    profile_id: userId,
+    keyword: parsedData.keyword,
+  });
+  if (parsedData.page > totalPages) {
+    throw new Error("Invalid page");
+  }
+  const stocks_list = await getStocksList(client as any, {
+    profile_id: userId,
+    page: parsedData.page,
+    sorting: parsedData.sorting,
+    keyword: parsedData.keyword,
+  });
+  return { stocks_list, totalPages };
 };
 
 export default function StocksPage({ loaderData }: Route.ComponentProps) {
@@ -66,8 +69,8 @@ export default function StocksPage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="space-y-10">
       <Hero
-        title="추천된 주식 목록"
-        subtitle="지금까지 어떤 주식들이 추천되어 왔는지 확인해보세요."
+        title="추천 주식 리스트"
+        subtitle="지금까지 추천된 주식을 살펴보세요"
       />
       <div className=" items-start gap-40">
         <div className=" space-y-10">
@@ -115,18 +118,19 @@ export default function StocksPage({ loaderData }: Route.ComponentProps) {
               </PulsatingButton>
             </div>
           </div>
-          <div className="flex flex-col gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {(loaderData.stocks_list as any[]).map((stock) => (
               <StockCard
-                key={stock.stock_id}
-                stockId={stock.stock_id}
-                stockName={stock.stock_name}
+                key={stock.stock_code}
+                stockId={stock.stock_code}
+                stockName={stock.korean_name}
                 stockCode={stock.stock_code}
                 recommendationCount={stock.recommendation_count}
                 recommendationDates={stock.recommendation_dates}
-                per={stock.per}
-                pbr={stock.pbr}
-                roe={stock.roe}
+                trailingPer={stock.trailing_price_to_earnings_ratio}
+                forwardPer={stock.forward_price_to_earnings_ratio}
+                pbr={stock.price_to_book_ratio}
+                roe={stock.return_on_equity}
               />
             ))}
           </div>

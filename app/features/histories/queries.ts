@@ -233,67 +233,7 @@ export const getStockRecommendationDetail = async (
   return recommendation_detail;
 };
 
-export const getStocksList = async (
-  client: SupabaseClient<Database>,
-  {
-    profile_id,
-    page,
-    sorting,
-    keyword,
-  }: {
-    profile_id: string;
-    page: number;
-    sorting: "asc" | "desc";
-    keyword: string;
-  }
-) => {
-  const isAscending = sorting === "asc";
-  const baseQuery = client
-    .from("stock_card_list_view")
-    .select("*")
-    .eq("profile_id", profile_id)
-    .order("stock_name", { ascending: isAscending })
-    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
-  if (keyword) {
-    baseQuery.or(`stock_name.ilike.%${keyword}%,stock_code.ilike.%${keyword}%`);
-  }
-
-  const { data: stocks_list, error } = await baseQuery;
-
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get stocks list");
-  }
-
-  return stocks_list;
-};
-
-export const getTotalPagesStocks = async (
-  client: SupabaseClient<Database>,
-  {
-    profile_id,
-    keyword,
-  }: {
-    profile_id: string;
-    keyword: string;
-  }
-) => {
-  let baseQuery = client
-    .from("stock_card_list_view")
-    .select("stock_id", { count: "exact", head: true })
-    .eq("profile_id", profile_id);
-
-  if (keyword) {
-    baseQuery.or(`stock_name.ilike.%${keyword}%,stock_code.ilike.%${keyword}%`);
-  }
-
-  const { count, error } = await baseQuery;
-  if (error) throw error;
-  if (count === null) return 1;
-  //console.log(count);
-  return Math.ceil(count / PAGE_SIZE);
-};
 
 /*
 2025.07.24 refactoring codes for recommendation history
@@ -319,6 +259,7 @@ export const getTotalPagesStocks = async (
 /*
 2025.07.24 refactoring codes for recommendation history
 */
+
 export const getRecommendationHistoryTotalPages = async (
   client: SupabaseClient<Database>,
   {
@@ -554,3 +495,72 @@ export const getStockPerformanceChart = async (
 
   return chart_data;
 };
+
+
+export const getStocksTotalPages = async (
+  client: SupabaseClient<Database>,
+  {
+    profile_id,
+    keyword,
+  }: {
+    profile_id: string;
+    keyword: string;
+  }
+) => {
+  let baseQuery = client
+    .from("get_stocks_list_view")
+    .select("stock_code", { count: "exact", head: true })
+    .eq("profile_id", profile_id);
+
+  if (keyword) {
+    baseQuery.or(
+      `korean_name.ilike.%${keyword}%,english_name.ilike.%${keyword}%,stock_code.ilike.%${keyword}%`
+    );
+  }
+
+  const { count, error } = await baseQuery;
+  if (error) throw error;
+  if (count === null) return 1;
+  console.log("[getTotalPagesStocks] count=", count);
+  return Math.ceil(count / PAGE_SIZE);
+};
+
+export const getStocksList = async (
+  client: SupabaseClient<Database>,
+  {
+    profile_id,
+    page,
+    sorting,
+    keyword,
+  }: {
+    profile_id: string;
+    page: number;
+    sorting: "asc" | "desc";
+    keyword: string;
+  }
+) => {
+  const isAscending = sorting === "asc";
+  const baseQuery = client
+    .from("get_stocks_list_view")
+    .select("*")
+    .eq("profile_id", profile_id)
+    .order("korean_name", { ascending: isAscending })
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+
+  if (keyword) {
+    baseQuery.or(
+      `korean_name.ilike.%${keyword}%,english_name.ilike.%${keyword}%,stock_code.ilike.%${keyword}%`
+    );
+  }
+
+  const { data: stocks_list, error } = await baseQuery;
+
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get stocks list");
+  }
+
+  console.log("[getStocksList] stocks_list=", stocks_list);
+  return stocks_list;
+};
+
