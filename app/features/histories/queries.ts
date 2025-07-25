@@ -257,6 +257,24 @@ export const getStockRecommendationDetail = async (
 /*
 2025.07.24 refactoring codes for recommendation history
 */
+export const getLatestRecommendation = async (
+  client: SupabaseClient<Database>,
+  { userId }: { userId: string }
+) => {
+  const { data: lastest_history, error } = await client
+    .from("get_recommendation_history_detail_view")
+    .select("*")
+    .eq("profile_id", userId)
+    .order("recommendation_date", { ascending: false })
+    .limit(1)
+    .single();
+  if (error) {
+    console.log(error);
+    throw redirect("/recommendation");
+  }
+  //console.log(lastest_history);
+  return lastest_history;
+};
 
 export const getRecommendationHistoryTotalPages = async (
   client: SupabaseClient<Database>,
