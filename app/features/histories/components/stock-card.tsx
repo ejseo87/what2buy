@@ -36,9 +36,11 @@ export function StockCard({
     <Link to={`/histories/stocks/${stockId}`} className="block">
       <Card className="flex flex-col justify-between bg-transparent hover:bg-card/50 transition-colors h-full">
         <CardHeader className="flex flex-col gap-5  justify-start">
-          <CardTitle className="text-xl font-bold">
-            {stockName} ({stockCode})
-            <Badge className="text-bold text-sm ml-10">
+          <CardTitle className="flex flex-row justify-between text-xl font-bold">
+            <span className="block">
+              {stockName} ({stockCode})
+            </span>
+            <Badge variant="outline" className="text-bold text-sm ml-10">
               {recommendationCount}회 추천됨
             </Badge>
           </CardTitle>

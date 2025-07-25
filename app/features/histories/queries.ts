@@ -233,8 +233,6 @@ export const getStockRecommendationDetail = async (
   return recommendation_detail;
 };
 
-
-
 /*
 2025.07.24 refactoring codes for recommendation history
 */
@@ -460,11 +458,18 @@ export const getStocksSummaryWithRaitosByStockCode = async (
 
 export const getRecommendationHistoriesByStockCode = async (
   client: SupabaseClient<Database>,
-  { stockCode }: { stockCode: string }
+  {
+    stockCode,
+    userId
+  }: {
+      stockCode: string;
+      userId: string;
+    }
 ) => {
   const { data, error } = await client
     .from("recommendation_histories")
     .select("recommendation_id, recommendation_date")
+    .eq("profile_id", userId)
     .or(
       `stock1_code.eq.${stockCode},stock2_code.eq.${stockCode},stock3_code.eq.${stockCode}`
     );
@@ -480,13 +485,36 @@ export const getStockPerformanceChart = async (
   client: SupabaseClient<Database>,
   { stockCode, days = 30 }: { stockCode: string; days?: number }
 ) => {
-  // 최근 N일간의 주식 가격 차트 데이터
+  // 해당 종목의 최근 날짜 찾기
+  const { data: latestData, error: latestError } = await client
+    .from("stocks_historical_data")
+    .select("date")
+    .eq("isu_srt_cd", stockCode)
+    .order("date", { ascending: false })
+    .limit(1);
+
+  if (latestError || !latestData || latestData.length === 0) {
+    console.log("[getStockPerformanceChart] latestError=", latestError);
+    throw new Error("Failed to get latest date for stock");
+  }
+
+  const latestDate = (latestData as any)[0].date;
+
+  // 최근 날짜부터 N일 전까지의 데이터 가져오기
   const { data: chart_data, error } = await client
     .from("stocks_historical_data")
     .select("date, close")
     .eq("isu_srt_cd", stockCode)
-    .order("date", { ascending: true })
-    .limit(days);
+    .gte(
+      "date",
+      new Date(
+        new Date(latestDate).getTime() - (days - 1) * 24 * 60 * 60 * 1000
+      )
+        .toISOString()
+        .split("T")[0]
+    )
+    .lte("date", latestDate)
+    .order("date", { ascending: true });
 
   if (error) {
     console.log(error);
@@ -495,7 +523,6 @@ export const getStockPerformanceChart = async (
 
   return chart_data;
 };
-
 
 export const getStocksTotalPages = async (
   client: SupabaseClient<Database>,
@@ -563,4 +590,3 @@ export const getStocksList = async (
   console.log("[getStocksList] stocks_list=", stocks_list);
   return stocks_list;
 };
-

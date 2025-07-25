@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { MoveRightIcon, TrendingDown, TrendingUp } from "lucide-react";
 import {
   CartesianGrid,
   Line,
@@ -132,6 +132,8 @@ export function StockChart({
           {changePercent ?? "0"}%)
           {changePercent > 0 ? (
             <TrendingUp className="size-5 text-green-500" />
+          ) : changePercent === 0 ? (
+            <MoveRightIcon className="size-5 text-grey-500" />
           ) : (
             <TrendingDown className="size-5 text-red-500" />
           )}
