@@ -80,54 +80,6 @@ export const getRecommendationCount = async (
   return count;
 };
 
-export const getHistories = async (
-  client: SupabaseClient<Database>,
-  {
-    profile_id,
-    page,
-    sorting,
-    keyword,
-  }: {
-    profile_id: string;
-    page: number;
-    sorting: "newest" | "oldest";
-    keyword: string;
-  }
-) => {
-  const isAscending = sorting === "oldest";
-
-  const baseQuery = client
-    .from("recommendation_stocks_view")
-    .select(
-      `
-      recommendation_id,
-      recommendation_date,
-      summary,
-      stock1_id,
-      stock2_id,
-      stock3_id,
-      stock1_name,
-      stock2_name,
-      stock3_name
-      `
-    )
-    .eq("profile_id", profile_id)
-    .order("recommendation_date", { ascending: isAscending })
-    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
-  if (keyword) {
-    baseQuery.or(
-      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,summary.ilike.%${keyword}%`
-    );
-  }
-  const { data: histories, error } = await baseQuery;
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get histories");
-  }
-  //console.log(histories);
-  return histories;
-};
-
 export const getStockOverview = async (
   client: SupabaseClient<Database>,
   { stockId }: { stockId: number }
@@ -343,7 +295,31 @@ export const getTotalPagesStocks = async (
   return Math.ceil(count / PAGE_SIZE);
 };
 
-export const getTotalPages = async (
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+/*
+2025.07.24 refactoring codes for recommendation history
+*/
+export const getRecommendationHistoryTotalPages = async (
   client: SupabaseClient<Database>,
   {
     profile_id,
@@ -354,7 +330,7 @@ export const getTotalPages = async (
   }
 ) => {
   const baseQuery = client
-    .from("recommendation_stocks_view")
+    .from("get_recommendation_history_detail_view")
     .select("recommendation_id", { count: "exact", head: true })
     .eq("profile_id", profile_id);
 
@@ -367,34 +343,57 @@ export const getTotalPages = async (
   const { count, error } = await baseQuery;
   if (error) throw error;
   if (count === null || count === 0) return 1;
-  //console.log(count);
+  console.log("[getRecommendationHistoryTotalPages] count=", count);
   return Math.ceil(count / PAGE_SIZE);
 };
 
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
+export const getRecommendationHistories = async (
+  client: SupabaseClient<Database>,
+  {
+    profile_id,
+    page,
+    sorting,
+    keyword,
+  }: {
+    profile_id: string;
+    page: number;
+    sorting: "newest" | "oldest";
+    keyword: string;
+  }
+) => {
+  const isAscending = sorting === "oldest";
+
+  const baseQuery = client
+    .from("get_recommendation_history_detail_view")
+    .select(
+      `
+      recommendation_id,
+      recommendation_date,
+      overall_summary,
+      stock1_code,
+      stock2_code,
+      stock3_code,
+      stock1_name,
+      stock2_name,
+      stock3_name
+      `
+    )
+    .eq("profile_id", profile_id)
+    .order("recommendation_date", { ascending: isAscending })
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  if (keyword) {
+    baseQuery.or(
+      `stock1_name.ilike.%${keyword}%,stock2_name.ilike.%${keyword}%, stock3_name.ilike.%${keyword}%,summary.ilike.%${keyword}%`
+    );
+  }
+  const { data: histories, error } = await baseQuery;
+  if (error) {
+    console.log(error);
+    throw new Error("Failed to get recommendation histories");
+  }
+  console.log("[getRecommendationHistories] histories=", histories);
+  return histories;
+};
 
 export const getRecommendationHistoryDetail = async (
   client: SupabaseClient<Database>,

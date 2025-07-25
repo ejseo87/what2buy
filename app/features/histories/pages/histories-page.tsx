@@ -12,11 +12,13 @@ import { useSearchParams } from "react-router";
 import { Input } from "~/common/components/ui/input";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import { RecommendationCard } from "../components/recommedation-card";
-import { getHistories, getTotalPages } from "../queries";
+import {
+  getRecommendationHistories,
+  getRecommendationHistoryTotalPages,
+} from "../queries";
 import { formatKoreanDate } from "~/common/utils";
 import { z } from "zod";
 import { SORT_OPTIONS } from "~/common/constants";
-import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
@@ -37,7 +39,7 @@ const searchParamsSchema = z.object({
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
   const userId = await getLoggedInUserId(client as any);
-  console.log("histories page userId=", userId);
+  console.log("[histories page] userId=", userId);
   const url = new URL(request.url);
   const { success, data: parsedData } = searchParamsSchema.safeParse(
     Object.fromEntries(url.searchParams)
@@ -45,15 +47,15 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!success) {
     throw new Error("Invalid search params");
   }
-  const totalPages = await getTotalPages(client as any, {
+  const totalPages = await getRecommendationHistoryTotalPages(client as any, {
     profile_id: userId,
     keyword: parsedData.keyword,
   });
-  //console.log("histories page totalPages=", totalPages);
+  console.log("[histories page] totalPages=", totalPages);
   if (parsedData.page > totalPages) {
     throw new Error("Invalid page");
   }
-  const histories = await getHistories(client as any, {
+  const histories = await getRecommendationHistories(client as any, {
     profile_id: userId,
     page: parsedData.page,
     sorting: parsedData.sorting,
@@ -75,10 +77,7 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="space-y-10">
-      <Hero
-        title="주식 추천 이력"
-        subtitle="주식 종목 추천 이력을 확인해보세요."
-      />
+      <Hero title="추천 기록" subtitle="지금까지의 추천 기록을 확인해보세요." />
       <div className=" items-start gap-40">
         <div className=" space-y-10">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -111,7 +110,7 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
                 <Input
                   type="text"
                   name="keyword"
-                  placeholder="추천 이력을 키워드로 검색해보세요."
+                  placeholder="추천 기록을 키워드로 검색해보세요."
                 />
               </Form>
             </div>
@@ -130,7 +129,7 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
                 key={history.recommendation_id}
                 id={history.recommendation_id}
                 date={history.formattedDate}
-                description={history.summary.slice(0, 500) + "..."}
+                description={history.overall_summary + "..."}
                 stocks={[
                   history.stock1_name,
                   history.stock2_name,
