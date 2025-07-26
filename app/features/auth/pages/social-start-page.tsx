@@ -13,7 +13,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     return redirect("/auth/login");
   }
   const { provider } = data;
-  const redirectTo = `http://what2buy.cool/auth/social/${provider}/complete`;
+  const redirectTo = `https://what2buy.cool/auth/social/${provider}/complete`;
   //console.log("[social start page] redirectTo=", redirectTo);
   const { client, headers } = makeSSRClient(request);
   const {
