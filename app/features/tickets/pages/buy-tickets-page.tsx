@@ -1,4 +1,3 @@
-import { Button } from "~/common/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,13 +5,27 @@ import {
   CardHeader,
   CardTitle,
 } from "~/common/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/common/components/ui/select";
 import { Input } from "~/common/components/ui/input";
 import { Label } from "~/common/components/ui/label";
+import { Button } from "~/common/components/ui/button";
 import { Separator } from "~/common/components/ui/separator";
-import { Form, Link, useLocation } from "react-router";
+import { Form, Link, useActionData, useNavigation } from "react-router";
 import { Hero } from "~/common/components/hero";
-import InputPair from "~/common/components/input-pair";
 import type { Route } from "./+types/buy-tickets-page";
+import { useState } from "react";
+import { TICKET_PLANS } from "../constants";
+import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId } from "~/features/users/queries";
+import { createTickets } from "../mutation";
+import LoadingButton from "~/common/components/loading-button";
+import AlertMessage from "~/common/components/alert-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -21,53 +34,55 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export function loader({ request }: Route.LoaderArgs) {
-  // TODO: Fetch ticket details and user payment methods
-  return {
-    paymentMethods: [
-      { id: "card", name: "Credit/Debit Card" },
-      { id: "paypal", name: "PayPal" },
-      { id: "bank", name: "Bank Transfer" },
-    ],
-    selectedTicket: {
-      id: 1,
-      title: "Premium Stock Analysis Package",
-      description:
-        "Get detailed analysis for up to 10 stocks with expert recommendations",
-      price: 29.99,
-      duration: "1 month",
-    },
-  };
-}
+export async function action({ request }: Route.ActionArgs) {
+  const { client } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client);
+  const formData = await request.formData();
+  const ticketId = formData.get("ticketId") as string;
+  const quantity = Number(formData.get("quantity"));
 
-export function action({ request }: Route.ActionArgs) {
-  // TODO: Process ticket purchase
-  return {};
-}
+  const selectedPlan = TICKET_PLANS.find((plan) => plan.id === ticketId);
 
-interface BuyTicketsPageProps {
-  loaderData: {
-    paymentMethods: Array<{
-      id: string;
-      name: string;
-    }>;
-    selectedTicket: {
-      id: number;
-      title: string;
-      description: string;
-      price: number;
-      duration: string;
+  if (!selectedPlan || !userId || quantity <= 0) {
+    return {
+      success: false,
+      error: "Invalid purchase request.",
     };
-  };
+  }
+
+  try {
+    await createTickets(client, {
+      userId,
+      ticketType: selectedPlan.type,
+      quantity,
+    });
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unknown error occurred.",
+    };
+  }
 }
 
-export default function BuyTicketsPage({ loaderData }: BuyTicketsPageProps) {
-  const { paymentMethods, selectedTicket } = loaderData;
-  const location = useLocation();
-  const ticketId = location.state?.ticketId || 1;
+export default function BuyTicketsPage() {
+  const [selectedTicketId, setSelectedTicketId] = useState<string>(
+    TICKET_PLANS[0].id
+  );
+  const [quantity, setQuantity] = useState(1);
+  const navigation = useNavigation();
+  const actionData = useActionData<typeof action>();
+
+  const selectedTicket =
+    TICKET_PLANS.find((p) => p.id === selectedTicketId) || TICKET_PLANS[0];
+
+  const subtotal = selectedTicket.price * quantity;
+  const tax = subtotal * 0.1;
+  const total = subtotal + tax;
 
   return (
-    <div className="space-y-10">
+    <Form method="post" className="space-y-10">
       <Hero
         title="티켓 구매"
         subtitle="결제 정보를 입력하고 티켓을 구매하세요."
@@ -75,167 +90,113 @@ export default function BuyTicketsPage({ loaderData }: BuyTicketsPageProps) {
 
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Order Summary */}
           <Card>
             <CardHeader>
               <CardTitle>주문 요약</CardTitle>
-              <CardDescription>구매하려는 티켓 정보</CardDescription>
+              <CardDescription>구매할 티켓을 선택하세요</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-semibold">{selectedTicket.title}</h3>
+                <Label htmlFor="ticket-type">티켓 종류</Label>
+                <Select
+                  name="ticketId"
+                  value={selectedTicketId}
+                  onValueChange={setSelectedTicketId}
+                >
+                  <SelectTrigger id="ticket-type">
+                    <SelectValue placeholder="티켓 종류를 선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TICKET_PLANS.map((plan) => (
+                      <SelectItem key={plan.id} value={plan.id}>
+                        {plan.title} - {plan.price}원
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <p className="text-sm text-muted-foreground">
                   {selectedTicket.description}
                 </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">이용 기간:</span>
-                  <span className="font-medium">{selectedTicket.duration}</span>
-                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="quantity">수량</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="1"
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, Number(e.target.value)))
+                  }
+                  className="w-24"
+                />
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
+              <div className="space-y-2 font-medium">
                 <div className="flex justify-between">
-                  <span>상품 가격:</span>
-                  <span>${selectedTicket.price}</span>
+                  <span>소계:</span>
+                  <span>{subtotal}원</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>부가세:</span>
-                  <span>${(selectedTicket.price * 0.1).toFixed(2)}</span>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>부가세 (10%):</span>
+                  <span>{tax}원</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>총 결제금액:</span>
-                  <span>${(selectedTicket.price * 1.1).toFixed(2)}</span>
+                  <span>${total}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Payment Form */}
           <Card>
             <CardHeader>
               <CardTitle>결제 정보</CardTitle>
               <CardDescription>
-                결제 방법을 선택하고 정보를 입력하세요
+                결제 방법을 선택하고 정보를 입력하세요 (테스트용)
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Form className="space-y-6">
-                {/* Payment Method Selection */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">결제 방법</Label>
-                  <div className="space-y-2">
-                    {paymentMethods.map((method) => (
-                      <div
-                        key={method.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <input
-                          type="radio"
-                          id={method.id}
-                          name="paymentMethod"
-                          value={method.id}
-                          defaultChecked={method.id === "card"}
-                          className="w-4 h-4"
-                        />
-                        <Label htmlFor={method.id} className="text-sm">
-                          {method.name}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <CardContent className="space-y-6">
+              <p className="text-center text-muted-foreground py-8">
+                실제 결제는 연동되지 않습니다.
+                <br />
+                아래 버튼을 누르면 티켓이 발급됩니다.
+              </p>
 
-                <Separator />
+              {actionData?.error && (
+                <AlertMessage
+                  variant="destructive"
+                  content={actionData.error}
+                />
+              )}
+              {actionData?.success && (
+                <AlertMessage
+                  variant="default"
+                  content="성공적으로 티켓을 구매했습니다! 티켓 목록 페이지로 이동합니다."
+                />
+              )}
 
-                {/* Card Details */}
-                <div className="space-y-4">
-                  <InputPair
-                    label="카드 번호"
-                    description="16자리 카드 번호를 입력하세요"
-                    name="cardNumber"
-                    id="cardNumber"
-                    required
-                    type="text"
-                    placeholder="1234 5678 9012 3456"
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputPair
-                      label="만료일"
-                      description="MM/YY"
-                      name="expiryDate"
-                      id="expiryDate"
-                      required
-                      type="text"
-                      placeholder="12/25"
-                    />
-
-                    <InputPair
-                      label="CVV"
-                      description="카드 뒷면 3자리"
-                      name="cvv"
-                      id="cvv"
-                      required
-                      type="text"
-                      placeholder="123"
-                    />
-                  </div>
-
-                  <InputPair
-                    label="카드 소유자명"
-                    description="카드에 표시된 이름"
-                    name="cardHolder"
-                    id="cardHolder"
-                    required
-                    type="text"
-                    placeholder="홍길동"
-                  />
-                </div>
-
-                <Separator />
-
-                {/* Billing Address */}
-                <div className="space-y-4">
-                  <h3 className="font-medium">청구 주소</h3>
-
-                  <InputPair
-                    label="이메일"
-                    description="영수증을 받을 이메일 주소"
-                    name="email"
-                    id="email"
-                    required
-                    type="email"
-                    placeholder="user@example.com"
-                  />
-
-                  <InputPair
-                    label="전화번호"
-                    description="연락 가능한 전화번호"
-                    name="phone"
-                    id="phone"
-                    required
-                    type="tel"
-                    placeholder="010-1234-5678"
-                  />
-                </div>
-
-                {/* Submit Buttons */}
-                <div className="flex gap-4 pt-4">
-                  <Button variant="outline" asChild className="flex-1">
-                    <Link to="/tickets">이전으로</Link>
-                  </Button>
-                  <Button type="submit" className="flex-1">
-                    ${(selectedTicket.price * 1.1).toFixed(2)} 결제하기
-                  </Button>
-                </div>
-              </Form>
+              <div className="flex gap-4 pt-4">
+                <Button variant="outline" asChild className="flex-1">
+                  <Link to="/tickets">이전으로</Link>
+                </Button>
+                <LoadingButton
+                  type="submit"
+                  className="flex-1"
+                  isLoading={navigation.state === "submitting"}
+                >
+                  {total}원 결제하기
+                </LoadingButton>
+              </div>
             </CardContent>
           </Card>
         </div>
       </div>
-    </div>
+    </Form>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Route } from "./+types/tickets-page";
 import { Hero } from "~/common/components/hero";
 import { TicketCard } from "../components/ticket-card";
@@ -31,8 +32,9 @@ export default function TicketsPage({ loaderData }: Route.ComponentProps) {
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-6">
-          {tickets.map((ticket) => (
+          {tickets.map((ticket: any) => (
             <TicketCard
+              key={ticket.ticket_id}
               title={ticket.ticket_id}
               type={ticket.ticket_type}
               duration_start={ticket.ticket_duration_start}
