@@ -19,8 +19,6 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  throw new Error("Sentry Test Error");
-  
   const { client, headers } = makeSSRClient(request);
 
   try {
