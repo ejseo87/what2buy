@@ -9,6 +9,7 @@ import {
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
 import { Link } from "react-router";
+import { redirect } from "react-router";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -19,137 +20,163 @@ export const meta: Route.MetaFunction = () => {
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
-  const userId = await getLoggedInUserId(client as any);
-  const latest_recommendation = await getLatestRecommendation(client as any, {
-    userId: userId,
-  });
-  console.log("[home-page] latest_recommendation=", latest_recommendation);
-  const recommendationDate = latest_recommendation.recommendation_date.slice(
-    0,
-    10
-  );
-  console.log(
-    "recommendationDate=",
-    recommendationDate,
-    "recommendationDate.length=",
-    recommendationDate.length
-  );
-  // #1 주식 상세 정보 가져오기
-  // const stockDetail_1 = await getStockDetail(client as any, {
-  //   stockId: latest_recommendation.stock1_id,
-  // });
-  // #1 차트 데이터 가져오기 (최근 30일)
-  const chartData_1 = await getStockPerformanceChart(client as any, {
-    stockCode: latest_recommendation.stock1_code,
-    days: 30,
-  });
-  //console.log("chartData_1=", chartData_1);
-  const recommendationPrice_1 =
-    chartData_1.find((item) => item.date === recommendationDate)?.close ?? 0;
-  console.log("recommendationPrice_1=", recommendationPrice_1);
 
-  // 추천일 종가 대비 변동률 계산
-  const currentPrice_1 = chartData_1[0].close || 0;
-  const changeAmount_1 = currentPrice_1 - recommendationPrice_1;
-  const changePercent_1 =
-    recommendationPrice_1 > 0
-      ? ((changeAmount_1 / recommendationPrice_1) * 100).toFixed(2)
-      : "0";
-  console.log("changeAmount_1=", changeAmount_1);
-  console.log("changePercent_1=", changePercent_1);
-  // #2 주식 상세 정보 가져오기
-  //const stockDetail_2 = await getStockDetail(client as any, {
-  //  stockId: latest_recommendation.stock2_id,
-  //});
-  // #2 차트 데이터 가져오기 (최근 30일)
-  const chartData_2 = await getStockPerformanceChart(client as any, {
-    stockCode: latest_recommendation.stock2_code,
-    days: 30,
-  });
-  //console.log("chartData_2=", chartData_2);
-  const recommendationPrice_2 =
-    chartData_2.find((item) => item.date === recommendationDate)?.close ?? 0;
-  console.log("recommendationPrice_2=", recommendationPrice_2);
-  // 추천일 종가 대비 변동률 계산
-  const currentPrice_2 = chartData_2[0].close || 0;
-  const changeAmount_2 = currentPrice_2 - recommendationPrice_2;
-  const changePercent_2 =
-    recommendationPrice_2 > 0
-      ? ((changeAmount_2 / recommendationPrice_2) * 100).toFixed(2)
-      : "0";
-  console.log("changeAmount_2=", changeAmount_2);
-  console.log("changePercent_2=", changePercent_2);
-  // #3 주식 상세 정보 가져오기
-  //const stockDetail_3 = await getStockDetail(client as any, {
-  //  stockId: latest_recommendation.stock3_id,
-  //});
-  // #3 차트 데이터 가져오기 (최근 30일)
-  const chartData_3 = await getStockPerformanceChart(client as any, {
-    stockCode: latest_recommendation.stock3_code,
-    days: 30,
-  });
-  console.log("chartData_3=", (chartData_3 as any)?.slice(0, 3)); // 처음 3개 항목만 출력
-  console.log("recommendationDate=", recommendationDate);
-  console.log("첫번째 chartData_3 날짜=", (chartData_3 as any)?.[0]?.date);
-  // 정확한 날짜가 없으면 가장 최근 날짜 사용 (데이터가 추천일보다 이전이므로)
-  const recommendationPrice_3 =
-    (chartData_3 as any).find((item: any) => item.date === recommendationDate)
-      ?.close ??
-    (chartData_3 as any)[(chartData_3 as any).length - 1]?.close ??
-    0;
-  console.log("recommendationPrice_3=", recommendationPrice_3);
+  try {
+    const userId = await getLoggedInUserId(client as any);
+    const latest_recommendation = (await getLatestRecommendation(
+      client as any,
+      {
+        userId: userId,
+      }
+    )) as any;
+    console.log("[home-page] latest_recommendation=", latest_recommendation);
+    const recommendationDate = latest_recommendation.recommendation_date.slice(
+      0,
+      10
+    );
+    console.log(
+      "recommendationDate=",
+      recommendationDate,
+      "recommendationDate.length=",
+      recommendationDate.length
+    );
+    // #1 주식 상세 정보 가져오기
+    // const stockDetail_1 = await getStockDetail(client as any, {
+    //   stockId: latest_recommendation.stock1_id,
+    // });
+    // #1 차트 데이터 가져오기 (최근 30일)
+    const chartData_1 = (await getStockPerformanceChart(client as any, {
+      stockCode: latest_recommendation.stock1_code,
+      days: 30,
+    })) as any;
+    //console.log("chartData_1=", chartData_1);
+    const recommendationPrice_1 =
+      chartData_1.find((item: any) => item.date === recommendationDate)
+        ?.close ?? 0;
+    console.log("recommendationPrice_1=", recommendationPrice_1);
 
-  // 추천일 종가 대비 변동률 계산
-  const currentPrice_3 = chartData_3[0].close || 0;
-  const changeAmount_3 = currentPrice_3 - recommendationPrice_3;
-  const changePercent_3 =
-    recommendationPrice_3 > 0
-      ? ((changeAmount_3 / recommendationPrice_3) * 100).toFixed(2)
-      : "0";
-  console.log("changeAmount_3=", changeAmount_3);
-  console.log("changePercent_3=", changePercent_3);
-  // #1 차트 데이터 변환
-  const transformedChartData_1 =
-    chartData_1?.map((item, index) => ({
-      date: item.date,
-      [latest_recommendation.stock1_name || "Stock"]: item.close,
-    })) || [];
+    // 추천일 종가 대비 변동률 계산
+    const currentPrice_1 = chartData_1[0].close || 0;
+    const changeAmount_1 = currentPrice_1 - recommendationPrice_1;
+    const changePercent_1 =
+      recommendationPrice_1 > 0
+        ? ((changeAmount_1 / recommendationPrice_1) * 100).toFixed(2)
+        : "0";
+    console.log("changeAmount_1=", changeAmount_1);
+    console.log("changePercent_1=", changePercent_1);
+    // #2 주식 상세 정보 가져오기
+    //const stockDetail_2 = await getStockDetail(client as any, {
+    //  stockId: latest_recommendation.stock2_id,
+    //});
+    // #2 차트 데이터 가져오기 (최근 30일)
+    const chartData_2 = (await getStockPerformanceChart(client as any, {
+      stockCode: latest_recommendation.stock2_code,
+      days: 30,
+    })) as any;
+    //console.log("chartData_2=", chartData_2);
+    const recommendationPrice_2 =
+      chartData_2.find((item: any) => item.date === recommendationDate)
+        ?.close ?? 0;
+    console.log("recommendationPrice_2=", recommendationPrice_2);
+    // 추천일 종가 대비 변동률 계산
+    const currentPrice_2 = chartData_2[0].close || 0;
+    const changeAmount_2 = currentPrice_2 - recommendationPrice_2;
+    const changePercent_2 =
+      recommendationPrice_2 > 0
+        ? ((changeAmount_2 / recommendationPrice_2) * 100).toFixed(2)
+        : "0";
+    console.log("changeAmount_2=", changeAmount_2);
+    console.log("changePercent_2=", changePercent_2);
+    // #3 주식 상세 정보 가져오기
+    //const stockDetail_3 = await getStockDetail(client as any, {
+    //  stockId: latest_recommendation.stock3_id,
+    //});
+    // #3 차트 데이터 가져오기 (최근 30일)
+    const chartData_3 = (await getStockPerformanceChart(client as any, {
+      stockCode: latest_recommendation.stock3_code,
+      days: 30,
+    })) as any;
+    console.log("chartData_3=", chartData_3?.slice(0, 3)); // 처음 3개 항목만 출력
+    console.log("recommendationDate=", recommendationDate);
+    console.log("첫번째 chartData_3 날짜=", chartData_3?.[0]?.date);
+    // 정확한 날짜가 없으면 가장 최근 날짜 사용 (데이터가 추천일보다 이전이므로)
+    const recommendationPrice_3 =
+      chartData_3.find((item: any) => item.date === recommendationDate)
+        ?.close ??
+      chartData_3[chartData_3.length - 1]?.close ??
+      0;
+    console.log("recommendationPrice_3=", recommendationPrice_3);
 
-  //console.log("transformedChartData_1=", transformedChartData_1);
-  // #2 차트 데이터 변환
-  const transformedChartData_2 =
-    chartData_2?.map((item, index) => ({
-      date: item.date,
-      [latest_recommendation.stock2_name || "Stock"]: item.close,
-    })) || [];
-  //console.log("transformedChartData_2=", transformedChartData_2);
-  // #3 차트 데이터 변환
-  const transformedChartData_3 =
-    chartData_3?.map((item, index) => ({
-      date: item.date,
-      [latest_recommendation.stock3_name || "Stock"]: item.close,
-    })) || [];
-  //console.log("transformedChartData_3=", transformedChartData_3);
-  return {
-    latest_recommendation,
-    recommendationDate,
-    transformedChartData_1,
-    recommendationPrice_1,
-    currentPrice_1,
-    changeAmount_1,
-    changePercent_1,
-    transformedChartData_2,
-    recommendationPrice_2,
-    currentPrice_2,
-    changeAmount_2,
-    changePercent_2,
-    chartData_3,
-    transformedChartData_3,
-    recommendationPrice_3,
-    currentPrice_3,
-    changeAmount_3,
-    changePercent_3,
-  };
+    // 추천일 종가 대비 변동률 계산
+    const currentPrice_3 = chartData_3[0].close || 0;
+    const changeAmount_3 = currentPrice_3 - recommendationPrice_3;
+    const changePercent_3 =
+      recommendationPrice_3 > 0
+        ? ((changeAmount_3 / recommendationPrice_3) * 100).toFixed(2)
+        : "0";
+    console.log("changeAmount_3=", changeAmount_3);
+    console.log("changePercent_3=", changePercent_3);
+    // #1 차트 데이터 변환
+    const transformedChartData_1 =
+      chartData_1?.map((item: any, index: number) => ({
+        date: item.date,
+        [latest_recommendation.stock1_name || "Stock"]: item.close,
+      })) || [];
+
+    //console.log("transformedChartData_1=", transformedChartData_1);
+    // #2 차트 데이터 변환
+    const transformedChartData_2 =
+      chartData_2?.map((item: any, index: number) => ({
+        date: item.date,
+        [latest_recommendation.stock2_name || "Stock"]: item.close,
+      })) || [];
+    //console.log("transformedChartData_2=", transformedChartData_2);
+    // #3 차트 데이터 변환
+    const transformedChartData_3 =
+      chartData_3?.map((item: any, index: number) => ({
+        date: item.date,
+        [latest_recommendation.stock3_name || "Stock"]: item.close,
+      })) || [];
+    //console.log("transformedChartData_3=", transformedChartData_3);
+    return {
+      latest_recommendation,
+      recommendationDate,
+      transformedChartData_1,
+      recommendationPrice_1,
+      currentPrice_1,
+      changeAmount_1,
+      changePercent_1,
+      transformedChartData_2,
+      recommendationPrice_2,
+      currentPrice_2,
+      changeAmount_2,
+      changePercent_2,
+      chartData_3,
+      transformedChartData_3,
+      recommendationPrice_3,
+      currentPrice_3,
+      changeAmount_3,
+      changePercent_3,
+    };
+  } catch (error: any) {
+    console.error("[home-page] error=", error);
+
+    // 인증 에러 처리
+    const errorMessage = error?.message || error?.details || "";
+    if (
+      errorMessage.includes("Auth session missing") ||
+      errorMessage.includes("JWT")
+    ) {
+      throw redirect("/auth/login");
+    }
+
+    // 추천 기록이 없는 경우 (새 사용자)
+    if (error?.code === "PGRST116" || errorMessage.includes("0 rows")) {
+      throw redirect("/recommendation");
+    }
+
+    throw error;
+  }
 };
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {

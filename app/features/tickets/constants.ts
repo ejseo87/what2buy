@@ -22,7 +22,7 @@ export const TICKET_PLANS = [
     id: "premium",
     type: TICKET_TYPE_MAP.PREMIUM,
     title: "유료 추천권",
-    description: "고급 분석과 함께 상세한 주식 추천을 받을 수 있습니다.",
+    description: "인공지능이 주식을 추천해드립니다.",
     price: 500,
     duration: "1개월",
   },

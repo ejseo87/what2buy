@@ -14,9 +14,9 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
   const { provider } = data;
   const url = new URL(request.url);
-  //console.log("social complete page url=", url);
+  //console.log("[social complete page] url=", url);
   const code = url.searchParams.get("code");
-  //console.log("social complete page code=", code);
+  //console.log("[social complete page] code=", code);
   if (!code) {
     return redirect("/auth/login");
   }
@@ -28,8 +28,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   if (error) {
     throw error;
   }
-  //console.log("social complete page user=", user);
-  //console.log("social complete page session=", session);
+  //console.log("[social complete page] user=", user);
+  //console.log("[social complete page] session=", session);
   return redirect("/", { headers });
 };
 

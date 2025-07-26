@@ -266,14 +266,20 @@ export const getLatestRecommendation = async (
     .select("*")
     .eq("profile_id", userId)
     .order("recommendation_date", { ascending: false })
-    .limit(1)
-    .single();
+    .limit(1);
+
   if (error) {
-    console.log(error);
+    console.log("[getLatestRecommendation] error=", error);
     throw redirect("/recommendation");
   }
-  //console.log(lastest_history);
-  return lastest_history;
+
+  // 추천 기록이 없는 경우 (새 사용자)
+  if (!lastest_history || lastest_history.length === 0) {
+    console.log("[getLatestRecommendation] No recommendation history found");
+    throw redirect("/recommendation");
+  }
+
+  return lastest_history[0];
 };
 
 export const getRecommendationHistoryTotalPages = async (

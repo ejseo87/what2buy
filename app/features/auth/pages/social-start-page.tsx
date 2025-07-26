@@ -14,7 +14,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
   const { provider } = data;
   const redirectTo = `http://localhost:5173/auth/social/${provider}/complete`;
-  console.log("social start page redirectTo=", redirectTo);
+  //console.log("[social start page] redirectTo=", redirectTo);
   const { client, headers } = makeSSRClient(request);
   const {
     data: { url },
@@ -27,7 +27,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   });
 
   if (url) {
-    console.log("social start page url=", url);
+    //console.log("[social start page] url=", url);
     return redirect(url, { headers });
   }
   if (error) {

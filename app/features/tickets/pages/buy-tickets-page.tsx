@@ -84,8 +84,8 @@ export default function BuyTicketsPage() {
   return (
     <Form method="post" className="space-y-10">
       <Hero
-        title="티켓 구매"
-        subtitle="결제 정보를 입력하고 티켓을 구매하세요."
+        title="추천권 구매하기"
+        subtitle="결제 정보를 입력해 추천권을 구매하세요."
       />
 
       <div className="container mx-auto px-4 max-w-4xl">
@@ -93,18 +93,18 @@ export default function BuyTicketsPage() {
           <Card>
             <CardHeader>
               <CardTitle>주문 요약</CardTitle>
-              <CardDescription>구매할 티켓을 선택하세요</CardDescription>
+              <CardDescription>구매할 추천권을 선택하세요</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="ticket-type">티켓 종류</Label>
+                <Label htmlFor="ticket-type">추천권 종류</Label>
                 <Select
                   name="ticketId"
                   value={selectedTicketId}
                   onValueChange={setSelectedTicketId}
                 >
                   <SelectTrigger id="ticket-type">
-                    <SelectValue placeholder="티켓 종류를 선택하세요" />
+                    <SelectValue placeholder="추천권 종류를 선택하세요" />
                   </SelectTrigger>
                   <SelectContent>
                     {TICKET_PLANS.map((plan) => (
@@ -138,17 +138,17 @@ export default function BuyTicketsPage() {
 
               <div className="space-y-2 font-medium">
                 <div className="flex justify-between">
-                  <span>소계:</span>
+                  <span>소계</span>
                   <span>{subtotal}원</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>부가세 (10%):</span>
+                  <span>부가세 (10%)</span>
                   <span>{tax}원</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
-                  <span>총 결제금액:</span>
-                  <span>${total}</span>
+                  <span>총 결제금액</span>
+                  <span>{total}원</span>
                 </div>
               </div>
             </CardContent>
@@ -156,16 +156,16 @@ export default function BuyTicketsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>결제 정보</CardTitle>
+              <CardTitle>결제 정보 입력</CardTitle>
               <CardDescription>
-                결제 방법을 선택하고 정보를 입력하세요 (테스트용)
+                결제 방법을 선택하고 정보를 입력하세요.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-center text-muted-foreground py-8">
-                실제 결제는 연동되지 않습니다.
+                이 모의 결제는 실제로 처리되지 않습니다.
                 <br />
-                아래 버튼을 누르면 티켓이 발급됩니다.
+                ‘결제하기’ 버튼 클릭 시 추천권이 발급됩니다.
               </p>
 
               {actionData?.error && (
