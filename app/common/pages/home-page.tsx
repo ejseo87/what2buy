@@ -1,13 +1,9 @@
-"use client";
-import { Line, LineChart, ResponsiveContainer } from "recharts";
 import { Hero } from "../components/hero";
 import { StockChart } from "../components/stock-chart";
-import { a_profile_id } from "../constants";
 import type { Route } from "./+types/home-page";
 import { PulsatingButton } from "~/common/components/magicui/pulsating-button";
 import {
   getLatestRecommendation,
-  getStockDetail,
   getStockPerformanceChart,
 } from "~/features/histories/queries";
 import { makeSSRClient } from "~/supa-client";
@@ -27,7 +23,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const latest_recommendation = await getLatestRecommendation(client as any, {
     userId: userId,
   });
-  //console.log(latest_recommendation);
+  console.log("[home-page] latest_recommendation=", latest_recommendation);
   const recommendationDate = latest_recommendation.recommendation_date.slice(
     0,
     10
@@ -92,9 +88,15 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     stockCode: latest_recommendation.stock3_code,
     days: 30,
   });
-  //console.log("chartData_3=", chartData_3);
+  console.log("chartData_3=", (chartData_3 as any)?.slice(0, 3)); // 처음 3개 항목만 출력
+  console.log("recommendationDate=", recommendationDate);
+  console.log("첫번째 chartData_3 날짜=", (chartData_3 as any)?.[0]?.date);
+  // 정확한 날짜가 없으면 가장 최근 날짜 사용 (데이터가 추천일보다 이전이므로)
   const recommendationPrice_3 =
-    chartData_3.find((item) => item.date === recommendationDate)?.close ?? 0;
+    (chartData_3 as any).find((item: any) => item.date === recommendationDate)
+      ?.close ??
+    (chartData_3 as any)[(chartData_3 as any).length - 1]?.close ??
+    0;
   console.log("recommendationPrice_3=", recommendationPrice_3);
 
   // 추천일 종가 대비 변동률 계산
@@ -106,21 +108,43 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       : "0";
   console.log("changeAmount_3=", changeAmount_3);
   console.log("changePercent_3=", changePercent_3);
+  // #1 차트 데이터 변환
+  const transformedChartData_1 =
+    chartData_1?.map((item, index) => ({
+      date: item.date,
+      [latest_recommendation.stock1_name || "Stock"]: item.close,
+    })) || [];
 
+  //console.log("transformedChartData_1=", transformedChartData_1);
+  // #2 차트 데이터 변환
+  const transformedChartData_2 =
+    chartData_2?.map((item, index) => ({
+      date: item.date,
+      [latest_recommendation.stock2_name || "Stock"]: item.close,
+    })) || [];
+  //console.log("transformedChartData_2=", transformedChartData_2);
+  // #3 차트 데이터 변환
+  const transformedChartData_3 =
+    chartData_3?.map((item, index) => ({
+      date: item.date,
+      [latest_recommendation.stock3_name || "Stock"]: item.close,
+    })) || [];
+  //console.log("transformedChartData_3=", transformedChartData_3);
   return {
     latest_recommendation,
     recommendationDate,
-    chartData_1,
+    transformedChartData_1,
     recommendationPrice_1,
     currentPrice_1,
     changeAmount_1,
     changePercent_1,
-    chartData_2,
+    transformedChartData_2,
     recommendationPrice_2,
     currentPrice_2,
     changeAmount_2,
     changePercent_2,
     chartData_3,
+    transformedChartData_3,
     recommendationPrice_3,
     currentPrice_3,
     changeAmount_3,
@@ -132,44 +156,23 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const {
     latest_recommendation,
     recommendationDate,
-    chartData_1,
+    transformedChartData_1,
     recommendationPrice_1,
     currentPrice_1,
     changeAmount_1,
     changePercent_1,
-    chartData_2,
+    transformedChartData_2,
     recommendationPrice_2,
     currentPrice_2,
     changeAmount_2,
     changePercent_2,
-    chartData_3,
+    transformedChartData_3,
     recommendationPrice_3,
     currentPrice_3,
     changeAmount_3,
     changePercent_3,
   } = loaderData;
-  // #1 차트 데이터 변환
-  const transformedChartData_1 =
-    chartData_1?.map((item, index) => ({
-      date: item.date,
-      [latest_recommendation.stock1_name || "Stock"]: item.close,
-    })) || [];
 
-  console.log("transformedChartData_1=", transformedChartData_1);
-  // #2 차트 데이터 변환
-  const transformedChartData_2 =
-    chartData_2?.map((item, index) => ({
-      date: item.date,
-      [latest_recommendation.stock2_name || "Stock"]: item.close,
-    })) || [];
-  console.log("transformedChartData_2=", transformedChartData_2);
-  // #3 차트 데이터 변환
-  const transformedChartData_3 =
-    chartData_3?.map((item, index) => ({
-      date: item.date,
-      [latest_recommendation.stock3_name || "Stock"]: item.close,
-    })) || [];
-  console.log("transformedChartData_3=", transformedChartData_3);
   return (
     <div className="space-y-10 w-full">
       <Hero
