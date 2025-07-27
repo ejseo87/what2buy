@@ -15,9 +15,11 @@ export const searchParamsSchema = z.object({
   startDate: z
     .string()
     .optional()
-    .default(DateTime.now().minus({ days: 5 }).toFormat("yyyy-MM-dd")),
+    .default(DateTime.now().minus({ days: 2 }).toFormat("yyyy-MM-dd")),
   endDate: z.string().optional().default(DateTime.now().toFormat("yyyy-MM-dd")),
 });
+
+//https://what2buy.cool/api/stocks?execute=true&startDate=2025-07-20&endDate=2025-07-27
 
 export async function action({ request }: Route.ActionArgs) {
   // POST 메서드 확인

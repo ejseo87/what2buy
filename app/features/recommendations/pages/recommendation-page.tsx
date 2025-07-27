@@ -17,7 +17,7 @@ import { Button } from "~/common/components/ui/button";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Request Recommendation - What2Buy" },
+    { title: "Request Recommendation - what2buy" },
     { name: "description", content: "Request stock recommendations" },
   ];
 };

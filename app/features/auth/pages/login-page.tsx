@@ -9,7 +9,7 @@ import AuthButtons from "../components/auth-buttons";
 import AlertMessage from "~/common/components/alert-message";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "Login | wemake" }];
+  return [{ title: "Login | what2buy" }];
 };
 const formSchema = z.object({
   email: z
@@ -57,21 +57,21 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
   return (
-    <div className="flex flex-col relative items-center justify-center h-full">
+    <div className="flex flex-col relative items-center justify-center h-full px-5">
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
-        <Link to="/auth/join">Join</Link>
+        <Link to="/auth/join">가입하기</Link>
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
-        <h1 className="text-2xl font-semibold">Log in to your account</h1>
+        <h1 className="text-2xl font-semibold">로그인하기</h1>
         <Form className="w-full space-y-4" method="post">
           <InputPair
-            label="Email"
-            description="Enter your email address"
+            label="이메일"
+            description="이메일을 입력해주세요"
             name="email"
             id="email"
             required
             type="email"
-            placeholder="i.e wemake@example.com"
+            placeholder="예)kdh2000@gmail.com"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -80,12 +80,12 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
           )}
           <InputPair
             id="password"
-            label="Password"
-            description="Enter your password"
+            label="비밀번호"
+            description="비밀번호를 입력해주세요"
             name="password"
             required
             type="password"
-            placeholder="i.e wemake@example.com"
+            placeholder="8자리 이상의 숫자, 영어문자, 특수문자 조합"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -97,7 +97,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
             type="submit"
             isLoading={isSubmitting}
           >
-            Log in
+            {isSubmitting ? "처리중..." : "로그인"}
           </LoadingButton>
           {actionData && "loginError" in actionData && (
             <AlertMessage

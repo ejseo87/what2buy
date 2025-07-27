@@ -15,7 +15,7 @@ import AlertMessage from "~/common/components/alert-message";
 import { updateUser, updateUserAvatar } from "../mutations";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "Edit profile | What2Buy" }];
+  return [{ title: "Edit profile | what2buy" }];
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

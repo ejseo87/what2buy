@@ -29,7 +29,7 @@ import AlertMessage from "~/common/components/alert-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Buy Tickets | What2Buy" },
+    { title: "Buy Tickets | what2buy" },
     { name: "description", content: "Complete your ticket purchase" },
   ];
 };

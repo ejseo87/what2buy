@@ -82,7 +82,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export const meta: Route.MetaFunction = () => [
-  { title: "Stock Detail API - What2Buy" },
+  { title: "Stock Detail API - what2buy" },
   {
     name: "description",
     content: "Get detailed stock information and price data",

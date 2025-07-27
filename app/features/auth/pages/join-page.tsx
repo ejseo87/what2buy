@@ -12,8 +12,8 @@ import AlertMessage from "~/common/components/alert-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Join | What2Buy" },
-    { name: "description", content: "Create a new What2Buy account" },
+    { title: "Join | what2buy" },
+    { name: "description", content: "Create a new what2buy account" },
   ];
 };
 const formSchema = z.object({
@@ -85,21 +85,21 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
   return (
-    <div className="flex flex-col relative items-center justify-center h-full">
+    <div className="flex flex-col relative items-center justify-center h-full ps-5">
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
-        <Link to="/auth/login">Login</Link>
+        <Link to="/auth/login">로그인</Link>
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
-        <h1 className="text-2xl font-semibold">Create an account</h1>
+        <h1 className="text-2xl font-semibold">계정 만들기</h1>
         <Form className="w-full space-y-4" method="post">
           <InputPair
-            label="Name"
-            description="Enter your name"
+            label="이름"
+            description="이름을 입력해주세요"
             name="name"
             id="name"
             required
             type="text"
-            placeholder="Enter your name"
+            placeholder="예) 홍길동"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -108,12 +108,12 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
           )}
           <InputPair
             id="username"
-            label="Username"
-            description="Enter your username"
+            label="아이디"
+            description="아이디를 입력해주세요"
             name="username"
             required
             type="text"
-            placeholder="i.e wemake"
+            placeholder="예) kdh2000"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -122,12 +122,12 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
           )}
           <InputPair
             id="email"
-            label="Email"
-            description="Enter your email address"
+            label="이메일"
+            description="이메일을 입력해주세요"
             name="email"
             required
             type="email"
-            placeholder="i.e wemake@example.com"
+            placeholder="예) kdh2000@gmail.com"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -136,12 +136,12 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
           )}
           <InputPair
             id="password"
-            label="Password"
-            description="Enter your password"
+            label="비밀번호"
+            description="비밀번호를 입력해주세요"
             name="password"
             required
             type="password"
-            placeholder="Enter your password"
+            placeholder="8자리 이상의 숫자, 영어문자, 특수문자 조합"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -149,7 +149,7 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
             </p>
           )}
           <LoadingButton isLoading={isSubmitting}>
-            {isSubmitting ? "Processing..." : "Join"}
+            {isSubmitting ? "처리중..." : "계정 생성"}
           </LoadingButton>
           {actionData &&
             "signUpError" in actionData &&

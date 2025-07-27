@@ -14,8 +14,6 @@ export default [
   ...prefix("/api", [
     route("/stocks", "features/api/pages/stocks-api.tsx"),
     route("/stocks/earnings", "features/api/pages/stock-earnings-api.tsx"),
-    route("/stocks/:symbol", "features/api/pages/stock-detail-api.tsx"),
-    route("/stocks/search/:query", "features/api/pages/stock-search-api.tsx"),
   ]),
 
   // History routes
@@ -71,5 +69,6 @@ export default [
     route("/profile", "features/users/pages/my-profile-page.tsx"),
     route("/settings", "features/users/pages/settings-page.tsx"),
     route("/notifications", "features/users/pages/notifications-page.tsx"),
+    route("/support", "features/users/pages/support-page.tsx"),
   ]),
 ] satisfies RouteConfig;

@@ -25,7 +25,7 @@ import { getLoggedInUserId } from "~/features/users/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Recommendation History | What2Buy" },
+    { title: "Recommendation History | what2buy" },
     { name: "description", content: "Stock recommendation history" },
   ];
 };

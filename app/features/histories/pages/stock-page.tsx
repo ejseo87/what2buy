@@ -21,7 +21,7 @@ import { getLoggedInUserId } from "~/features/users/queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Stock Detail | What2Buy" },
+    { title: "Stock Detail | what2buy" },
     { name: "description", content: "Stock detail and profit tracking" },
   ];
 };

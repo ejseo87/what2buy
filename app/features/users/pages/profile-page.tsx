@@ -13,7 +13,7 @@ import { getTicketCount } from "~/features/tickets/queries";
 import { getRecommendationCount } from "~/features/histories/queries";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "Profile | What2Buy" }];
+  return [{ title: "Profile | what2buy" }];
 };
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {

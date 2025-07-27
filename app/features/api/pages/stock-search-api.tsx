@@ -36,7 +36,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 export function meta(): Route.MetaFunction {
   return () => [
-    { title: "Stock Search API - What2Buy" },
+    { title: "Stock Search API - what2buy" },
     { name: "description", content: "Search stocks by name or symbol" },
   ];
 }

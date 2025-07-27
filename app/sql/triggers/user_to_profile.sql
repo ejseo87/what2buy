@@ -21,8 +21,8 @@ begin
         if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'github' then
             insert into public.profiles (profile_id, name, username, avatar)
             values (new.id, 
-                coalesce(new.raw_user_meta_data ->> 'name', new.raw_user_meta_data ->> 'silvermoon', 'GitHub User'), 
-                coalesce(new.raw_user_meta_data ->> 'preferred_username', new.raw_user_meta_data ->> 'username', 'github_user') || '_' || substr(md5(random()::text), 1, 5), 
+                coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name', 'GitHub User'), 
+                coalesce(new.raw_user_meta_data ->> 'user_name', new.raw_user_meta_data ->> 'login', 'github_user') || '_' || substr(md5(random()::text), 1, 5), 
                 new.raw_user_meta_data ->> 'avatar_url');
         end if;
         if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'kakao' then

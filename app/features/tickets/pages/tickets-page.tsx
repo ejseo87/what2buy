@@ -5,10 +5,11 @@ import { TicketCard } from "../components/ticket-card";
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
 import { getTickets } from "../queries";
+import { Button } from "~/common/components/ui/button";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Tickets | What2Buy" },
+    { title: "Tickets | what2buy" },
     { name: "description", content: "Available tickets for purchase" },
   ];
 };
@@ -28,8 +29,11 @@ export default function TicketsPage({ loaderData }: Route.ComponentProps) {
   console.log("tickets page tickets=", tickets);
   return (
     <div className="space-y-10">
-      <Hero title="티켓 목록" subtitle="티켓 목록을 확인해보세요." />
-
+      <Hero
+        title="보유중인 추천권 목록"
+        subtitle="보우중인 추천권의 사용여부와 유효기간을 확인해보세요."
+      />
+      <Button>추천권 구매</Button>
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-6">
           {tickets.map((ticket: any) => (

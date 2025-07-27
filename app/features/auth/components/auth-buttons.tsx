@@ -17,19 +17,19 @@ export default function AuthButtons() {
         <Button variant="outline" className="w-full" asChild>
           <Link to="/auth/social/kakao/start">
             <MessageCircleIcon className="w-4 h-4" />
-            Kakao Talk
+           카카오톡으로 시작하기
           </Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>
           <Link to="/auth/social/github/start">
             <GithubIcon className="w-4 h-4" />
-            Github
+            깃헙으로 시작하기
           </Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>
           <Link to="/auth/otp/start">
             <LockIcon className="w-4 h-4" />
-            OTP
+            OTP로 가입하고 로그인하기
           </Link>
         </Button>
       </div>

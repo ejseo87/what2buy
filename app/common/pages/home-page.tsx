@@ -13,7 +13,7 @@ import { redirect } from "react-router";
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: "Home | What2Buy" },
+    { title: "Home | what2buy" },
     { name: "description", content: "Stock recommendation platform home page" },
   ];
 };
@@ -29,17 +29,17 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
         userId: userId,
       }
     )) as any;
-    console.log("[home-page] latest_recommendation=", latest_recommendation);
+    //console.log("[home-page] latest_recommendation=", latest_recommendation);
     const recommendationDate = latest_recommendation.recommendation_date.slice(
       0,
       10
     );
-    console.log(
-      "recommendationDate=",
-      recommendationDate,
-      "recommendationDate.length=",
-      recommendationDate.length
-    );
+    //console.log(
+    //  "recommendationDate=",
+    //  recommendationDate,
+    //  "recommendationDate.length=",
+    //  recommendationDate.length
+    //);
     // #1 주식 상세 정보 가져오기
     // const stockDetail_1 = await getStockDetail(client as any, {
     //   stockId: latest_recommendation.stock1_id,
@@ -53,7 +53,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     const recommendationPrice_1 =
       chartData_1.find((item: any) => item.date === recommendationDate)
         ?.close ?? 0;
-    console.log("recommendationPrice_1=", recommendationPrice_1);
+    //console.log("recommendationPrice_1=", recommendationPrice_1);
 
     // 추천일 종가 대비 변동률 계산
     const currentPrice_1 = chartData_1[0].close || 0;
@@ -62,8 +62,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       recommendationPrice_1 > 0
         ? ((changeAmount_1 / recommendationPrice_1) * 100).toFixed(2)
         : "0";
-    console.log("changeAmount_1=", changeAmount_1);
-    console.log("changePercent_1=", changePercent_1);
+    //console.log("changeAmount_1=", changeAmount_1);
+    //console.log("changePercent_1=", changePercent_1);
     // #2 주식 상세 정보 가져오기
     //const stockDetail_2 = await getStockDetail(client as any, {
     //  stockId: latest_recommendation.stock2_id,
@@ -77,7 +77,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     const recommendationPrice_2 =
       chartData_2.find((item: any) => item.date === recommendationDate)
         ?.close ?? 0;
-    console.log("recommendationPrice_2=", recommendationPrice_2);
+    //console.log("recommendationPrice_2=", recommendationPrice_2);
     // 추천일 종가 대비 변동률 계산
     const currentPrice_2 = chartData_2[0].close || 0;
     const changeAmount_2 = currentPrice_2 - recommendationPrice_2;
@@ -85,8 +85,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       recommendationPrice_2 > 0
         ? ((changeAmount_2 / recommendationPrice_2) * 100).toFixed(2)
         : "0";
-    console.log("changeAmount_2=", changeAmount_2);
-    console.log("changePercent_2=", changePercent_2);
+    //console.log("changeAmount_2=", changeAmount_2);
+    //console.log("changePercent_2=", changePercent_2);
     // #3 주식 상세 정보 가져오기
     //const stockDetail_3 = await getStockDetail(client as any, {
     //  stockId: latest_recommendation.stock3_id,
@@ -96,16 +96,16 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       stockCode: latest_recommendation.stock3_code,
       days: 30,
     })) as any;
-    console.log("chartData_3=", chartData_3?.slice(0, 3)); // 처음 3개 항목만 출력
-    console.log("recommendationDate=", recommendationDate);
-    console.log("첫번째 chartData_3 날짜=", chartData_3?.[0]?.date);
+    //console.log("chartData_3=", chartData_3?.slice(0, 3)); // 처음 3개 항목만 출력
+    //console.log("recommendationDate=", recommendationDate);
+    //console.log("첫번째 chartData_3 날짜=", chartData_3?.[0]?.date);
     // 정확한 날짜가 없으면 가장 최근 날짜 사용 (데이터가 추천일보다 이전이므로)
     const recommendationPrice_3 =
       chartData_3.find((item: any) => item.date === recommendationDate)
         ?.close ??
       chartData_3[chartData_3.length - 1]?.close ??
       0;
-    console.log("recommendationPrice_3=", recommendationPrice_3);
+    //console.log("recommendationPrice_3=", recommendationPrice_3);
 
     // 추천일 종가 대비 변동률 계산
     const currentPrice_3 = chartData_3[0].close || 0;
@@ -114,8 +114,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       recommendationPrice_3 > 0
         ? ((changeAmount_3 / recommendationPrice_3) * 100).toFixed(2)
         : "0";
-    console.log("changeAmount_3=", changeAmount_3);
-    console.log("changePercent_3=", changePercent_3);
+    //console.log("changeAmount_3=", changeAmount_3);
+    //console.log("changePercent_3=", changePercent_3);
     // #1 차트 데이터 변환
     const transformedChartData_1 =
       chartData_1?.map((item: any, index: number) => ({
@@ -203,7 +203,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="space-y-10 w-full">
       <Hero
-        title="인공지능이 추천하는 주식 What2Buy"
+        title="인공지능이 추천하는 주식 what2buy"
         subtitle="주식시장이 어렵고 부담스럽다면, 이곳에서 당신만을 위한 주식 추천을 받아보세요"
       />
       <div className="flex flex-col sm:flex-row justify-between gap-3 items-center">
@@ -212,7 +212,10 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         </div>
         <div className="order-1 sm:order-2">
           <Link to="/recommendation">
-            <PulsatingButton pulseColor="#FF007F" className="text-2xl px-10">
+            <PulsatingButton
+              pulseColor="#FF007F"
+              className="text-2xl px-5 sm:px-10"
+            >
               주식 추천 받으러 가져오기
             </PulsatingButton>
           </Link>

@@ -31,45 +31,44 @@ import { cn } from "~/lib/utils";
 
 const menus = [
   {
-    name: "Histories",
+    name: "추천 기록",
     to: "/histories",
     items: [
       {
-        name: "All Recommendations",
+        name: "전체 추천 기록",
         to: "/histories",
-        description: "list of all recommendations",
+        description: "지금까지의 추천 기록을 확인해보세요",
       },
       {
-        name: "Recommended Stocks",
+        name: "추천 주식 리스트",
         to: "/histories/stocks",
-        description: "list of recommended stocks",
+        description: "지금까지 추천된 주식을 살펴보세요",
       },
       {
-        name: "Search",
+        name: "추천 기록 검색",
         to: "/histories/search",
-        description: "search for a recommendation",
+        description: "키워드로 추천 기록을 검색해보세요",
       },
     ],
   },
   {
-    name: "Recommendation",
+    name: "주식 추천 받기",
     to: "/recommendation",
-    description: "recommendation for some stocks",
+    description: "추천권을 선택해서 추천을 받아보세요",
   },
   {
-    name: "Tickets",
+    name: "추천권",
     to: "/tickets",
     items: [
       {
-        name: "Tickets",
+        name: "보유 추천권 목록",
         to: "/tickets",
-        description:
-          "List of your tickets with the state whether it is used or not",
+        description: "보유 추천권 목록을 확인해보세요",
       },
       {
-        name: "Buy Tickets",
+        name: "추천권 구매",
         to: "/tickets/buy",
-        description: "buy tickets",
+        description: "추천권을 구매해서 주식 추천을 받아보세요",
       },
     ],
   },
@@ -108,7 +107,7 @@ export default function Navigation({
                   <>
                     <NavigationMenuTrigger>{menu.name}</NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid w-[500px] font-light gap-3 p-4 grid-cols-2">
+                      <ul className="grid w-[500px] font-light gap-3 p-4 grid-cols-1 sm:grid-cols-2">
                         {menu.items?.map((item) => (
                           <NavigationMenuItem key={item.name}>
                             <NavigationMenuLink asChild>
@@ -173,26 +172,26 @@ export default function Navigation({
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/my/profile">
                     <UserIcon className="size-4 mr-2" />
-                    Profile
+                    프로필 보기
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/my/settings">
                     <SettingsIcon className="size-4 mr-2" />
-                    Settings
+                    프로필 변경
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/my/support">
                     <MessageCircleQuestionIcon className="size-4 mr-2" />
-                    Support
+                    FAQ
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to="/auth/logout">
                     <LogOutIcon className="size-4 mr-2" />
-                    Logout
+                    로그아웃
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -201,10 +200,10 @@ export default function Navigation({
         ) : (
           <div className="flex items-center gap-4">
             <Button variant="secondary" asChild>
-              <Link to="/auth/login">Login</Link>
+              <Link to="/auth/login">로그인</Link>
             </Button>
             <Button asChild>
-              <Link to="/auth/join">Join</Link>
+              <Link to="/auth/join">가입하기</Link>
             </Button>
           </div>
         )}

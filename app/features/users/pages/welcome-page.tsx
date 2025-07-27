@@ -26,7 +26,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
   const { data, error } = await resend.emails.send({
     from: "eva <eva@mail.what2buy.cool>",
     to: email!,
-    subject: "Welcome to What2Buy",
+    subject: "Welcome to what2buy",
     react: <WelcomeUser username={username} />,
   });
 

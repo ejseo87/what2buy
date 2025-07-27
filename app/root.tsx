@@ -65,13 +65,19 @@ export default function App({ loaderData }: Route.ComponentProps) {
   //console.log("root app loaderData=", loaderData);
   console.log("root app isLoggedIn=", isLoggedIn);
   return (
-    <div className={pathname.includes("/auth/") ? "" : "py-28 px-20"}>
+    <div
+      className={
+        pathname.includes("/auth/")
+          ? ""
+          : "py-16 md:py-20 lg:py-28 px-4 md:px-10 lg:px-20"
+      }
+    >
       {pathname.includes("/auth") ? null : (
         <Navigation
           isLoggedIn={isLoggedIn}
-          username={loaderData.profile?.username ?? ""}
-          name={loaderData.profile?.name ?? ""}
-          avatar={loaderData.profile?.avatar ?? null}
+          username={(loaderData.profile as any)?.username ?? ""}
+          name={(loaderData.profile as any)?.name ?? ""}
+          avatar={(loaderData.profile as any)?.avatar ?? null}
           hasNotifications={false}
           hasMessages={false}
         />
@@ -79,9 +85,9 @@ export default function App({ loaderData }: Route.ComponentProps) {
       <Outlet
         context={{
           isLoggedIn,
-          username: loaderData.profile?.username ?? "",
-          name: loaderData.profile?.name ?? "",
-          avatar: loaderData.profile?.avatar ?? null,
+          username: (loaderData.profile as any)?.username ?? "",
+          name: (loaderData.profile as any)?.name ?? "",
+          avatar: (loaderData.profile as any)?.avatar ?? null,
         }}
       />
     </div>
