@@ -16,7 +16,13 @@ import { Input } from "~/common/components/ui/input";
 import { Label } from "~/common/components/ui/label";
 import { Button } from "~/common/components/ui/button";
 import { Separator } from "~/common/components/ui/separator";
-import { Form, Link, useActionData, useNavigation } from "react-router";
+import {
+  Form,
+  Link,
+  redirect,
+  useActionData,
+  useNavigation,
+} from "react-router";
 import { Hero } from "~/common/components/hero";
 import type { Route } from "./+types/buy-tickets-page";
 import { useState } from "react";
@@ -26,6 +32,7 @@ import { getLoggedInUserId } from "~/features/users/queries";
 import { createTickets } from "../mutation";
 import LoadingButton from "~/common/components/loading-button";
 import AlertMessage from "~/common/components/alert-message";
+import { getTicketCount } from "../queries";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -38,6 +45,16 @@ export async function action({ request }: Route.ActionArgs) {
   const { client } = makeSSRClient(request);
   const userId = await getLoggedInUserId(client);
   const formData = await request.formData();
+
+  const ticketCount = await getTicketCount(client, {
+    profile_id: userId,
+    status: "all",
+  });
+  if (ticketCount && ticketCount >= 5) {
+    return {
+      error: "테스트용으로 사용할 수 있는 최대 보유 추천권 수를 초과했습니다.",
+    };
+  }
   const ticketId = formData.get("ticketId") as string;
   const quantity = Number(formData.get("quantity"));
 
@@ -45,7 +62,6 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (!selectedPlan || !userId || quantity <= 0) {
     return {
-      success: false,
       error: "Invalid purchase request.",
     };
   }
@@ -56,23 +72,24 @@ export async function action({ request }: Route.ActionArgs) {
       ticketType: selectedPlan.type,
       quantity,
     });
-    return { success: true };
+    return redirect("/tickets");
   } catch (error) {
     return {
-      success: false,
       error:
         error instanceof Error ? error.message : "An unknown error occurred.",
     };
   }
 }
 
-export default function BuyTicketsPage() {
+export default function BuyTicketsPage({ actionData }: Route.ComponentProps) {
+  const navigation = useNavigation();
+  const isSubmitting =
+    navigation.state === "submitting" || navigation.state === "loading";
+
   const [selectedTicketId, setSelectedTicketId] = useState<string>(
     TICKET_PLANS[0].id
   );
   const [quantity, setQuantity] = useState(1);
-  const navigation = useNavigation();
-  const actionData = useActionData<typeof action>();
 
   const selectedTicket =
     TICKET_PLANS.find((p) => p.id === selectedTicketId) || TICKET_PLANS[0];
@@ -120,12 +137,13 @@ export default function BuyTicketsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="quantity">수량</Label>
+                <Label htmlFor="quantity">수량 (테스트용 1개로 고정)</Label>
                 <Input
                   id="quantity"
                   name="quantity"
                   type="number"
                   min="1"
+                  max="1"
                   value={quantity}
                   onChange={(e) =>
                     setQuantity(Math.max(1, Number(e.target.value)))
@@ -165,21 +183,9 @@ export default function BuyTicketsPage() {
               <p className="text-center text-muted-foreground py-8">
                 이 모의 결제는 실제로 처리되지 않습니다.
                 <br />
-                ‘결제하기’ 버튼 클릭 시 추천권이 발급됩니다.
+                ‘결제하기’ 버튼 클릭 시 추천권이 발급됩니다. 추천권 구매 후
+                추천권 목록 페이지로 이동합니다.
               </p>
-
-              {actionData?.error && (
-                <AlertMessage
-                  variant="destructive"
-                  content={actionData.error}
-                />
-              )}
-              {actionData?.success && (
-                <AlertMessage
-                  variant="default"
-                  content="성공적으로 티켓을 구매했습니다! 티켓 목록 페이지로 이동합니다."
-                />
-              )}
 
               <div className="flex gap-4 pt-4">
                 <Button variant="outline" asChild className="flex-1">
@@ -188,11 +194,17 @@ export default function BuyTicketsPage() {
                 <LoadingButton
                   type="submit"
                   className="flex-1"
-                  isLoading={navigation.state === "submitting"}
+                  isLoading={isSubmitting}
                 >
-                  {total}원 결제하기
+                  {isSubmitting ? "처리중..." : `${total}원 결제하기`}
                 </LoadingButton>
               </div>
+              {actionData && "error" in actionData && (
+                <AlertMessage
+                  content={actionData.error || undefined}
+                  variant="destructive"
+                />
+              )}
             </CardContent>
           </Card>
         </div>

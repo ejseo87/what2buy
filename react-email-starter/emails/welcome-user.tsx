@@ -41,7 +41,7 @@ export const WelcomeUser = ({ username }: GithubAccessTokenEmailProps) => (
             저희에게 맡기세요.
             <br />
             <br />
-            what2buy는 주식시장이 어렵고 부담스러운 분들을 위해 만들어졋어요.
+            what2buy는 주식시장이 어렵고 부담스러운 분들을 위해 만들어졌어요.
             은행 예적금보다는 높은 수익을 꿈꾸지만, 손실은 두렵고... 그런 마음,
             저희도 너무 잘 알아요.
             <br />

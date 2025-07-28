@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { render } from "@react-email/components";
 import type { Route } from "./+types/welcome-page";
-import { WelcomeUser } from "@/react-email-starter/emails/welcom-user";
+import { WelcomeUser } from "@/react-email-starter/emails/welcome-user";
 import { adminClient } from "~/supa-client";
 import { getEmailByUserId, getUserProfile } from "../queries";
 
