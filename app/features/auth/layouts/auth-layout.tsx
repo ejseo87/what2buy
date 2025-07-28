@@ -13,12 +13,12 @@ import { Card, CardContent } from "~/common/components/ui/card";
 
 export default function AuthLayout() {
   const images = [
-    "/assets/images/what2buy_홈페이지-로그인가입자용.png",
-    "/assets/images/what2buy_주식추천요청페이지.png",
-    "/assets/images/what2buy_추천기록목록페이지.png",
-    "/assets/images/what2buy_추천내역상세페이지.png",
-    "/assets/images/what2buy_주식상세페이지.png",
-    "/assets/images/what2buy_보유추천권목록페이지.png",
+    "/public/images/what2buy_홈페이지-로그인가입자용.png",
+    "/public/images/what2buy_주식추천요청페이지.png",
+    "/public/images/what2buy_추천기록목록페이지.png",
+    "/public/images/what2buy_추천내역상세페이지.png",
+    "/public/images/what2buy_주식상세페이지.png",
+    "/public/images/what2buy_보유추천권목록페이지.png",
   ];
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
