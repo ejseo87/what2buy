@@ -32,4 +32,6 @@ export default defineConfig((config) => ({
       ".trycloudflare.com", // 모든 Cloudflare Tunnel 도메인 허용
     ],
   },
+  // 이미지 최적화 설정
+  assetsInclude: ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.svg"],
 }));
