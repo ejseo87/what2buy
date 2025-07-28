@@ -9,7 +9,7 @@ export default function AuthButtons() {
       <div className="w-full flex flex-col items-center gap-2">
         <Separator className="w-full" />
         <span className="text-xs text-muted-foreground uppercase font-medium">
-          Or continue with
+          또는 아래 버튼으로 시작하기
         </span>
         <Separator className="w-full" />
       </div>
@@ -17,7 +17,7 @@ export default function AuthButtons() {
         <Button variant="outline" className="w-full" asChild>
           <Link to="/auth/social/kakao/start">
             <MessageCircleIcon className="w-4 h-4" />
-           카카오톡으로 시작하기
+            카카오톡으로 시작하기
           </Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>

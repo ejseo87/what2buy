@@ -14,6 +14,8 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { getGoodStockListByUserId } from "~/features/api/queries";
 import { useTicket } from "~/features/tickets/mutation";
 import { Button } from "~/common/components/ui/button";
+import { Label } from "~/common/components/ui/label";
+import ServiceIntroMessage from "~/common/components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -175,6 +177,7 @@ export default function RecommendationPage({
         title="주식 추천 받기"
         subtitle="남은 추천권을 선택해 AI가 엄선한 오늘의 주식 종목을 확인해 보세요."
       />
+      <ServiceIntroMessage addedClassName="w-1/2" />
       {tickets.length === 0 ? (
         <>
           <AlertMessage content="주식 추천을 받으려면 추천권이 필요합니다. 남은 추천권이 없다면, 지금 바로 구매하세요." />

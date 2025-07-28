@@ -9,6 +9,7 @@ import { makeSSRClient } from "~/supa-client";
 import { LoaderCircle } from "lucide-react";
 import LoadingButton from "~/common/components/loading-button";
 import AlertMessage from "~/common/components/alert-message";
+import ServiceIntroMessage from "~/common/components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -87,10 +88,11 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
   return (
     <div className="flex flex-col relative items-center justify-center h-full ps-5">
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
-        <Link to="/auth/login">로그인</Link>
+        <Link to="/auth/login">이미 계정이 있다면, 로그인하기</Link>
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
         <h1 className="text-2xl font-semibold">계정 만들기</h1>
+        <ServiceIntroMessage addedClassName="w-full mx-auto" />
         <Form className="w-full space-y-4" method="post">
           <InputPair
             label="이름"
@@ -113,7 +115,7 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
             name="username"
             required
             type="text"
-            placeholder="예) kdh2000"
+            placeholder="예) anonymous"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">
@@ -127,7 +129,7 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
             name="email"
             required
             type="email"
-            placeholder="예) kdh2000@gmail.com"
+            placeholder="예) example@example.com"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">

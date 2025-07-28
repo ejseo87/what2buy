@@ -19,6 +19,7 @@ import { a_profile_id } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
+import ServiceIntroMessage from "~/common/components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -72,6 +73,7 @@ export default function StocksPage({ loaderData }: Route.ComponentProps) {
         title="추천 주식 리스트"
         subtitle="지금까지 추천된 주식을 살펴보세요"
       />
+      <ServiceIntroMessage addedClassName="w-full mx-auto" />
       <div className=" items-start gap-40">
         <div className=" space-y-10">
           <div className="flex justify-between">

@@ -1,4 +1,5 @@
 import { Button } from "~/common/components/ui/button";
+
 import type { Route } from "./+types/login-page";
 import { Form, Link, redirect, useNavigation } from "react-router";
 import InputPair from "~/common/components/input-pair";
@@ -7,6 +8,7 @@ import z from "zod";
 import { makeSSRClient } from "~/supa-client";
 import AuthButtons from "../components/auth-buttons";
 import AlertMessage from "~/common/components/alert-message";
+import ServiceIntroMessage from "~/common/components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Login | what2buy" }];
@@ -56,13 +58,15 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
+
   return (
-    <div className="flex flex-col relative items-center justify-center h-full px-5">
+    <div className="relative flex flex-col items-center justify-center h-full px-5">
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
-        <Link to="/auth/join">가입하기</Link>
+        <Link to="/auth/join">아직 회원이 아니신가요? 가입하기</Link>
       </Button>
-      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
-        <h1 className="text-2xl font-semibold">로그인하기</h1>
+      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10 space-y-5">
+        <h1 className="text-2xl font-semibold">로그인</h1>
+        <ServiceIntroMessage addedClassName="w-full mx-auto" />
         <Form className="w-full space-y-4" method="post">
           <InputPair
             label="이메일"
@@ -71,7 +75,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
             id="email"
             required
             type="email"
-            placeholder="예)kdh2000@gmail.com"
+            placeholder="예) example@example.com"
           />
           {actionData && "formError" in actionData && (
             <p className="text-sm text-red-500">

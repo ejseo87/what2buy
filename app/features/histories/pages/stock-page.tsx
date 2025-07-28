@@ -18,6 +18,7 @@ import {
   getRecommendedStockReturns,
 } from "../queries";
 import { getLoggedInUserId } from "~/features/users/queries";
+import ServiceIntroMessage from "~/common/components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -29,11 +30,11 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
   const { stockCode } = params;
-  console.log("[stock-page] params=", params);
+  //console.log("[stock-page] params=", params);
   // 주식 상세 정보 가져오기
   // stockoverview stocks_warnings stocks_summary_with_raitos
   const userId = await getLoggedInUserId(client as any);
-  console.log("[stock-page] userId=", userId);
+  //console.log("[stock-page] userId=", userId);
   const stockOverview = await getStocksOverviewByStockCode(client as any, {
     stockCode: stockCode,
   });
@@ -124,6 +125,7 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
         title={stockOverview?.isu_abbrv || "주식 상세 정보"}
         subtitle="추천된 종목에 대한 자세한 정보를 확인해 보세요."
       />
+      <ServiceIntroMessage addedClassName="w-full mx-auto" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <div className=" bg-white ">
           <StockChart
