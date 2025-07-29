@@ -1,5 +1,12 @@
 import type { Route } from "./+types/otp-complete-page";
-import { Form, redirect, useNavigation, useSearchParams } from "react-router";
+import {
+  Form,
+  redirect,
+  useNavigation,
+  useSearchParams,
+  Link,
+} from "react-router";
+import { useEffect, useState } from "react";
 import z from "zod";
 import AlertMessage from "~/common/components/alert-message";
 import InputPair from "~/common/components/input-pair";
@@ -9,6 +16,52 @@ import { makeSSRClient } from "~/supa-client";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Verify OTP | what2buy" }];
+};
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const url = new URL(request.url);
+  const error = url.searchParams.get("error");
+  const errorCode = url.searchParams.get("error_code");
+  const errorDescription = url.searchParams.get("error_description");
+
+  // URL에서 에러 파라미터 확인 (쿼리 파라미터와 fragment 모두 확인)
+  if (error && errorCode) {
+    let userFriendlyMessage = "인증 중 오류가 발생했습니다.";
+
+    if (errorCode === "otp_expired") {
+      userFriendlyMessage =
+        "Magic Link가 만료되었습니다. 새로운 OTP를 요청하거나 이메일에서 받은 6자리 코드를 직접 입력해주세요.";
+    } else if (errorCode === "access_denied") {
+      userFriendlyMessage = "인증이 거부되었습니다. 다시 시도해주세요.";
+    }
+
+    return {
+      urlError: {
+        code: errorCode,
+        message: userFriendlyMessage,
+        description: errorDescription,
+      },
+    };
+  }
+
+  // 성공적인 토큰이 있는지 확인
+  const accessToken = url.searchParams.get("access_token");
+  const refreshToken = url.searchParams.get("refresh_token");
+
+  if (accessToken && refreshToken) {
+    // 토큰이 있으면 자동으로 로그인 처리
+    const { client, headers } = makeSSRClient(request);
+    const { error: sessionError } = await client.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (!sessionError) {
+      return redirect("/", { headers });
+    }
+  }
+
+  return { urlError: null };
 };
 
 const formSchema = z.object({
@@ -43,12 +96,50 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return redirect("/", { headers });
 };
 
-export default function OtpPage({ actionData }: Route.ComponentProps) {
+export default function OtpPage({
+  actionData,
+  loaderData,
+}: Route.ComponentProps) {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
+
+  // Fragment에서 온 에러를 위한 상태
+  const [fragmentError, setFragmentError] = useState<{
+    code: string;
+    message: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const fragment = window.location.hash.substring(1);
+    if (fragment) {
+      const params = new URLSearchParams(fragment);
+      const error = params.get("error");
+      const errorCode = params.get("error_code");
+
+      if (error && errorCode) {
+        let userFriendlyMessage = "인증 중 오류가 발생했습니다.";
+
+        if (errorCode === "otp_expired") {
+          userFriendlyMessage =
+            "Magic Link가 만료되었습니다. 새로운 OTP를 요청하거나 이메일에서 받은 6자리 코드를 직접 입력해주세요.";
+        } else if (errorCode === "access_denied") {
+          userFriendlyMessage = "인증이 거부되었습니다. 다시 시도해주세요.";
+        }
+
+        setFragmentError({
+          code: errorCode,
+          message: userFriendlyMessage,
+        });
+      }
+    }
+  }, []);
+
+  // 서버사이드 에러 또는 클라이언트사이드 에러
+  const displayError = loaderData?.urlError || fragmentError;
+
   return (
     <div className="flex flex-col relative items-center justify-center h-full">
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
@@ -58,6 +149,29 @@ export default function OtpPage({ actionData }: Route.ComponentProps) {
             Enter the OTP code sent to your email address.
           </p>
         </div>
+
+        {/* URL 에러 표시 */}
+        {displayError && (
+          <div className="w-full space-y-4">
+            <AlertMessage
+              content={displayError.message}
+              variant="destructive"
+            />
+            <div className="text-center">
+              <Link to="/auth/otp/start">
+                <Button variant="outline" className="w-full">
+                  새로운 OTP 요청하기
+                </Button>
+              </Link>
+            </div>
+            <div className="border-t pt-4">
+              <p className="text-sm text-gray-600 text-center mb-4">
+                또는 아래에 직접 OTP 코드를 입력하세요
+              </p>
+            </div>
+          </div>
+        )}
+
         <Form className="w-full space-y-4" method="post">
           <InputPair
             label="Email"
@@ -80,8 +194,11 @@ export default function OtpPage({ actionData }: Route.ComponentProps) {
             name="otp"
             id="otp"
             required
-            type="number"
-            placeholder="i.e 1234"
+            type="text"
+            placeholder="예: 123456"
+            maxLength={6}
+            inputMode="numeric"
+            pattern="[0-9]*"
           />
           {actionData && "fieldErrors" in actionData && (
             <p className="text-red-500">
@@ -102,6 +219,14 @@ export default function OtpPage({ actionData }: Route.ComponentProps) {
             />
           )}
         </Form>
+
+        {/* 추가 도움말 */}
+        <div className="text-center text-sm text-gray-600">
+          <p>OTP를 받지 못하셨나요?</p>
+          <Link to="/auth/otp/start" className="text-blue-600 hover:underline">
+            새로운 OTP 요청하기
+          </Link>
+        </div>
       </div>
     </div>
   );

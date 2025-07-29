@@ -53,7 +53,8 @@ export default function OtpStartPage({ actionData }: Route.ComponentProps) {
         <div className="text-center">
           <h1 className="text-2xl font-semibold">Log in with OTP</h1>
           <p className="text-sm text-muted-foreground">
-            We will send you a 4-digit code to log in to your account.
+            이메일로 Magic Link와 6자리 OTP 코드를 보내드립니다. <br />
+            Magic Link를 클릭하거나 코드를 직접 입력하여 로그인하세요.
           </p>
         </div>
         <Form className="w-full space-y-4" method="post">
