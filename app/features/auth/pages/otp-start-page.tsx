@@ -24,6 +24,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const { email } = data;
   console.log("otp start page email=", email);
   const { client } = makeSSRClient(request);
+  // Magic Link + OTP 코드 방식 (권장)
   const { error } = await client.auth.signInWithOtp({
     email: email,
     options: {
@@ -31,11 +32,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
       emailRedirectTo: `${
         new URL(request.url).origin
       }/auth/otp/complete?email=${email}`,
-      data: {
-        domain: new URL(request.url).origin,
-      },
     },
   });
+
+  // 대안: OTP 코드만 사용하는 방식 (Magic Link 문제 시)
+  // const { error } = await client.auth.signInWithOtp({
+  //   email: email,
+  //   options: {
+  //     shouldCreateUser: true,
+  //   },
+  // });
   if (error) {
     return { error: "Failed to send OTP" };
   }

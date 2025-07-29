@@ -44,7 +44,44 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     };
   }
 
-  // 성공적인 토큰이 있는지 확인
+  // Magic Link의 code 파라미터 확인 및 자동 로그인 처리
+  const code = url.searchParams.get("code");
+  if (code) {
+    console.log("Magic Link code received:", code);
+    const { client, headers } = makeSSRClient(request);
+
+    try {
+      const { data, error: exchangeError } =
+        await client.auth.exchangeCodeForSession(code);
+
+      if (!exchangeError && data.session) {
+        console.log("Magic Link login successful");
+        return redirect("/", { headers });
+      } else {
+        console.error("Magic Link exchange error:", exchangeError);
+        return {
+          urlError: {
+            code: "exchange_failed",
+            message:
+              "Magic Link 인증에 실패했습니다. 아래에 이메일에서 받은 6자리 OTP 코드를 직접 입력해주세요.",
+            description: exchangeError?.message || "Code exchange failed",
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Magic Link processing error:", error);
+      return {
+        urlError: {
+          code: "processing_error",
+          message:
+            "Magic Link 처리 중 오류가 발생했습니다. 아래에 이메일에서 받은 6자리 OTP 코드를 직접 입력해주세요.",
+          description: error instanceof Error ? error.message : "Unknown error",
+        },
+      };
+    }
+  }
+
+  // 성공적인 토큰이 있는지 확인 (fallback)
   const accessToken = url.searchParams.get("access_token");
   const refreshToken = url.searchParams.get("refresh_token");
 
@@ -113,6 +150,40 @@ export default function OtpPage({
   } | null>(null);
 
   useEffect(() => {
+    const handleMagicLink = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+
+      if (code) {
+        console.log("Client-side Magic Link code processing:", code);
+        try {
+          const { browserClient } = await import("~/supa-client");
+          const { data, error } =
+            await browserClient.auth.exchangeCodeForSession(code);
+
+          if (!error && data.session) {
+            console.log("Magic Link login successful on client");
+            window.location.href = "/";
+            return;
+          } else {
+            console.error("Client-side Magic Link error:", error);
+            setFragmentError({
+              code: "client_exchange_failed",
+              message:
+                "Magic Link 인증에 실패했습니다. 아래에 이메일에서 받은 6자리 OTP 코드를 직접 입력해주세요.",
+            });
+          }
+        } catch (error) {
+          console.error("Client-side Magic Link processing error:", error);
+          setFragmentError({
+            code: "client_processing_error",
+            message:
+              "Magic Link 처리 중 오류가 발생했습니다. 아래에 이메일에서 받은 6자리 OTP 코드를 직접 입력해주세요.",
+          });
+        }
+      }
+    };
+
     const fragment = window.location.hash.substring(1);
     if (fragment) {
       const params = new URLSearchParams(fragment);
@@ -134,6 +205,9 @@ export default function OtpPage({
           message: userFriendlyMessage,
         });
       }
+    } else {
+      // fragment가 없으면 query parameter 확인
+      handleMagicLink();
     }
   }, []);
 
