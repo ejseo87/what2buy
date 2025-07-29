@@ -15,7 +15,9 @@ import { getGoodStockListByUserId } from "~/features/api/queries";
 import { useTicket } from "~/features/tickets/mutation";
 import { Button } from "~/common/components/ui/button";
 import { Label } from "~/common/components/ui/label";
+import { Checkbox } from "~/common/components/ui/checkbox";
 import ServiceIntroMessage from "~/common/components/service-intro-message";
+import { useState } from "react";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -171,6 +173,10 @@ export default function RecommendationPage({
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
+
+  // 사용자 동의 상태 관리
+  const [isAgreed, setIsAgreed] = useState(false);
+
   return (
     <div className="space-y-10">
       <Hero
@@ -202,8 +208,48 @@ export default function RecommendationPage({
               }))}
             />
 
-            <LoadingButton type="submit" isLoading={isSubmitting}>
-              주식 추천 받기
+            {/* 사용자 동의 체크박스 */}
+            <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="user-agreement"
+                  checked={isAgreed}
+                  onCheckedChange={(checked) => setIsAgreed(checked === true)}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label
+                    htmlFor="user-agreement"
+                    className="text-sm font-medium leading-relaxed cursor-pointer"
+                  >
+                    투자 위험 고지 및 서비스 이용 동의
+                  </Label>
+                  <div className="text-xs text-muted-foreground space-y-2">
+                    <p>
+                      • what2buy는 AI 분석을 통해 성장 가능성이 확률적으로 높은
+                      주식을 추천하는 서비스입니다.
+                    </p>
+                    <p>
+                      • 주식 투자는 원금 손실의 위험이 있으며, 모든 투자 결정에
+                      대한 책임은 투자자 본인에게 있습니다.
+                    </p>
+                    <p>
+                      • 추천 받은 종목에 대해 충분한 검토 후 신중하게 투자
+                      결정을 내릴 것에 동의합니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <LoadingButton
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={!isAgreed || isSubmitting}
+              className={!isAgreed ? "opacity-50 cursor-not-allowed" : ""}
+            >
+              {!isAgreed
+                ? "위 내용에 동의하고 주식 추천 받기"
+                : "주식 추천 받기"}
             </LoadingButton>
           </Form>
         </>

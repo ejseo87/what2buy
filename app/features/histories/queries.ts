@@ -459,10 +459,10 @@ export const getStocksOverviewByStockCode = async (
     console.log(error);
     throw new Error("Failed to get stocks overview");
   }
-  console.log(
-    "[getStocksOverviewByStockCode] stocks_overview=",
-    stocks_overview
-  );
+  //console.log(
+  //  "[getStocksOverviewByStockCode] stocks_overview=",
+  //  stocks_overview
+  //);
   return stocks_overview;
 };
 

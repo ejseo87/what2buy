@@ -22,18 +22,24 @@ export const action = async ({ request }: Route.ActionArgs) => {
     Object.fromEntries(formData)
   );
   if (!success) {
+    console.error("OTP form validation error:", error.flatten().fieldErrors);
     return { fieldErrors: error.flatten().fieldErrors };
   }
   const { email, otp } = data;
+  console.log("OTP verification attempt for email:", email);
+
   const { client, headers } = makeSSRClient(request);
   const { error: verifyError } = await client.auth.verifyOtp({
     type: "email",
     email: email,
     token: otp,
   });
+
   if (verifyError) {
     return { verifyError: verifyError.message };
   }
+
+  console.log("OTP verification successful for email:", email);
   return redirect("/", { headers });
 };
 

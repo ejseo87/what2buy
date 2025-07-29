@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
+import { TooltipProvider } from "~/common/components/ui/tooltip";
 import { makeSSRClient, type Database } from "~/supa-client";
 import {
   getStockPerformanceChart,
@@ -19,6 +20,8 @@ import {
 } from "../queries";
 import { getLoggedInUserId } from "~/features/users/queries";
 import ServiceIntroMessage from "~/common/components/service-intro-message";
+import IndicatorLabel from "../components/IndicatorLabel";
+import formatNumber from "../components/formatNumber";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -115,196 +118,237 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
   //    : "0";
   // 차트 데이터 변환
   const transformedChartData =
-    chartData?.map((item, index) => ({
+    (chartData as any)?.map((item: any, index: number) => ({
       date: item.date,
-      [stockOverview?.isu_abbrv || "Stock"]: item.close,
+      [(stockOverview as any)?.isu_abbrv || "Stock"]: item.close,
     })) || [];
   return (
-    <div className="space-y-20">
-      <Hero
-        title={stockOverview?.isu_abbrv || "주식 상세 정보"}
-        subtitle="추천된 종목에 대한 자세한 정보를 확인해 보세요."
-      />
-      <ServiceIntroMessage addedClassName="w-full mx-auto" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div className=" bg-white ">
-          <StockChart
-            title={`${stockOverview?.isu_abbrv || "주식"}`}
-            description="최근 30일 주가 추이"
-            chartData={transformedChartData}
-            dataKey={stockOverview?.isu_abbrv || "Stock"}
-            currentPrice={profitTrackingData[0]?.current_price || 0}
-            changeAmount={profitTrackingData[0]?.profit_amount || 0}
-            changePercent={Number(profitTrackingData[0]?.profit_rate) || 0}
-            referencePrice={profitTrackingData[0]?.recommended_price || 0}
-            recommendationDate={
-              profitTrackingData[0]?.recommendation_date || ""
-            }
-          />
-        </div>
+    <TooltipProvider>
+      <div className="space-y-20">
+        <Hero
+          title={(stockOverview as any)?.isu_abbrv || "주식 상세 정보"}
+          subtitle="추천된 종목에 대한 자세한 정보를 확인해 보세요."
+        />
+        <ServiceIntroMessage addedClassName="w-full mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className=" bg-white ">
+            <StockChart
+              title={`${(stockOverview as any)?.isu_abbrv || "주식"}`}
+              description="최근 30일 주가 추이"
+              chartData={transformedChartData}
+              dataKey={(stockOverview as any)?.isu_abbrv || "Stock"}
+              currentPrice={profitTrackingData[0]?.current_price || 0}
+              changeAmount={profitTrackingData[0]?.profit_amount || 0}
+              changePercent={Number(profitTrackingData[0]?.profit_rate) || 0}
+              referencePrice={profitTrackingData[0]?.recommended_price || 0}
+              recommendationDate={
+                profitTrackingData[0]?.recommendation_date || ""
+              }
+            />
+          </div>
 
-        <div className=" bg-white rounded-lg shadow-md px-4 mt-5">
-          <div className="space-y-4">
-            <div className="text-sm text-gray-500">
-              <span className="mr-5">
-                시장 구분 : {stockOverview?.mkt_tp_nm || "N/A"}
-              </span>
-              <span className="mr-5">
-                종목 코드 : {stockOverview?.isu_srt_cd || "N/A"}
-              </span>
-              <span className="mr-5">
-                영문 이름 : {stockOverview?.isu_eng_nm || "N/A"}
-              </span>
-            </div>
+          <div className=" bg-white rounded-lg shadow-md px-4 mt-5">
+            <div className="space-y-4">
+              <div className="text-sm text-gray-500">
+                <span className="mr-5">
+                  시장 구분 : {(stockOverview as any)?.mkt_tp_nm || "N/A"}
+                </span>
+                <span className="mr-5">
+                  종목 코드 : {(stockOverview as any)?.isu_srt_cd || "N/A"}
+                </span>
+                <span className="mr-5">
+                  영문 이름 : {(stockOverview as any)?.isu_eng_nm || "N/A"}
+                </span>
+              </div>
 
-            {/* Stock Information */}
-            <div className="border-b pb-4">
-              <h2 className="text-xl font-semibold mb-3">종목 정보</h2>
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium w-1/3">
-                      Trailing PE
-                    </TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.trailing_pe || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Forward PE</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.forward_pe || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">PBR</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.pbr || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">PCR</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.pcr || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">PSR</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.psr || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">EV/EBITDA</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.ev_to_ebitda || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">EV/Revenue</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.ev_to_revenue || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">ROE</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.roe || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">ROA</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.roa || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">RPS</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.rps || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Beta</TableCell>
-                    <TableCell>
-                      {(stocksSummaryWithRaitos as any)?.beta || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">액면가</TableCell>
-                    <TableCell>
-                      {(stockOverview as any)?.parval || "N/A"}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">주식수</TableCell>
-                    <TableCell>
-                      {(stockOverview as any)?.list_shrs
-                        ? `${(stockOverview as any).list_shrs}주`
-                        : "N/A"}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Profit Tracking */}
-            <div>
-              <h2 className="text-xl font-semibold mb-3">Profit Tracking</h2>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>추천일</TableHead>
-                    <TableHead>추천 종가</TableHead>
-                    <TableHead>현재 가격</TableHead>
-                    <TableHead>수익률</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {profitTrackingData?.map((data, index) => (
-                    <TableRow key={index}>
+              {/* Stock Information */}
+              <div className="border-b pb-4">
+                <h2 className="text-xl font-semibold mb-3">종목 정보</h2>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="w-1/3">
+                        <IndicatorLabel indicator="Trailing PE">
+                          Trailing PE
+                        </IndicatorLabel>
+                      </TableCell>
                       <TableCell>
-                        {data.recommendation_date
-                          ? new Date(
-                              data.recommendation_date
-                            ).toLocaleDateString("ko-KR")
+                        {formatNumber(
+                          (stocksSummaryWithRaitos as any)?.trailing_pe
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="Forward PE">
+                          Forward PE
+                        </IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber(
+                          (stocksSummaryWithRaitos as any)?.forward_pe
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="PBR">PBR</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.pbr)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="PCR">PCR</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.pcr)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="PSR">PSR</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.psr)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="EV/EBITDA">
+                          EV/EBITDA
+                        </IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber(
+                          (stocksSummaryWithRaitos as any)?.ev_to_ebitda
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="EV/Revenue">
+                          EV/Revenue
+                        </IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber(
+                          (stocksSummaryWithRaitos as any)?.ev_to_revenue
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="ROE">ROE</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.roe)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="ROA">ROA</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.roa)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="RPS">RPS</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.rps)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <IndicatorLabel indicator="Beta">Beta</IndicatorLabel>
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber((stocksSummaryWithRaitos as any)?.beta)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">액면가</TableCell>
+                      <TableCell>
+                        {(stockOverview as any)?.parval || "N/A"}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">주식수</TableCell>
+                      <TableCell>
+                        {(stockOverview as any)?.list_shrs
+                          ? `${Number(
+                              (stockOverview as any).list_shrs
+                            ).toLocaleString("ko-KR")}주`
                           : "N/A"}
                       </TableCell>
-                      <TableCell>
-                        {data.recommended_price.toLocaleString() || "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {data.current_price.toLocaleString() || "N/A"}
-                      </TableCell>
-                      <TableCell
-                        className={`${
-                          Number(data.profit_rate) > 0
-                            ? "text-green-600"
-                            : Number(data.profit_rate) < 0
-                            ? "text-red-600"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {data.profit_rate ? `${data.profit_rate}%` : "N/A"}
-                      </TableCell>
                     </TableRow>
-                  ))}
-                  {(!profitTrackingData || profitTrackingData.length === 0) && (
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Profit Tracking */}
+              <div>
+                <h2 className="text-xl font-semibold mb-3">Profit Tracking</h2>
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="text-center text-gray-500"
-                      >
-                        수익률 추적 데이터가 없습니다.
-                      </TableCell>
+                      <TableHead>추천일</TableHead>
+                      <TableHead>추천 종가</TableHead>
+                      <TableHead>현재 가격</TableHead>
+                      <TableHead>수익률</TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {profitTrackingData?.map((data, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          {data.recommendation_date
+                            ? new Date(
+                                data.recommendation_date
+                              ).toLocaleDateString("ko-KR")
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {data.recommended_price.toLocaleString() || "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {data.current_price.toLocaleString() || "N/A"}
+                        </TableCell>
+                        <TableCell
+                          className={`${
+                            Number(data.profit_rate) > 0
+                              ? "text-green-600"
+                              : Number(data.profit_rate) < 0
+                              ? "text-red-600"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {data.profit_rate ? `${data.profit_rate}%` : "N/A"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {(!profitTrackingData ||
+                      profitTrackingData.length === 0) && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          className="text-center text-gray-500"
+                        >
+                          수익률 추적 데이터가 없습니다.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

@@ -28,6 +28,12 @@ export const action = async ({ request }: Route.ActionArgs) => {
     email: email,
     options: {
       shouldCreateUser: true,
+      emailRedirectTo: `${
+        new URL(request.url).origin
+      }/auth/otp/complete?email=${email}`,
+      data: {
+        domain: new URL(request.url).origin,
+      },
     },
   });
   if (error) {

@@ -95,11 +95,75 @@ export function transformStockData(stockData: {
 export class StockDataService {
   private static readonly YAHOO_FINANCE_BASE_URL =
     "https://query1.finance.yahoo.com/v8/finance/chart";
+  private static readonly DEFAULT_TIMEOUT = 10000; // 10초 타임아웃
+  private static readonly MAX_RETRIES = 2; // 최대 재시도 횟수
+
+  // 타임아웃과 함께 fetch 요청을 수행하는 유틸리티 함수
+  private static async fetchWithTimeout(
+    url: string,
+    options: RequestInit = {},
+    timeout: number = this.DEFAULT_TIMEOUT
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`Request timeout after ${timeout}ms`);
+      }
+      throw error;
+    }
+  }
+
+  // 재시도 로직이 포함된 fetch 함수
+  private static async fetchWithRetry(
+    url: string,
+    options: RequestInit = {},
+    maxRetries: number = this.MAX_RETRIES
+  ): Promise<Response> {
+    let lastError: Error;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this.fetchWithTimeout(url, options);
+        if (!response.ok && response.status >= 500) {
+          // 서버 에러인 경우 재시도
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response;
+      } catch (error) {
+        lastError = error as Error;
+
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        // 지수 백오프로 대기 시간 증가
+        const waitTime = Math.min(1000 * Math.pow(2, attempt), 5000);
+        console.log(
+          `[StockDataService] Retry attempt ${
+            attempt + 1
+          }/${maxRetries} after ${waitTime}ms for ${url}`
+        );
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+      }
+    }
+
+    throw lastError!;
+  }
 
   // Yahoo Finance API를 사용한 실시간 주가 데이터 가져오기
   static async getStockQuote(symbol: string): Promise<StockQuote> {
     try {
-      const response = await fetch(
+      const response = await this.fetchWithRetry(
         `${this.YAHOO_FINANCE_BASE_URL}/${symbol}?interval=1d&range=1d`
       );
 
@@ -130,7 +194,11 @@ export class StockDataService {
       };
     } catch (error) {
       console.error(`Error fetching stock quote for ${symbol}:`, error);
-      throw new Error(`Failed to fetch stock quote for ${symbol}`);
+      throw new Error(
+        `Failed to fetch stock quote for ${symbol}: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
@@ -144,7 +212,7 @@ export class StockDataService {
       const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
       const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
 
-      const response = await fetch(
+      const response = await this.fetchWithRetry(
         `${this.YAHOO_FINANCE_BASE_URL}/${symbol}?interval=1d&period1=${startTimestamp}&period2=${endTimestamp}`
       );
 
@@ -208,7 +276,7 @@ export class StockDataService {
   ): Promise<StockInfo[]> {
     try {
       // Yahoo Finance 검색 API 사용
-      const response = await fetch(
+      const response = await this.fetchWithRetry(
         `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
           query
         )}&quotesCount=${limit}`
@@ -233,7 +301,11 @@ export class StockDataService {
       }));
     } catch (error) {
       console.error("Error searching stocks:", error);
-      throw new Error("Failed to search stocks");
+      throw new Error(
+        `Failed to search stocks: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   }
 
@@ -263,8 +335,6 @@ export class StockDataService {
 
     return quotes;
   }
-
- 
 }
 
 // 한국 주식 데이터를 위한 특별한 서비스

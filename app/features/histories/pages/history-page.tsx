@@ -20,9 +20,9 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
   const userId = await getLoggedInUserId(client as any);
-  console.log("userId=", userId);
+  //console.log("userId=", userId);
   const { recommendationId } = params;
-  console.log("recommendationId=", recommendationId);
+  //console.log("recommendationId=", recommendationId);
   const recommendation = await getRecommendationHistoryDetail(client, {
     recommendationId: Number(recommendationId),
   });
@@ -35,18 +35,18 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     stockCode: (recommendation as any).stock1_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
-  console.log("[history-page] stock1_return_info=", stock1_return_info);
+  //console.log("[history-page] stock1_return_info=", stock1_return_info);
   const stock2_return_info = await getRecommendedStockReturns(client as any, {
     stockCode: (recommendation as any).stock2_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
-  console.log("[history-page] stock2_return_info=", stock2_return_info);
+  //console.log("[history-page] stock2_return_info=", stock2_return_info);
 
   const stock3_return_info = await getRecommendedStockReturns(client as any, {
     stockCode: (recommendation as any).stock3_code,
     recommendationDate: (recommendation as any).recommendation_date,
   });
-  console.log("[history-page] stock3_return_info=", stock3_return_info);
+  //console.log("[history-page] stock3_return_info=", stock3_return_info);
 
   return {
     recommendation,
