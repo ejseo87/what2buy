@@ -4,256 +4,8 @@ import type { Database } from "~/supa-client";
 import pkg from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "react-router";
+import type { GoodStock } from "~/features/api/types";
 
-export const latestRecommendation = async (
-  client: SupabaseClient<Database>,
-  { profile_id }: { profile_id: string }
-) => {
-  const { data: lastest_history, error } = await client
-    .from("histories")
-    .select("*")
-    .eq("profile_id", profile_id)
-    .order("recommendation_date", { ascending: false })
-    .limit(1)
-    .single();
-  if (error) {
-    console.log(error);
-    throw redirect("/recommendation");
-  }
-  //console.log(lastest_history);
-  return lastest_history;
-};
-
-export const getHistory = async (
-  client: SupabaseClient<Database>,
-  { recommendation_id }: { recommendation_id: number }
-) => {
-  const { data: history, error } = await client
-    .from("recommendation_stocks_view")
-    .select("*")
-    .eq("recommendation_id", recommendation_id)
-    .single();
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get history");
-  }
-  //console.log(history);
-  return history;
-};
-
-export const getStockRecommendationChart = async (
-  client: SupabaseClient<Database>,
-  {
-    recommendation_id,
-    stock_id,
-  }: {
-    recommendation_id: number;
-    stock_id: number;
-  }
-) => {
-  const { data: stock_recommendation_chart, error } = await client
-    .from("stock_recommendation_chart_view")
-    .select("*")
-    .eq("stock_id", stock_id)
-    .eq("recommendation_id", recommendation_id)
-    .single();
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get stock recommendation chart");
-  }
-  //console.log(stock_recommendation_chart);
-  return stock_recommendation_chart;
-};
-
-export const getRecommendationCount = async (
-  client: SupabaseClient<Database>,
-  { profile_id }: { profile_id: string }
-) => {
-  const { count, error } = await client
-    .from("histories")
-    .select("recommendation_id", { count: "exact", head: true })
-    .eq("profile_id", profile_id);
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get recommendation count");
-  }
-  return count;
-};
-
-export const getStockOverview = async (
-  client: SupabaseClient<Database>,
-  { stockId }: { stockId: number }
-) => {
-  const { data: stock_overview, error } = await client
-    .from("stocks")
-    .select("*")
-    .eq("stock_id", stockId)
-    .single();
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get stock overview");
-  }
-  //console.log(stock_overview);
-  return stock_overview;
-};
-
-export const getDailyPricesByStockId = async (
-  client: SupabaseClient<Database>,
-  {
-    stockId,
-    count,
-  }: {
-    stockId: number;
-    count: number;
-  }
-) => {
-  const { data: daily_prices, error } = await client
-    .from("daily_stocks")
-    .select("date, close")
-    .eq("stock_id", stockId)
-    .order("date", { ascending: false })
-    .limit(count);
-
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get daily prices");
-  }
-
-  // Reverse the array to get chronological order (oldest to newest)
-  const sortedPrices = daily_prices?.reverse() || [];
-  //console.log(sortedPrices);
-  return sortedPrices;
-};
-
-// 새로운 뷰를 사용하는 함수들 추가 (기존 테이블 조인 방식 사용)
-export const getStockDetail = async (
-  client: SupabaseClient<Database>,
-  { stockId }: { stockId: string }
-) => {
-  // 주식 정보와 최근 가격 정보를 함께 가져오기
-  const { data: stock_detail, error } = await client
-    .from("stocks")
-    .select(
-      `
-      *,
-      daily_stocks(
-        date,
-        close,
-        open,
-        high,
-        low,
-        volume,
-        change
-      )
-    `
-    )
-    .eq("stock_id", stockId)
-    .order("date", { ascending: false, referencedTable: "daily_stocks" })
-    .limit(1, { referencedTable: "daily_stocks" })
-    .single();
-
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get stock detail");
-  }
-
-  return stock_detail;
-};
-
-export const getProfitTrackingByStockId = async (
-  client: SupabaseClient<Database>,
-  {
-    stockId,
-    profileId,
-  }: {
-    stockId: number;
-    profileId: string;
-  }
-) => {
-  // 수익률 추적 정보 가져오기
-  const { data: profit_tracking, error } = await client
-    .from("profit_tracking_view")
-    .select("*")
-    .eq("stock_id", stockId)
-    .eq("profile_id", profileId)
-    .order("recommendation_date", {
-      ascending: false,
-    });
-
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get profit tracking");
-  }
-
-  return profit_tracking;
-};
-
-export const getStockRecommendationDetail = async (
-  client: SupabaseClient<Database>,
-  {
-    recommendationId,
-    stockId,
-  }: {
-    recommendationId: number;
-    stockId: number;
-  }
-) => {
-  // 특정 추천의 주식 상세 정보
-  const { data: recommendation_detail, error } = await client
-    .from("histories")
-    .select(
-      `
-      *,
-      stocks!histories_stock1_id_fkey(
-        stock_id,
-        stock_name,
-        stock_code,
-        per,
-        pbr,
-        eps,
-        bps,
-        roe,
-        dividend_per_share
-      ),
-      history_stock_relations(
-        profit,
-        profit_rate
-      )
-    `
-    )
-    .eq("recommendation_id", recommendationId)
-    .eq("history_stock_relations.stock_id", stockId)
-    .single();
-
-  if (error) {
-    console.log(error);
-    throw new Error("Failed to get stock recommendation detail");
-  }
-
-  return recommendation_detail;
-};
-
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
-/*
-2025.07.24 refactoring codes for recommendation history
-*/
 /*
 2025.07.24 refactoring codes for recommendation history
 */
@@ -357,7 +109,7 @@ export const getRecommendationHistories = async (
     console.log(error);
     throw new Error("Failed to get recommendation histories");
   }
-  console.log("[getRecommendationHistories] histories=", histories);
+  //console.log("[getRecommendationHistories] histories=", histories);
   return histories;
 };
 
@@ -616,4 +368,72 @@ export const getStocksList = async (
 
   //console.log("[getStocksList] stocks_list=", stocks_list);
   return stocks_list;
+};
+
+async function getRecommendedStocksNByUserId(
+  client: SupabaseClient<Database>,
+  userId: string
+): Promise<string[]> {
+  const { data, error } = await client
+    .from("get_recommendation_history_detail_view")
+    .select("stock1_code, stock2_code, stock3_code")
+    .eq("profile_id", userId);
+
+  if (error) {
+    console.error("Error fetching recommended stock codes:", error);
+    return [];
+  }
+
+  const stockCodes = (data as any[]) // Assuming RecommendedHistory is no longer needed, so cast to any[]
+    .flatMap((row) => [row.stock1_code, row.stock2_code, row.stock3_code])
+    .filter((code): code is string => !!code); // Filter out null/undefined and assert type
+
+  // remove duplicates
+  return [...new Set(stockCodes)];
+}
+export interface GoodStock {
+  stock_code: string;
+  korean_name: string;
+  english_name: string;
+  market_type: string;
+}
+export const getGoodStockListByUserId = async (
+  client: SupabaseClient<Database>,
+  { userId }: { userId: string }
+): Promise<GoodStock[]> => {
+  const recommendedStockCodes = await getRecommendedStocksNByUserId(
+    client,
+    userId
+  );
+
+  let query = client
+    .from("get_good_stocks_list_view")
+    .select("stock_code, korean_name, english_name, market_type");
+
+  // 이미 추천받은 주식들을 제외
+  if (recommendedStockCodes.length > 0) {
+    //console.log(
+    //  "[getGoodStockListByUserId] Excluding previously recommended stocks:",
+    //  recommendedStockCodes
+    //);
+    // 각 주식 코드를 개별적으로 제외 (더 확실한 방법)
+    recommendedStockCodes.forEach((code) => {
+      query = query.neq("stock_code", code);
+    });
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("[getGoodStockListByUserId] Query error:", error);
+    throw new Error("Failed to get good stocks");
+  }
+
+  console.log(
+    "[getGoodStockListByUserId] Final filtered data count:",
+    data?.length
+  );
+  console.log("[getGoodStockListByUserId] Sample data:", data?.slice(0, 3));
+
+  return data as GoodStock[];
 };
