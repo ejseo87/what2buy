@@ -24,24 +24,12 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const { email } = data;
   console.log("otp start page email=", email);
   const { client } = makeSSRClient(request);
-  // Magic Link + OTP 코드 방식 (권장)
   const { error } = await client.auth.signInWithOtp({
     email: email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: `${
-        new URL(request.url).origin
-      }/auth/otp/complete?email=${email}`,
     },
   });
-
-  // 대안: OTP 코드만 사용하는 방식 (Magic Link 문제 시)
-  // const { error } = await client.auth.signInWithOtp({
-  //   email: email,
-  //   options: {
-  //     shouldCreateUser: true,
-  //   },
-  // });
   if (error) {
     return { error: "Failed to send OTP" };
   }
@@ -57,16 +45,18 @@ export default function OtpStartPage({ actionData }: Route.ComponentProps) {
     <div className="flex flex-col relative items-center justify-center h-full">
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold">Log in with OTP</h1>
+          <h1 className="text-2xl font-semibold">
+            OTP로 가입도하고 로그인도 하기
+          </h1>
           <p className="text-sm text-muted-foreground">
-            이메일로 Magic Link와 6자리 OTP 코드를 보내드립니다. <br />
-            Magic Link를 클릭하거나 코드를 직접 입력하여 로그인하세요.
+            이메일로 6자리 OTP 코드를 보내드립니다. <br />
+            OTP는 3분 후에 만료됩니다.
           </p>
         </div>
         <Form className="w-full space-y-4" method="post">
           <InputPair
             label="Email"
-            description="Enter your email address"
+            description="이메일 주소를 입력해주세요."
             name="email"
             id="email"
             required
@@ -81,7 +71,7 @@ export default function OtpStartPage({ actionData }: Route.ComponentProps) {
             type="submit"
             isLoading={isSubmitting}
           >
-            Send OTP
+            OTP 보내기
           </LoadingButton>
         </Form>
       </div>
