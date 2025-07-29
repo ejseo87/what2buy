@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "app/features/api/pages/stocks-api.tsx": {
-      "maxDuration": 300
-    }
-  },
   "crons": [
     {
       "path": "/api/stocks",
