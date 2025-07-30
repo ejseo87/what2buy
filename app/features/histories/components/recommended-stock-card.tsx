@@ -76,6 +76,7 @@ export function RecommendedStockCard({
             추천일 마감가 {referencPrice.toLocaleString()}원
           </span>
           <span className="text-lg font-bold  flex items-center">
+            현재가{" "}
             {currentPrice > referencPrice ? (
               <ArrowUpIcon className="w-4 h-4 text-red-600" />
             ) : currentPrice === referencPrice ? (
@@ -83,7 +84,6 @@ export function RecommendedStockCard({
             ) : (
               <ArrowDownIcon className="w-4 h-4 text-blue-600" />
             )}
-
             <span
               className={
                 currentPrice > referencPrice
@@ -93,11 +93,20 @@ export function RecommendedStockCard({
                   : "text-blue-600"
               }
             >
-              {currentPrice.toLocaleString()}원
+              {currentPrice.toLocaleString()}원 (
+              {(currentPrice - referencPrice).toLocaleString()}원)
             </span>
           </span>
 
-          <span className="text-lg font-bold block text-red-800">
+          <span
+            className={
+              currentPrice > referencPrice
+                ? "text-red-600"
+                : currentPrice === referencPrice
+                ? "text-gray-600"
+                : "text-blue-600"
+            }
+          >
             수익률 {changeRate.toFixed(2)}%
           </span>
         </CardFooter>

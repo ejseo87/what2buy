@@ -9,7 +9,9 @@ import { makeSSRClient } from "~/supa-client";
 import { LoaderCircle } from "lucide-react";
 import LoadingButton from "~/common/components/loading-button";
 import AlertMessage from "~/common/components/alert-message";
-import ServiceIntroMessage from "~/common/components/service-intro-message";
+import { Checkbox } from "~/common/components/ui/checkbox";
+import { Label } from "~/common/components/ui/label";
+import { useState } from "react";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -85,6 +87,13 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
+
+  // 약관 동의 상태 관리
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
+
+  // 두 약관 모두 동의해야 가입 가능
+  const canSubmit = termsAgreed && privacyAgreed && !isSubmitting;
   return (
     <div className="flex flex-col relative items-center justify-center h-full ps-5">
       <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
@@ -92,7 +101,7 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
         <h1 className="text-2xl font-semibold">계정 만들기</h1>
-        <ServiceIntroMessage addedClassName="w-full mx-auto" />
+
         <Form className="w-full space-y-4" method="post">
           <InputPair
             label="이름"
@@ -150,8 +159,78 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
               {actionData?.formError?.password?.join(", ")}
             </p>
           )}
-          <LoadingButton isLoading={isSubmitting}>
-            {isSubmitting ? "처리중..." : "계정 생성"}
+
+          {/* 약관 동의 섹션 */}
+          <div className="space-y-4 pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-medium text-gray-900">
+              서비스 약관 동의
+            </h3>
+
+            {/* 이용약관 동의 */}
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="terms-agreement"
+                checked={termsAgreed}
+                onCheckedChange={(checked) => setTermsAgreed(checked === true)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <Label
+                  htmlFor="terms-agreement"
+                  className="text-sm font-medium leading-relaxed cursor-pointer"
+                >
+                  이용약관에 동의합니다. (필수)
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    className="text-blue-600 hover:underline"
+                  >
+                    이용약관 전문 보기
+                  </Link>
+                </p>
+              </div>
+            </div>
+
+            {/* 개인정보처리방침 동의 */}
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="privacy-agreement"
+                checked={privacyAgreed}
+                onCheckedChange={(checked) =>
+                  setPrivacyAgreed(checked === true)
+                }
+              />
+              <div className="grid gap-1.5 leading-none">
+                <Label
+                  htmlFor="privacy-agreement"
+                  className="text-sm font-medium leading-relaxed cursor-pointer"
+                >
+                  개인정보처리방침에 동의합니다. (필수)
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    className="text-blue-600 hover:underline"
+                  >
+                    개인정보처리방침 전문 보기
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <LoadingButton
+            isLoading={isSubmitting}
+            disabled={!canSubmit}
+            className={!canSubmit ? "opacity-50 cursor-not-allowed" : ""}
+          >
+            {!termsAgreed || !privacyAgreed
+              ? "약관에 동의하고 계정 생성"
+              : isSubmitting
+              ? "처리중..."
+              : "계정 생성"}
           </LoadingButton>
           {actionData &&
             "signUpError" in actionData &&
@@ -162,7 +241,7 @@ export default function JoinPage({ actionData }: Route.ComponentProps) {
               />
             )}
         </Form>
-        <AuthButtons />
+        {!termsAgreed || !privacyAgreed ? null : <AuthButtons />}
       </div>
     </div>
   );

@@ -22,7 +22,6 @@ import { SORT_OPTIONS } from "~/common/constants";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
-import ServiceIntroMessage from "~/common/components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -79,7 +78,7 @@ export default function HistoriesPage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="space-y-10">
       <Hero title="추천 기록" subtitle="지금까지의 추천 기록을 확인해보세요." />
-      <ServiceIntroMessage addedClassName="w-full mx-auto" />
+
       <div className=" items-start gap-40">
         <div className=" space-y-10">
           <div className="flex flex-col sm:flex-row justify-between gap-4">

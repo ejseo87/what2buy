@@ -10,7 +10,6 @@ import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
 import { Link } from "react-router";
 import { redirect } from "react-router";
-import ServiceIntroMessage from "../components/service-intro-message";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -207,7 +206,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         title="인공지능이 추천하는 주식 what2buy"
         subtitle="주식시장이 어렵고 부담스럽다면, 이곳에서 당신만을 위한 주식 추천을 받아보세요"
       />
-      <ServiceIntroMessage addedClassName="w-full mx-auto" />
+
       <div className="flex flex-col sm:flex-row justify-between gap-3 items-center">
         <div className="order-2 sm:order-1 text-2xl font-bold py-2.5">
           최근 추천 기록

@@ -42,7 +42,7 @@ const apiKey = process.env.OPENAI_API_KEY;
 const openai = apiKey ? new OpenAI({ apiKey }) : null;
 
 const ResponseSchema = z.object({
-  overall_summary: z.string().min(100).max(500),
+  overall_summary: z.string().min(100).max(1000),
   stock1_name: z.string(),
   stock1_code: z.string(),
   stock1_summary: z.string().min(100).max(500),
@@ -88,7 +88,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
           role: "system",
           content: `
           You are an expert stock analyst. You will receive a list of stocks in JSON format.
-          Your task is to analyze these stocks based on your own survey and recommend the three stocks for investment.
+          Your task is to analyze these stocks based on valluation, momentum, financial health and other factors. Your analysis results should be quantified as something like 70/100. Finally recommend the three best stocks based on your quantitative analysis.
           For each recommended stock, provide its name, stock code, and a detailed summary explaining why it's a good investment.
           Recommendation should be in Korean.
           `,
@@ -96,7 +96,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         {
           role: "user",
           content: `
-          Here is a list of promising stocks based on our filtering criteria. Please analyze them and provide a recommendation for the three stocks.
+          Here is a list of promising stocks based on our filtering criteria. Please analyze them and provide a recommendation for the three stocks with your quantitative analysis.
           Stock List (JSON):
           ${JSON.stringify(goodStocks, null, 2)}
           `,
@@ -185,12 +185,12 @@ export default function RecommendationPage({
       />
       <ServiceIntroMessage addedClassName="w-1/2" />
       {tickets.length === 0 ? (
-        <>
+        <div className="w-1/2 mx-auto">
           <AlertMessage content="주식 추천을 받으려면 추천권이 필요합니다. 남은 추천권이 없다면, 지금 바로 구매하세요." />
           <Link to="/tickets/buy">
-            <Button>추천권 구매하기</Button>
+            <Button>추천권 구매</Button>
           </Link>
-        </>
+        </div>
       ) : (
         <>
           <Form className="flex flex-col gap-10 w-1/2 mx-auto " method="post">

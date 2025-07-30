@@ -10,6 +10,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import Navigation from "./common/components/Navigation";
+import Footer from "./common/components/footer";
 import { Settings } from "luxon";
 import { makeSSRClient } from "./supa-client";
 import { getUserById } from "./features/users/queries";
@@ -64,15 +65,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const isLoggedIn = loaderData.user !== null;
   //console.log("root app loaderData=", loaderData);
   console.log("root app isLoggedIn=", isLoggedIn);
+  
+  const isAuthPage = pathname.includes("/auth/");
+  
   return (
-    <div
-      className={
-        pathname.includes("/auth/")
-          ? ""
-          : "py-16 md:py-20 lg:py-28 px-4 md:px-10 lg:px-20"
-      }
-    >
-      {pathname.includes("/auth") ? null : (
+    <div className="min-h-screen flex flex-col">
+      {!isAuthPage && (
         <Navigation
           isLoggedIn={isLoggedIn}
           username={(loaderData.profile as any)?.username ?? ""}
@@ -82,14 +80,25 @@ export default function App({ loaderData }: Route.ComponentProps) {
           hasMessages={false}
         />
       )}
-      <Outlet
-        context={{
-          isLoggedIn,
-          username: (loaderData.profile as any)?.username ?? "",
-          name: (loaderData.profile as any)?.name ?? "",
-          avatar: (loaderData.profile as any)?.avatar ?? null,
-        }}
-      />
+      
+      <main 
+        className={
+          isAuthPage
+            ? "flex-1"
+            : "flex-1 py-16 md:py-20 lg:py-28 px-4 md:px-10 lg:px-20"
+        }
+      >
+        <Outlet
+          context={{
+            isLoggedIn,
+            username: (loaderData.profile as any)?.username ?? "",
+            name: (loaderData.profile as any)?.name ?? "",
+            avatar: (loaderData.profile as any)?.avatar ?? null,
+          }}
+        />
+      </main>
+      
+      {!isAuthPage && <Footer />}
     </div>
   );
 }

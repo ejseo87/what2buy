@@ -8,7 +8,7 @@ import z from "zod";
 import { makeSSRClient } from "~/supa-client";
 import AuthButtons from "../components/auth-buttons";
 import AlertMessage from "~/common/components/alert-message";
-import ServiceIntroMessage from "~/common/components/service-intro-message";
+
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Login | what2buy" }];
@@ -66,7 +66,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10 space-y-5">
         <h1 className="text-2xl font-semibold">로그인</h1>
-        <ServiceIntroMessage addedClassName="w-full mx-auto" />
+        
         <Form className="w-full space-y-4" method="post">
           <InputPair
             label="이메일"

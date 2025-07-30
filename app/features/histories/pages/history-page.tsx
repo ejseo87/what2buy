@@ -8,7 +8,7 @@ import {
 import { formatKoreanDate } from "~/common/utils";
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
-import ServiceIntroMessage from "~/common/components/service-intro-message";
+
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -70,7 +70,7 @@ export default function HistoryDetailPage({
         title={` 추천 내역 #${recommendation.recommendation_id}`}
         subtitle="추천된 종목들의 주요 지표와 수익률을 확인해 보세요"
       />
-      <ServiceIntroMessage addedClassName="w-full mx-auto" />
+
       <div className="flex flex-col gap-10 ">
         <div>
           <span className="font-medium text-lg">추천 날짜 : </span>

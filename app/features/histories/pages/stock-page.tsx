@@ -19,7 +19,6 @@ import {
   getRecommendedStockReturns,
 } from "../queries";
 import { getLoggedInUserId } from "~/features/users/queries";
-import ServiceIntroMessage from "~/common/components/service-intro-message";
 import IndicatorLabel from "../components/IndicatorLabel";
 import formatNumber from "../components/formatNumber";
 
@@ -129,7 +128,7 @@ export default function StockDetailPage({ loaderData }: Route.ComponentProps) {
           title={(stockOverview as any)?.isu_abbrv || "주식 상세 정보"}
           subtitle="추천된 종목에 대한 자세한 정보를 확인해 보세요."
         />
-        <ServiceIntroMessage addedClassName="w-full mx-auto" />
+    
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div className=" bg-white ">
             <StockChart

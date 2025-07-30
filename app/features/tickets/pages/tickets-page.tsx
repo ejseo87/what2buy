@@ -6,6 +6,7 @@ import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
 import { getTickets } from "../queries";
 import { Button } from "~/common/components/ui/button";
+import { Link } from "react-router";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -33,7 +34,9 @@ export default function TicketsPage({ loaderData }: Route.ComponentProps) {
         title="보유중인 추천권 목록"
         subtitle="보우중인 추천권의 사용여부와 유효기간을 확인해보세요."
       />
-      <Button>추천권 구매</Button>
+      <Link to="/tickets/buy">
+        <Button>추천권 구매</Button>
+      </Link>
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-6">
           {tickets.map((ticket: any) => (

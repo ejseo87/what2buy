@@ -10,6 +10,7 @@ export default [
   // Home page
   index("common/pages/home-page.tsx"),
 
+
   // API routes
   ...prefix("/api", [
     route("/stocks", "features/api/pages/stocks-api.tsx"),
@@ -70,5 +71,7 @@ export default [
     route("/settings", "features/users/pages/settings-page.tsx"),
     route("/notifications", "features/users/pages/notifications-page.tsx"),
     route("/support", "features/users/pages/support-page.tsx"),
+    route("/terms", "features/users/pages/terms-page.tsx"),
+    route("/privacy", "features/users/pages/privacy-page.tsx"),
   ]),
 ] satisfies RouteConfig;
