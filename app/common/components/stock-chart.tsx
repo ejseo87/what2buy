@@ -54,6 +54,16 @@ export function StockChart({
   //console.log("StockChart:changeAmount", changeAmount);
   //console.log("StockChart:chartData", chartData);
   console.log("StockChart:recommendationDate", recommendationDate);
+
+  // 날짜를 한국어 형식으로 포맷팅
+  const formatKoreanDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
   // Create a safe key for CSS variable
   const safeDataKey = "stock";
   const chartConfig = {
@@ -115,12 +125,25 @@ export function StockChart({
                 strokeWidth={2}
                 dot={false}
               />
+              {/* 추천일 수직선 */}
               <ReferenceLine
                 x={recommendationDate ? recommendationDate : ""}
                 stroke="#ff6b6b"
                 strokeDasharray="5 5"
                 strokeWidth={2}
                 label={{ value: "추천일", position: "right" }}
+              />
+              {/* 추천일 종가 수평선 */}
+              <ReferenceLine
+                y={referencePrice || 0}
+                stroke="#ff6b6b"
+                strokeDasharray="3 3"
+                strokeWidth={1.5}
+                label={{
+                  value: `${(referencePrice || 0).toLocaleString()}원`,
+                  position: "insideTopRight",
+                  style: { fontSize: "12px", fontWeight: "bold" },
+                }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -140,7 +163,8 @@ export function StockChart({
         </div>
         <div className="flex flex-row justify-between w-full text-muted-foreground">
           <span className="block">
-            추천일 종가: {(referencePrice ?? 0).toLocaleString()}원
+            추천일 {formatKoreanDate(recommendationDate)} 종가:{" "}
+            {(referencePrice ?? 0).toLocaleString()}원
           </span>
           <span className="block">
             현재가: {(currentPrice ?? 0).toLocaleString()}원

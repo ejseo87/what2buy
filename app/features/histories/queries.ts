@@ -453,3 +453,98 @@ export const getGoodStockListByUserId = async (
 
   return data as GoodStock[];
 };
+
+export const getTopPerformingRecommendedStocks = async (
+  client: SupabaseClient<Database>,
+  { userId }: { userId: string }
+) => {
+  // 1. 사용자의 모든 추천 기록 가져오기
+  const { data: recommendations, error: recError } = await client
+    .from("get_recommendation_history_detail_view")
+    .select(
+      `
+      recommendation_id,
+      recommendation_date,
+      stock1_code,
+      stock1_name,
+      stock2_code,
+      stock2_name,
+      stock3_code,
+      stock3_name
+    `
+    )
+    .eq("profile_id", userId)
+    .order("recommendation_date", { ascending: false });
+
+  if (recError) {
+    console.error("[getTopPerformingRecommendedStocks] Error:", recError);
+    throw new Error("Failed to get recommendations");
+  }
+
+  if (!recommendations || recommendations.length === 0) {
+    return [];
+  }
+
+  // 2. 모든 추천 주식들의 수익률 계산
+  const stockPerformances = [];
+
+  for (const rec of recommendations) {
+    const stocks = [
+      { code: (rec as any).stock1_code, name: (rec as any).stock1_name },
+      { code: (rec as any).stock2_code, name: (rec as any).stock2_name },
+      { code: (rec as any).stock3_code, name: (rec as any).stock3_name },
+    ];
+
+    for (const stock of stocks) {
+      if (stock.code && stock.name) {
+        try {
+          const returns = await getRecommendedStockReturns(client, {
+            stockCode: stock.code,
+            recommendationDate: (rec as any).recommendation_date,
+          });
+
+          stockPerformances.push({
+            stockCode: stock.code,
+            stockName: stock.name,
+            recommendationId: (rec as any).recommendation_id,
+            recommendationDate: (rec as any).recommendation_date,
+            profitRate: parseFloat(returns.profitRate),
+            profitAmount: returns.profitAmount,
+            recommendationPrice: returns.recommendationPrice,
+            currentPrice: returns.latestPrice,
+          });
+        } catch (error) {
+          console.log(
+            `[getTopPerformingRecommendedStocks] Error for ${stock.code}:`,
+            error
+          );
+          // 에러가 있는 주식은 건너뛰기
+        }
+      }
+    }
+  }
+
+  // 3. 주식 코드별로 중복 제거 (가장 높은 수익률만 유지)
+  const uniqueStocksMap = new Map();
+
+  stockPerformances.forEach((stock) => {
+    if (
+      !uniqueStocksMap.has(stock.stockCode) ||
+      uniqueStocksMap.get(stock.stockCode).profitRate < stock.profitRate
+    ) {
+      uniqueStocksMap.set(stock.stockCode, stock);
+    }
+  });
+
+  // 4. 수익률 기준으로 정렬하고 TOP 3 선택
+  const uniqueStocks = Array.from(uniqueStocksMap.values());
+  const top3Stocks = uniqueStocks
+    .sort((a, b) => b.profitRate - a.profitRate)
+    .slice(0, 3);
+
+  console.log(
+    "[getTopPerformingRecommendedStocks] Top 3 unique stocks:",
+    top3Stocks
+  );
+  return top3Stocks;
+};
