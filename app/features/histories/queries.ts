@@ -4,7 +4,6 @@ import type { Database } from "~/supa-client";
 import pkg from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "react-router";
-import type { GoodStock } from "~/features/api/types";
 
 /*
 2025.07.24 refactoring codes for recommendation history
@@ -63,6 +62,23 @@ export const getRecommendationHistoryTotalPages = async (
   if (count === null || count === 0) return 1;
   //console.log("[getRecommendationHistoryTotalPages] count=", count);
   return Math.ceil(count / PAGE_SIZE);
+};
+
+export const getRecommendationCount = async (
+  client: SupabaseClient<Database>,
+  { profile_id }: { profile_id: string }
+) => {
+  const { count, error } = await client
+    .from("get_recommendation_history_detail_view")
+    .select("recommendation_id", { count: "exact", head: true })
+    .eq("profile_id", profile_id);
+
+  if (error) {
+    console.log("[getRecommendationCount] error=", error);
+    throw error;
+  }
+
+  return count || 0;
 };
 
 export const getRecommendationHistories = async (
