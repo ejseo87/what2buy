@@ -30,15 +30,19 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       }
     );
 
-    if (!topPerformingStocks || topPerformingStocks.length === 0) {
+    if (!topPerformingStocks || topPerformingStocks.topStocks.length === 0) {
       throw redirect("/recommendation");
     }
 
     // 각 TOP3 주식에 대한 차트 데이터와 계산된 수익률 정보 준비
     const stocksData = [];
 
-    for (let i = 0; i < Math.min(topPerformingStocks.length, 3); i++) {
-      const stock = topPerformingStocks[i];
+    for (
+      let i = 0;
+      i < Math.min(topPerformingStocks.topStocks.length, 3);
+      i++
+    ) {
+      const stock = topPerformingStocks.topStocks[i];
       const recommendationDate = stock.recommendationDate.slice(0, 10);
 
       // 차트 데이터 가져오기 (최근 30일)
@@ -139,9 +143,12 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">1위 주식 상세 보기</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            수익율 1위 주식이 추천된 기록 상세 보기
+          </h2>
           <p className="text-gray-600 mb-4">
-            가장 높은 수익률을 기록한 추천 주식의 상세 내용을 확인해보세요.
+            가장 높은 수익률을 기록한 주식이 추천된 기록의 상세 내용을
+            확인해보세요.
           </p>
           <a
             href={`/histories/${stocksData[0]?.recommendationId}`}

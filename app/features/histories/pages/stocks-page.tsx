@@ -14,7 +14,11 @@ import type { Route } from "./+types/stocks-page";
 import { StockCard } from "../components/stock-card";
 import { STOCK_SORT_OPTIONS } from "~/common/constants";
 import { z } from "zod";
-import { getStocksList, getStocksTotalPages } from "../queries";
+import {
+  getStocksList,
+  getStocksTotalPages,
+  getRecommendedStockReturns,
+} from "../queries";
 import AllPurposesPagination from "~/common/components/all-purposes-pagination";
 import { makeSSRClient } from "~/supa-client";
 import { getLoggedInUserId } from "~/features/users/queries";
@@ -57,7 +61,50 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     sorting: parsedData.sorting,
     keyword: parsedData.keyword,
   });
-  return { stocks_list, totalPages };
+
+  // 각 주식의 추천일별 수익률 계산
+  const stocksWithReturns = await Promise.all(
+    (stocks_list as any[]).map(async (stock) => {
+      const recommendationReturns = [];
+
+      // 각 추천일에 대해 수익률 계산
+      for (const date of stock.recommendation_dates) {
+        try {
+          const returns = await getRecommendedStockReturns(client as any, {
+            stockCode: stock.stock_code,
+            recommendationDate: date,
+          });
+
+          recommendationReturns.push({
+            date: date,
+            profitRate: parseFloat(returns.profitRate),
+            profitAmount: returns.profitAmount,
+          });
+        } catch (error) {
+          console.log(
+            `Error calculating returns for ${stock.stock_code} on ${date}:`,
+            error
+          );
+          // 에러가 있는 경우 0% 수익률로 처리
+          recommendationReturns.push({
+            date: date,
+            profitRate: 0,
+            profitAmount: 0,
+          });
+        }
+      }
+
+      // 수익률 높은 순으로 정렬
+      recommendationReturns.sort((a, b) => b.profitRate - a.profitRate);
+
+      return {
+        ...stock,
+        recommendationReturns,
+      };
+    })
+  );
+
+  return { stocks_list: stocksWithReturns, totalPages };
 };
 
 export default function StocksPage({ loaderData }: Route.ComponentProps) {
@@ -125,7 +172,7 @@ export default function StocksPage({ loaderData }: Route.ComponentProps) {
                 stockName={stock.korean_name}
                 stockCode={stock.stock_code}
                 recommendationCount={stock.recommendation_count}
-                recommendationDates={stock.recommendation_dates}
+                recommendationReturns={stock.recommendationReturns}
                 trailingPer={stock.trailing_price_to_earnings_ratio}
                 forwardPer={stock.forward_price_to_earnings_ratio}
                 pbr={stock.price_to_book_ratio}

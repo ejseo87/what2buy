@@ -482,7 +482,10 @@ export const getTopPerformingRecommendedStocks = async (
   }
 
   if (!recommendations || recommendations.length === 0) {
-    return [];
+    return {
+      topStocks: [],
+      bottomStocks: [],
+    };
   }
 
   // 2. 모든 추천 주식들의 수익률 계산
@@ -538,13 +541,22 @@ export const getTopPerformingRecommendedStocks = async (
 
   // 4. 수익률 기준으로 정렬하고 TOP 3 선택
   const uniqueStocks = Array.from(uniqueStocksMap.values());
-  const top3Stocks = uniqueStocks
-    .sort((a, b) => b.profitRate - a.profitRate)
-    .slice(0, 3);
+  const sortedStocks = uniqueStocks.sort((a, b) => b.profitRate - a.profitRate);
+
+  const top3Stocks = sortedStocks.slice(0, 3);
+  const bottom3Stocks = sortedStocks.slice(-3).reverse(); // 가장 낮은 것부터 표시
 
   console.log(
     "[getTopPerformingRecommendedStocks] Top 3 unique stocks:",
     top3Stocks
   );
-  return top3Stocks;
+  console.log(
+    "[getTopPerformingRecommendedStocks] Bottom 3 unique stocks:",
+    bottom3Stocks
+  );
+
+  return {
+    topStocks: top3Stocks,
+    bottomStocks: bottom3Stocks,
+  };
 };

@@ -58,10 +58,10 @@ export function StockChart({
   // 날짜를 한국어 형식으로 포맷팅
   const formatKoreanDate = (dateString: string) => {
     const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${year}년 ${month}월 ${day}일`;
+    const year = date.getFullYear().toString().slice(-2); // 마지막 2자리만
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}/${month}/${day}`;
   };
 
   // Create a safe key for CSS variable
